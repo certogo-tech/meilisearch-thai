@@ -1,0 +1,1 @@
+# MeiliSearch client wrapper - placeholder for task 3.1

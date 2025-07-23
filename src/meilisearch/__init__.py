@@ -1,0 +1,1 @@
+# MeiliSearch integration module

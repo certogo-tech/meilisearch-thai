@@ -1,0 +1,1 @@
+# Document processing pipeline - placeholder for task 3.3

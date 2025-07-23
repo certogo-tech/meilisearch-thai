@@ -1,0 +1,1 @@
+# Document processing endpoints - placeholder for task 4.2

@@ -1,0 +1,1 @@
+# Core Thai tokenization logic - placeholder for task 2.1

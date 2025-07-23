@@ -1,0 +1,1 @@
+# Configuration endpoints - placeholder for task 4.3

@@ -1,0 +1,1 @@
+# FastAPI application - placeholder for task 4.1
