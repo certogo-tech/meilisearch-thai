@@ -1,0 +1,1 @@
+# Thai Tokenizer for MeiliSearch
