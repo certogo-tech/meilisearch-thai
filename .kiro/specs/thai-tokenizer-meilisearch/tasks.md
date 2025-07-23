@@ -6,20 +6,20 @@
   - Set up basic project dependencies and package management
   - _Requirements: 2.1, 2.2_
 
-- [ ] 2. Implement Thai tokenization core service
-  - [ ] 2.1 Create Thai word segmentation module
+- [x] 2. Implement Thai tokenization core service
+  - [x] 2.1 Create Thai word segmentation module
     - Integrate PyThaiNLP library for Thai word boundary detection
     - Implement tokenization function that handles compound words
     - Write unit tests for various Thai text patterns including compound words
     - _Requirements: 1.1, 1.3, 3.1_
 
-  - [ ] 2.2 Build token processing utilities
+  - [x] 2.2 Build token processing utilities
     - Create functions to convert segmented words into MeiliSearch-compatible tokens
     - Implement custom separator insertion for Thai word boundaries
     - Add support for handling mixed Thai-English content
     - _Requirements: 1.1, 1.4, 4.3_
 
-  - [ ] 2.3 Develop configuration management system
+  - [x] 2.3 Develop configuration management system
     - Create configuration schema for tokenizer settings and MeiliSearch connection
     - Implement configuration validation and error handling
     - Add support for custom dictionaries and tokenization parameters
