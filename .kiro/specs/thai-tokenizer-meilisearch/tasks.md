@@ -25,20 +25,20 @@
     - Add support for custom dictionaries and tokenization parameters
     - _Requirements: 5.1, 5.2_
 
-- [ ] 3. Create MeiliSearch integration layer
-  - [ ] 3.1 Implement MeiliSearch client wrapper
+- [x] 3. Create MeiliSearch integration layer
+  - [x] 3.1 Implement MeiliSearch client wrapper
     - Create client class for MeiliSearch API interactions
     - Implement methods for index configuration and document management
     - Add error handling and retry logic for API calls
     - _Requirements: 2.1, 2.2, 5.3_
 
-  - [ ] 3.2 Build custom tokenization settings manager
+  - [x] 3.2 Build custom tokenization settings manager
     - Implement functions to configure MeiliSearch separator and non-separator tokens
     - Create methods to update dictionary and synonym settings for Thai text
     - Add validation for tokenization configuration before applying to MeiliSearch
     - _Requirements: 1.1, 1.2, 2.2_
 
-  - [ ] 3.3 Develop document processing pipeline
+  - [x] 3.3 Develop document processing pipeline
     - Create document preprocessor that identifies and tokenizes Thai content
     - Implement batch processing for multiple documents
     - Add support for preserving original text while creating searchable tokens
