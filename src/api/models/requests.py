@@ -27,9 +27,12 @@ class MeiliSearchConfigRequest(BaseModel):
 
 class TokenizerConfigRequest(BaseModel):
     """Request model for tokenizer configuration."""
-    engine: str = Field("pythainlp", description="Tokenization engine")
+    engine: str = Field("newmm", description="Tokenization engine (pythainlp, newmm, attacut, deepcut)")
     model_version: Optional[str] = Field(None, description="Model version")
     custom_dictionary: Optional[List[str]] = Field(None, description="Custom dictionary words")
+    keep_whitespace: bool = Field(True, description="Whether to preserve whitespace in tokenization")
+    handle_compounds: bool = Field(True, description="Whether to apply compound word processing")
+    fallback_engine: Optional[str] = Field("newmm", description="Fallback engine if primary fails")
     batch_size: int = Field(100, description="Batch processing size")
     max_retries: int = Field(3, description="Maximum retry attempts")
     timeout_ms: int = Field(5000, description="Timeout in milliseconds")
