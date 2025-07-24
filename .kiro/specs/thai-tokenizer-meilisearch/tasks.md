@@ -76,20 +76,20 @@
     - Create relevance scoring adjustments for Thai text matches
     - _Requirements: 1.2, 3.2, 3.3_
 
-- [-] 6. Create comprehensive test suite
-  - [-] 6.1 Write unit tests for tokenization accuracy
+- [x] 6. Create comprehensive test suite
+  - [x] 6.1 Write unit tests for tokenization accuracy
     - Create test cases for common Thai compound words and technical terms
     - Implement tests for edge cases like mixed content and special characters
     - Add performance benchmarks for tokenization speed
     - _Requirements: 3.1, 3.4, 4.1, 4.2, 4.3_
 
-  - [ ] 6.2 Build integration tests for MeiliSearch
+  - [x] 6.2 Build integration tests for MeiliSearch
     - Create tests for document indexing with Thai content
     - Implement search accuracy tests comparing before/after tokenization results
     - Add tests for configuration updates and error handling
     - _Requirements: 3.2, 3.3, 2.2_
 
-  - [ ] 6.3 Develop end-to-end testing scenarios
+  - [x] 6.3 Develop end-to-end testing scenarios
     - Create automated tests for complete document processing workflow
     - Implement search query tests with various Thai text patterns
     - Add performance tests for throughput and response times
