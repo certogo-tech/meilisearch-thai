@@ -7,7 +7,7 @@ import asyncio
 from unittest.mock import Mock, AsyncMock, patch
 from datetime import datetime
 
-from src.meilisearch.document_processor import (
+from src.meilisearch_integration.document_processor import (
     DocumentProcessor,
     ProcessedDocument,
     ProcessingStatus,
@@ -18,7 +18,7 @@ from src.meilisearch.document_processor import (
 )
 from src.tokenizer.thai_segmenter import ThaiSegmenter, TokenizationResult
 from src.tokenizer.token_processor import TokenProcessor, TokenProcessingResult, ProcessedToken, ContentType
-from src.meilisearch.client import MeiliSearchClient
+from src.meilisearch_integration.client import MeiliSearchClient
 
 
 class TestThaiContentDetector:

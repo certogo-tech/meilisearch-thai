@@ -36,3 +36,21 @@ class TokenizerConfigRequest(BaseModel):
     batch_size: int = Field(100, description="Batch processing size")
     max_retries: int = Field(3, description="Maximum retry attempts")
     timeout_ms: int = Field(5000, description="Timeout in milliseconds")
+
+
+class QueryProcessingRequest(BaseModel):
+    """Request model for search query processing."""
+    query: str = Field(..., description="Search query to process")
+    enable_partial_matching: bool = Field(True, description="Enable partial compound word matching")
+    enable_query_expansion: bool = Field(True, description="Enable query expansion with variants")
+    include_suggestions: bool = Field(False, description="Include completion suggestions")
+    max_suggestions: int = Field(10, description="Maximum number of suggestions to return")
+
+
+class SearchResultEnhancementRequest(BaseModel):
+    """Request model for search result enhancement."""
+    search_results: Dict[str, Any] = Field(..., description="Raw search results from MeiliSearch")
+    original_query: str = Field(..., description="Original search query")
+    highlight_fields: Optional[List[str]] = Field(None, description="Fields to enhance highlighting for")
+    enable_compound_highlighting: bool = Field(True, description="Enable compound word highlighting")
+    enable_relevance_boosting: bool = Field(True, description="Enable relevance score boosting")

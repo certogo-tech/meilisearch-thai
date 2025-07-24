@@ -51,9 +51,8 @@ def get_settings_manager() -> TokenizationSettingsManager:
     """Dependency to get settings manager instance."""
     global _settings_manager, _meilisearch_client
     if _settings_manager is None:
-        if _meilisearch_client is None:
-            _meilisearch_client = get_meilisearch_client()
-        _settings_manager = TokenizationSettingsManager(meilisearch_client=_meilisearch_client)
+        # Create settings manager with default configuration
+        _settings_manager = TokenizationSettingsManager()
     return _settings_manager
 
 
@@ -95,13 +94,14 @@ async def get_current_configuration(
         
     except Exception as e:
         logger.error(f"Failed to retrieve configuration: {e}", exc_info=True)
+        error_response = ErrorResponse(
+            error="config_retrieval_error",
+            message=f"Failed to retrieve configuration: {str(e)}",
+            timestamp=datetime.now()
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=ErrorResponse(
-                error="config_retrieval_error",
-                message=f"Failed to retrieve configuration: {str(e)}",
-                timestamp=datetime.now()
-            ).model_dump()
+            detail=error_response.model_dump(mode="json")
         )
 
 
@@ -122,16 +122,20 @@ async def update_meilisearch_configuration(
         logger.info(f"Updating MeiliSearch configuration for host: {request.host}")
         
         # Validate the configuration by testing connection
+        from src.meilisearch_integration.client import MeiliSearchConfig as ClientConfig
         test_client = MeiliSearchClient(
-            host=request.host,
-            api_key=request.api_key
+            config=ClientConfig(
+                host=request.host,
+                api_key=request.api_key
+            )
         )
         
         # Test connection
-        if not await test_client.health_check():
+        health_result = await test_client.health_check()
+        if health_result.get("status") != "healthy":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot connect to MeiliSearch with provided settings"
+                detail=f"Cannot connect to MeiliSearch with provided settings: {health_result.get('error', 'Unknown error')}"
             )
         
         # Create MeiliSearchConfig object and update configuration
@@ -145,15 +149,17 @@ async def update_meilisearch_configuration(
         
         config_manager.update_meilisearch_config(meilisearch_config)
         
-        # Update the client instance
-        meilisearch_client.update_connection(
-            host=request.host,
-            api_key=request.api_key
-        )
+        # Update the client instance with new connection details
+        global _meilisearch_client
+        _meilisearch_client = test_client
         
         # Apply Thai tokenization settings to the index
         try:
-            await settings_manager.configure_thai_tokenization(request.index_name)
+            # Create Thai tokenization settings
+            thai_settings = settings_manager.create_meilisearch_settings()
+            
+            # Apply settings to the index
+            await test_client.update_index_settings(request.index_name, thai_settings)
             logger.info(f"Thai tokenization settings applied to index: {request.index_name}")
         except Exception as e:
             logger.warning(f"Failed to apply Thai tokenization settings: {e}")
@@ -172,13 +178,14 @@ async def update_meilisearch_configuration(
         raise
     except Exception as e:
         logger.error(f"Failed to update MeiliSearch configuration: {e}", exc_info=True)
+        error_response = ErrorResponse(
+            error="meilisearch_config_error",
+            message=f"Failed to update MeiliSearch configuration: {str(e)}",
+            timestamp=datetime.now()
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=ErrorResponse(
-                error="meilisearch_config_error",
-                message=f"Failed to update MeiliSearch configuration: {str(e)}",
-                timestamp=datetime.now()
-            ).model_dump()
+            detail=error_response.model_dump(mode="json")
         )
 
 
@@ -262,13 +269,14 @@ async def update_tokenizer_configuration(
         raise
     except Exception as e:
         logger.error(f"Failed to update tokenizer configuration: {e}", exc_info=True)
+        error_response = ErrorResponse(
+            error="tokenizer_config_error",
+            message=f"Failed to update tokenizer configuration: {str(e)}",
+            timestamp=datetime.now()
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=ErrorResponse(
-                error="tokenizer_config_error",
-                message=f"Failed to update tokenizer configuration: {str(e)}",
-                timestamp=datetime.now()
-            ).model_dump()
+            detail=error_response.model_dump(mode="json")
         )
 
 

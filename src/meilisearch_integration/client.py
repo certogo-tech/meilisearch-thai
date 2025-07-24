@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass
 from datetime import datetime
 
-import meilisearch
+import meilisearch as ms_client
 from meilisearch.errors import MeilisearchError, MeilisearchApiError
 from pydantic import BaseModel, Field
 
@@ -61,7 +61,7 @@ class MeiliSearchClient:
     def __init__(self, config: MeiliSearchConfig):
         """Initialize MeiliSearch client with configuration."""
         self.config = config
-        self.client = meilisearch.Client(
+        self.client = ms_client.Client(
             url=config.host,
             api_key=config.api_key,
             timeout=config.timeout
@@ -117,6 +117,16 @@ class MeiliSearchClient:
             
         except Exception as e:
             logger.error(f"Failed to create index {index_name}: {e}")
+            raise
+    
+    async def index_exists(self, index_name: str) -> bool:
+        """Check if an index exists."""
+        try:
+            await self._retry_operation(self.client.get_index, index_name)
+            return True
+        except MeilisearchApiError as e:
+            if "index_not_found" in str(e):
+                return False
             raise
     
     async def get_index(self, index_name: str):

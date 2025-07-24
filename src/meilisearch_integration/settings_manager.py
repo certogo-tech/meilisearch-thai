@@ -420,6 +420,40 @@ def create_minimal_thai_settings() -> TokenizationSettingsManager:
     return TokenizationSettingsManager(minimal_config)
 
 
+async def configure_thai_tokenization(client, index_name: str, settings_manager: Optional[TokenizationSettingsManager] = None) -> Dict[str, Any]:
+    """
+    Configure Thai tokenization settings for a MeiliSearch index.
+    
+    Args:
+        client: MeiliSearch client instance
+        index_name: Name of the index to configure
+        settings_manager: Optional settings manager instance
+        
+    Returns:
+        Dictionary with configuration status
+    """
+    try:
+        # Use provided settings manager or create a default one
+        manager = settings_manager or create_default_thai_settings()
+        
+        # Create Thai tokenization settings
+        thai_settings = manager.create_meilisearch_settings()
+        
+        # Apply settings to the index
+        result = await client.update_index_settings(index_name, thai_settings)
+        
+        logger.info(f"Thai tokenization settings applied to index: {index_name}")
+        return {
+            "status": "configured",
+            "index": index_name,
+            "task_uid": result.get("task_uid")
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to configure Thai tokenization for index {index_name}: {e}")
+        raise
+
+
 def validate_thai_text_settings(settings: Dict[str, Any]) -> bool:
     """
     Validate that settings are appropriate for Thai text processing.

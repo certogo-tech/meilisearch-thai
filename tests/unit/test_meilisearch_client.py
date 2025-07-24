@@ -7,7 +7,7 @@ import asyncio
 from unittest.mock import Mock, AsyncMock, patch
 from datetime import datetime
 
-from src.meilisearch.client import (
+from src.meilisearch_integration.client import (
     MeiliSearchClient,
     MeiliSearchConfig,
     DocumentModel,

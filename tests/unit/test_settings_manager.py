@@ -5,7 +5,7 @@ Unit tests for MeiliSearch tokenization settings manager.
 import pytest
 from unittest.mock import patch
 
-from src.meilisearch.settings_manager import (
+from src.meilisearch_integration.settings_manager import (
     TokenizationSettingsManager,
     ThaiTokenizationConfig,
     MeiliSearchSettings,

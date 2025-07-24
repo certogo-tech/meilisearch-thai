@@ -44,40 +44,40 @@
     - Add support for preserving original text while creating searchable tokens
     - _Requirements: 1.1, 1.4, 3.1_
 
-- [ ] 4. Build REST API service
-  - [ ] 4.1 Create FastAPI application structure
+- [x] 4. Build REST API service
+  - [x] 4.1 Create FastAPI application structure
     - Set up FastAPI application with proper routing and middleware
     - Implement health check endpoint for container monitoring
     - Add request/response models for API endpoints
     - _Requirements: 2.1, 2.3, 5.3_
 
-  - [ ] 4.2 Implement tokenization endpoints
+  - [x] 4.2 Implement tokenization endpoints
     - Create POST /tokenize endpoint for text segmentation
     - Implement POST /index-document endpoint for document processing
     - Add proper error handling and response formatting
     - _Requirements: 1.1, 1.3, 3.1_
 
-  - [ ] 4.3 Add configuration management endpoints
+  - [x] 4.3 Add configuration management endpoints
     - Implement PUT /config/meilisearch endpoint for settings updates
     - Create GET /config endpoint to retrieve current configuration
     - Add validation and error responses for configuration changes
     - _Requirements: 5.1, 5.2, 5.4_
 
-- [ ] 5. Implement search query processing
-  - [ ] 5.1 Create query tokenization service
+- [x] 5. Implement search query processing
+  - [x] 5.1 Create query tokenization service
     - Implement function to segment Thai search queries using same tokenization logic
     - Add support for handling partial compound word searches
     - Create query preprocessing that maintains search intent
     - _Requirements: 1.2, 1.3, 3.2_
 
-  - [ ] 5.2 Build search result enhancement
+  - [x] 5.2 Build search result enhancement
     - Implement result post-processing to highlight Thai compound words correctly
     - Add support for returning both original and tokenized versions
     - Create relevance scoring adjustments for Thai text matches
     - _Requirements: 1.2, 3.2, 3.3_
 
-- [ ] 6. Create comprehensive test suite
-  - [ ] 6.1 Write unit tests for tokenization accuracy
+- [-] 6. Create comprehensive test suite
+  - [-] 6.1 Write unit tests for tokenization accuracy
     - Create test cases for common Thai compound words and technical terms
     - Implement tests for edge cases like mixed content and special characters
     - Add performance benchmarks for tokenization speed
