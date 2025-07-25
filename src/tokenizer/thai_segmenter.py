@@ -6,9 +6,9 @@ word components, with special handling for compound words.
 """
 
 import logging
+import time
 from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
-import time
 
 try:
     from pythainlp import word_tokenize
@@ -20,8 +20,10 @@ except ImportError as e:
         "Install it with: pip install pythainlp"
     ) from e
 
+from ..utils.logging import get_structured_logger, TokenizationMetrics, performance_monitor
 
-logger = logging.getLogger(__name__)
+
+logger = get_structured_logger(__name__)
 
 
 @dataclass
@@ -73,8 +75,12 @@ class ThaiSegmenter:
             except Exception as e:
                 logger.warning(f"Failed to initialize custom tokenizer: {e}")
         
-        logger.info(f"ThaiSegmenter initialized with engine: {engine}")
+        logger.info("ThaiSegmenter initialized", 
+                    engine=engine, 
+                    custom_dict_size=len(self.custom_dict),
+                    has_custom_tokenizer=self._custom_tokenizer is not None)
     
+    @performance_monitor("thai_text_segmentation")
     def segment_text(self, text: str) -> TokenizationResult:
         """
         Segment Thai text into word tokens.
@@ -116,6 +122,11 @@ class ThaiSegmenter:
             
             processing_time = (time.time() - start_time) * 1000
             
+            # Detect compound words and mixed content
+            compound_words_detected = sum(1 for token in tokens if len(token) > 6 and self._is_thai_text(token))
+            thai_content_ratio = sum(1 for char in text if self._is_thai_char(char)) / len(text) if text else 0
+            mixed_content = self._has_mixed_content(text)
+            
             result = TokenizationResult(
                 original_text=text,
                 tokens=tokens,
@@ -124,15 +135,24 @@ class ThaiSegmenter:
                 engine=engine_used
             )
             
-            logger.debug(
-                f"Segmented text ({len(text)} chars) into {len(tokens)} tokens "
-                f"in {processing_time:.2f}ms using {engine_used}"
+            # Log structured tokenization metrics
+            metrics = TokenizationMetrics(
+                text_length=len(text),
+                token_count=len(tokens),
+                processing_time_ms=processing_time,
+                engine=engine_used,
+                compound_words_detected=compound_words_detected,
+                thai_content_ratio=thai_content_ratio,
+                mixed_content=mixed_content,
+                fallback_used=False
             )
+            logger.tokenization(metrics)
             
             return result
             
         except Exception as e:
-            logger.error(f"Tokenization failed with {self.engine}: {e}")
+            logger.error(f"Tokenization failed with {self.engine}", error=e, 
+                        text_length=len(text), engine=self.engine)
             # Fallback to character-level segmentation
             return self._fallback_segmentation(text, start_time)
     
@@ -234,7 +254,8 @@ class ThaiSegmenter:
     
     def _fallback_segmentation(self, text: str, start_time: float) -> TokenizationResult:
         """Fallback to character-level segmentation when tokenization fails."""
-        logger.warning("Using character-level fallback segmentation")
+        logger.warning("Using character-level fallback segmentation", 
+                      text_length=len(text), original_engine=self.engine)
         
         # Simple character-based segmentation preserving Thai characters
         tokens = []
@@ -255,6 +276,19 @@ class ThaiSegmenter:
         
         processing_time = (time.time() - start_time) * 1000
         
+        # Log fallback metrics
+        metrics = TokenizationMetrics(
+            text_length=len(text),
+            token_count=len(tokens),
+            processing_time_ms=processing_time,
+            engine="fallback_char",
+            compound_words_detected=0,
+            thai_content_ratio=sum(1 for char in text if self._is_thai_char(char)) / len(text) if text else 0,
+            mixed_content=self._has_mixed_content(text),
+            fallback_used=True
+        )
+        logger.tokenization(metrics)
+        
         return TokenizationResult(
             original_text=text,
             tokens=tokens,
@@ -274,6 +308,14 @@ class ThaiSegmenter:
     def _is_thai_char(self, char: str) -> bool:
         """Check if character is Thai."""
         return '\u0e00' <= char <= '\u0e7f'
+    
+    def _has_mixed_content(self, text: str) -> bool:
+        """Check if text has mixed Thai/non-Thai content."""
+        if not text:
+            return False
+        thai_chars = sum(1 for char in text if self._is_thai_char(char))
+        non_thai_chars = sum(1 for char in text if char.isalnum() and not self._is_thai_char(char))
+        return thai_chars > 0 and non_thai_chars > 0
     
     def get_stats(self) -> Dict[str, Any]:
         """Get segmenter statistics and configuration."""

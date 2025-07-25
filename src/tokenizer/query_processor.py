@@ -13,9 +13,10 @@ from enum import Enum
 
 from .thai_segmenter import ThaiSegmenter, TokenizationResult
 from .token_processor import TokenProcessor, ContentType
+from ..utils.logging import get_structured_logger, SearchMetrics, performance_monitor
 
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class QueryType(Enum):
@@ -98,6 +99,7 @@ class QueryProcessor:
         
         logger.info("QueryProcessor initialized")
     
+    @performance_monitor("search_query_processing")
     def process_search_query(self, query: str) -> QueryProcessingResult:
         """
         Process search query for optimal Thai text matching.
@@ -109,6 +111,7 @@ class QueryProcessor:
             QueryProcessingResult with processed query and variants
         """
         if not query or not query.strip():
+            logger.debug("Empty query received")
             return QueryProcessingResult(
                 original_query=query,
                 processed_query=query,

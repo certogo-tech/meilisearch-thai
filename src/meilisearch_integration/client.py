@@ -9,6 +9,7 @@ This module provides a wrapper around the MeiliSearch client with:
 
 import asyncio
 import logging
+import time
 from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass
 from datetime import datetime
@@ -17,8 +18,10 @@ import meilisearch as ms_client
 from meilisearch.errors import MeilisearchError, MeilisearchApiError
 from pydantic import BaseModel, Field
 
+from ..utils.logging import get_structured_logger, SearchMetrics, performance_monitor
 
-logger = logging.getLogger(__name__)
+
+logger = get_structured_logger(__name__)
 
 
 @dataclass
@@ -271,6 +274,7 @@ class MeiliSearchClient:
             logger.error(f"Failed to delete documents from index {index_name}: {e}")
             raise
     
+    @performance_monitor("meilisearch_search")
     async def search(
         self, 
         index_name: str, 
@@ -278,17 +282,33 @@ class MeiliSearchClient:
         options: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """Search documents in index."""
+        start_time = time.time()
+        
         try:
             index = await self.get_index(index_name)
             search_options = options or {}
             
             results = await self._retry_operation(index.search, query, search_options)
             
-            logger.debug(f"Search query '{query}' returned {len(results.get('hits', []))} results")
+            processing_time_ms = (time.time() - start_time) * 1000
+            
+            # Log search metrics
+            metrics = SearchMetrics(
+                query=query,
+                query_length=len(query),
+                results_count=len(results.get('hits', [])),
+                processing_time_ms=processing_time_ms,
+                index_name=index_name,
+                thai_query_detected=self._is_thai_query(query),
+                query_tokens=len(query.split()) if query else 0
+            )
+            logger.search(metrics)
+            
             return results
             
         except Exception as e:
-            logger.error(f"Search failed for query '{query}' in index {index_name}: {e}")
+            logger.error(f"Search failed for query '{query}' in index {index_name}", 
+                        error=e, query=query, index_name=index_name)
             raise
     
     async def get_index_stats(self, index_name: str) -> IndexStats:
@@ -362,6 +382,13 @@ class MeiliSearchClient:
         except Exception as e:
             logger.error(f"Failed to get task status for {task_uid}: {e}")
             raise
+    
+    def _is_thai_query(self, query: str) -> bool:
+        """Check if query contains Thai characters."""
+        if not query:
+            return False
+        thai_chars = sum(1 for char in query if '\u0e00' <= char <= '\u0e7f')
+        return thai_chars > 0
     
     async def close(self):
         """Clean up resources."""

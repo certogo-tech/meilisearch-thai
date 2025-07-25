@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.utils.logging import setup_logging
+from src.utils.logging import setup_logging, get_structured_logger, set_correlation_id, generate_correlation_id
 from src.api.models.responses import HealthCheckResponse, ErrorResponse
 from src.tokenizer.config_manager import ConfigManager
 from src.meilisearch_integration.client import MeiliSearchClient
@@ -21,7 +21,7 @@ from src.utils.health import health_checker, register_default_checks
 
 # Set up logging
 setup_logging()
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 # Global state
 app_state: Dict[str, Any] = {
@@ -104,40 +104,48 @@ app.add_middleware(
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    """Add processing time header to responses."""
+    """Add processing time header to responses and record metrics."""
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
+    process_time_ms = process_time * 1000
+    
+    # Record request metrics for monitoring
+    success = response.status_code < 400
+    health_checker.record_request(success, process_time_ms)
+    
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
 
 @app.middleware("http")
 async def logging_middleware(request: Request, call_next):
-    """Log all requests and responses."""
+    """Log all requests and responses with correlation tracking."""
     start_time = time.time()
     
+    # Set up correlation ID for request tracking
+    correlation_id = request.headers.get("X-Correlation-ID", generate_correlation_id())
+    set_correlation_id(correlation_id)
+    
     # Log request
-    logger.info(
-        f"Request: {request.method} {request.url.path}",
-        extra={
-            "method": request.method,
-            "path": request.url.path,
-            "query_params": str(request.query_params),
-        }
-    )
+    logger.info("HTTP request received",
+               method=request.method,
+               path=request.url.path,
+               query_params=dict(request.query_params),
+               user_agent=request.headers.get("user-agent"),
+               client_ip=request.client.host if request.client else None)
     
     response = await call_next(request)
     
     # Log response
     process_time = time.time() - start_time
-    logger.info(
-        f"Response: {response.status_code} in {process_time:.4f}s",
-        extra={
-            "status_code": response.status_code,
-            "process_time": process_time,
-        }
-    )
+    logger.info("HTTP request completed",
+               status_code=response.status_code,
+               processing_time_ms=process_time * 1000,
+               response_size=response.headers.get("content-length"))
+    
+    # Add correlation ID to response headers
+    response.headers["X-Correlation-ID"] = correlation_id
     
     return response
 
@@ -146,7 +154,10 @@ async def logging_middleware(request: Request, call_next):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle validation errors."""
-    logger.warning(f"Validation error: {exc}")
+    logger.warning("Request validation failed",
+                  path=request.url.path,
+                  method=request.method,
+                  validation_errors=exc.errors())
     return JSONResponse(
         status_code=422,
         content=ErrorResponse(
@@ -161,7 +172,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     """Handle HTTP exceptions."""
-    logger.warning(f"HTTP error {exc.status_code}: {exc.detail}")
+    logger.warning("HTTP exception occurred",
+                  status_code=exc.status_code,
+                  detail=exc.detail,
+                  path=request.url.path,
+                  method=request.method)
     error_response = ErrorResponse(
         error="http_error",
         message=exc.detail,
@@ -176,7 +191,10 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     """Handle general exceptions."""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    logger.error("Unhandled exception occurred", 
+                error=exc,
+                path=request.url.path,
+                method=request.method)
     error_response = ErrorResponse(
         error="internal_error",
         message="Internal server error",
@@ -214,10 +232,11 @@ async def health_check():
 
 
 # Include routers
-from src.api.endpoints import tokenize, documents, config
+from src.api.endpoints import tokenize, documents, config, monitoring
 app.include_router(tokenize.router, prefix="/api/v1", tags=["tokenization"])
 app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
 app.include_router(config.router, prefix="/api/v1", tags=["configuration"])
+app.include_router(monitoring.router, prefix="/api/v1", tags=["monitoring"])
 
 # Root endpoint
 @app.get("/")

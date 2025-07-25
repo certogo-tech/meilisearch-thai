@@ -4,7 +4,7 @@ import logging
 from typing import Dict, Any
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from fastapi.responses import JSONResponse
 
 from src.api.models.requests import TokenizeRequest, QueryProcessingRequest, SearchResultEnhancementRequest
@@ -13,8 +13,9 @@ from src.tokenizer.thai_segmenter import ThaiSegmenter
 from src.tokenizer.token_processor import TokenProcessor
 from src.tokenizer.query_processor import QueryProcessor
 from src.tokenizer.result_enhancer import SearchResultEnhancer
+from src.utils.logging import get_structured_logger, set_correlation_id, generate_correlation_id
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 router = APIRouter()
 
@@ -60,6 +61,7 @@ def get_result_enhancer() -> SearchResultEnhancer:
 @router.post("/tokenize", response_model=TokenizationResult)
 async def tokenize_text(
     request: TokenizeRequest,
+    http_request: Request,
     thai_segmenter: ThaiSegmenter = Depends(get_thai_segmenter),
     token_processor: TokenProcessor = Depends(get_token_processor)
 ):
@@ -69,8 +71,15 @@ async def tokenize_text(
     This endpoint segments Thai text using PyThaiNLP and returns the tokens
     along with word boundaries and processing metadata.
     """
+    # Set correlation ID for request tracking
+    correlation_id = http_request.headers.get("X-Correlation-ID", generate_correlation_id())
+    set_correlation_id(correlation_id)
+    
     try:
-        logger.info(f"Tokenizing text: {len(request.text)} characters")
+        logger.info("Tokenization request received", 
+                   text_length=len(request.text),
+                   include_confidence=request.include_confidence,
+                   endpoint="tokenize")
         
         if not request.text.strip():
             return TokenizationResult(
@@ -102,15 +111,17 @@ async def tokenize_text(
             processing_time_ms=int(tokenization_result.processing_time_ms)
         )
         
-        logger.info(
-            f"Tokenization completed: {len(response.tokens)} tokens "
-            f"in {response.processing_time_ms}ms"
-        )
+        logger.info("Tokenization completed successfully",
+                   token_count=len(response.tokens),
+                   processing_time_ms=response.processing_time_ms,
+                   endpoint="tokenize")
         
         return response
         
     except Exception as e:
-        logger.error(f"Tokenization failed: {e}", exc_info=True)
+        logger.error("Tokenization failed", error=e, 
+                    text_length=len(request.text),
+                    endpoint="tokenize")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=ErrorResponse(
