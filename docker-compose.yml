@@ -1,6 +1,27 @@
-version: '3.8'
-
 services:
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      thai-tokenizer:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    profiles:
+      - production
+
   thai-tokenizer:
     build:
       context: .
@@ -8,9 +29,24 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # MeiliSearch connection
       - MEILISEARCH_HOST=http://meilisearch:7700
       - MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY:-masterKey}
-      - LOG_LEVEL=INFO
+      - MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
+      
+      # Tokenizer configuration
+      - TOKENIZER_ENGINE=${TOKENIZER_ENGINE:-pythainlp}
+      - TOKENIZER_MODEL=${TOKENIZER_MODEL:-}
+      
+      # Processing configuration
+      - BATCH_SIZE=${BATCH_SIZE:-100}
+      - MAX_RETRIES=${MAX_RETRIES:-3}
+      - TIMEOUT_MS=${TIMEOUT_MS:-5000}
+      
+      # Service configuration
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SERVICE_NAME=${SERVICE_NAME:-thai-tokenizer}
+      - VERSION=${VERSION:-0.1.0}
     depends_on:
       meilisearch:
         condition: service_healthy
@@ -21,17 +57,30 @@ services:
       retries: 3
       start_period: 40s
     restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
 
   meilisearch:
     image: getmeili/meilisearch:v1.15.2
     ports:
       - "7700:7700"
     environment:
+      # Core MeiliSearch configuration
       - MEILI_MASTER_KEY=${MEILISEARCH_API_KEY:-masterKey}
-      - MEILI_ENV=development
-      - MEILI_LOG_LEVEL=INFO
+      - MEILI_ENV=${MEILI_ENV:-development}
+      - MEILI_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      
+      # Thai tokenization optimizations
+      - MEILI_MAX_INDEXING_MEMORY=${MEILI_MAX_INDEXING_MEMORY:-2Gb}
+      - MEILI_MAX_INDEXING_THREADS=${MEILI_MAX_INDEXING_THREADS:-4}
+      
+      # Performance settings for Thai text
+      - MEILI_SNAPSHOT_DIR=/meili_data/snapshots
+      - MEILI_DUMP_DIR=/meili_data/dumps
     volumes:
       - meilisearch_data:/meili_data
+      - meilisearch_snapshots:/meili_data/snapshots
+      - meilisearch_dumps:/meili_data/dumps
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
       interval: 30s
@@ -39,6 +88,17 @@ services:
       retries: 3
       start_period: 40s
     restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
 
 volumes:
   meilisearch_data:
+    driver: local
+  meilisearch_snapshots:
+    driver: local
+  meilisearch_dumps:
+    driver: local
+
+networks:
+  thai-tokenizer-network:
+    driver: bridge

@@ -44,7 +44,16 @@ async def lifespan(app: FastAPI):
         logger.info("Configuration manager initialized")
         
         # Initialize MeiliSearch client
-        app_state["meilisearch_client"] = MeiliSearchClient()
+        meilisearch_config = app_state["config_manager"].get_meilisearch_config()
+        # Convert to the client's expected config format
+        from src.meilisearch_integration.client import MeiliSearchConfig as ClientConfig
+        client_config = ClientConfig(
+            host=meilisearch_config.host,
+            api_key=meilisearch_config.api_key,
+            timeout=meilisearch_config.timeout_ms // 1000,  # Convert ms to seconds
+            max_retries=meilisearch_config.max_retries
+        )
+        app_state["meilisearch_client"] = MeiliSearchClient(client_config)
         logger.info("MeiliSearch client initialized")
         
         # Register health checks

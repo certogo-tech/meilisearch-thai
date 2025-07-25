@@ -1,0 +1,21 @@
+# Development overrides for docker-compose.yml
+# This file is automatically loaded by docker-compose
+
+services:
+  thai-tokenizer:
+    # Enable development mode with hot reload
+    volumes:
+      - ./src:/app/src:ro
+    environment:
+      - LOG_LEVEL=DEBUG
+      - MEILI_ENV=development
+    # Override command for development with reload
+    command: ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
+
+  meilisearch:
+    environment:
+      - MEILI_ENV=development
+      - MEILI_LOG_LEVEL=DEBUG
+
+  # Nginx is disabled in development by default (use profiles to enable)
+  # Run with: docker-compose --profile production up

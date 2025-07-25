@@ -18,13 +18,58 @@ Thai language lacks spaces between words, making compound word segmentation crit
 
 ### Using Docker Compose
 
+#### Development Mode (Default)
 ```bash
-# Start all services
+# Start services for development (no nginx proxy)
 docker compose up -d
 
 # Check service health
 curl http://localhost:8000/health
 curl http://localhost:7700/health
+
+# View logs
+docker compose logs -f thai-tokenizer
+```
+
+#### Production Mode (With Nginx Proxy)
+```bash
+# Start all services including nginx proxy
+docker compose --profile production up -d
+
+# Access through nginx proxy
+curl http://localhost/health
+curl http://localhost/api/docs
+
+# Direct service access still available
+curl http://localhost:8000/health
+curl http://localhost:7700/health
+```
+
+#### Environment Configuration
+```bash
+# Copy example environment file
+cp .env.example .env
+
+# Edit configuration as needed
+# Key variables:
+# - MEILISEARCH_API_KEY: API key for MeiliSearch
+# - TOKENIZER_ENGINE: pythainlp (default), attacut, or deepcut
+# - LOG_LEVEL: INFO (default), DEBUG, WARNING, ERROR
+```
+
+#### Container Management
+```bash
+# Stop services
+docker compose down
+
+# Rebuild and restart
+docker compose up --build -d
+
+# View service status
+docker compose ps
+
+# Clean up volumes (WARNING: deletes data)
+docker compose down -v
 ```
 
 ### Development Setup
