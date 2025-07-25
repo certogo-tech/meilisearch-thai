@@ -1,0 +1,202 @@
+[
+  {
+    "id": "compound_search_001",
+    "query": "ปัญญาประดิษฐ์",
+    "description": "Search for compound word 'artificial intelligence'",
+    "expected_results": ["tech_001"],
+    "search_type": "exact_compound",
+    "difficulty": "basic"
+  },
+  {
+    "id": "compound_search_002", 
+    "query": "การเรียนรู้",
+    "description": "Search for compound word 'learning' - should match multiple contexts",
+    "expected_results": ["tech_001", "education_001"],
+    "search_type": "exact_compound",
+    "difficulty": "basic"
+  },
+  {
+    "id": "partial_compound_001",
+    "query": "เทคโนโลยี",
+    "description": "Search for 'technology' - should match multiple documents",
+    "expected_results": ["tech_001", "health_001", "environment_001"],
+    "search_type": "partial_compound",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "partial_compound_002",
+    "query": "อาหาร",
+    "description": "Search for 'food' - should match food and travel documents",
+    "expected_results": ["food_001", "travel_001", "casual_001"],
+    "search_type": "partial_compound",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "mixed_content_001",
+    "query": "Startup ไทย",
+    "description": "Mixed Thai-English search",
+    "expected_results": ["mixed_001"],
+    "search_type": "mixed_language",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "mixed_content_002",
+    "query": "Digital marketing",
+    "description": "English term search in mixed content",
+    "expected_results": ["mixed_001"],
+    "search_type": "english_in_thai",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "technical_term_001",
+    "query": "Machine Learning",
+    "description": "English technical term search",
+    "expected_results": ["tech_001"],
+    "search_type": "technical_english",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "technical_term_002",
+    "query": "การประมวลผลภาษาธรรมชาติ",
+    "description": "Thai technical compound term",
+    "expected_results": ["tech_001"],
+    "search_type": "technical_thai",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "cultural_term_001",
+    "query": "ต้มยำกุ้ง",
+    "description": "Thai cultural food term",
+    "expected_results": ["food_001"],
+    "search_type": "cultural",
+    "difficulty": "basic"
+  },
+  {
+    "id": "cultural_term_002",
+    "query": "วัฒนธรรมล้านนา",
+    "description": "Thai cultural compound term",
+    "expected_results": ["travel_001"],
+    "search_type": "cultural",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "location_search_001",
+    "query": "เชียงใหม่",
+    "description": "Location name search",
+    "expected_results": ["travel_001"],
+    "search_type": "location",
+    "difficulty": "basic"
+  },
+  {
+    "id": "location_search_002",
+    "query": "กรุงเทพฯ",
+    "description": "Abbreviated location name",
+    "expected_results": ["casual_001"],
+    "search_type": "location",
+    "difficulty": "basic"
+  },
+  {
+    "id": "business_term_001",
+    "query": "ตลาดหุ้น",
+    "description": "Business compound term",
+    "expected_results": ["business_001"],
+    "search_type": "business",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "business_term_002",
+    "query": "การลงทุน",
+    "description": "Investment-related compound term",
+    "expected_results": ["business_001"],
+    "search_type": "business",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "health_term_001",
+    "query": "การดูแลสุขภาพ",
+    "description": "Health care compound term",
+    "expected_results": ["health_001"],
+    "search_type": "health",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "health_term_002",
+    "query": "แอปพลิเคชันสุขภาพ",
+    "description": "Health app compound term",
+    "expected_results": ["health_001"],
+    "search_type": "health_tech",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "education_term_001",
+    "query": "การศึกษาออนไลน์",
+    "description": "Online education compound term",
+    "expected_results": ["education_001"],
+    "search_type": "education",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "environment_term_001",
+    "query": "พลังงานทดแทน",
+    "description": "Renewable energy compound term",
+    "expected_results": ["environment_001"],
+    "search_type": "environment",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "sports_term_001",
+    "query": "มวยไทย",
+    "description": "Thai boxing cultural term",
+    "expected_results": ["sports_001"],
+    "search_type": "sports_cultural",
+    "difficulty": "basic"
+  },
+  {
+    "id": "multi_word_001",
+    "query": "การเรียนรู้ของเครื่อง",
+    "description": "Multi-compound word phrase",
+    "expected_results": ["tech_001"],
+    "search_type": "multi_compound",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "partial_match_001",
+    "query": "การเรียน",
+    "description": "Partial compound word - should match learning contexts",
+    "expected_results": ["tech_001", "education_001"],
+    "search_type": "partial_match",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "brand_search_001",
+    "query": "Starbucks",
+    "description": "Brand name search in mixed content",
+    "expected_results": ["casual_001"],
+    "search_type": "brand",
+    "difficulty": "basic"
+  },
+  {
+    "id": "abbreviation_001",
+    "query": "AI",
+    "description": "English abbreviation search",
+    "expected_results": ["tech_001"],
+    "search_type": "abbreviation",
+    "difficulty": "basic"
+  },
+  {
+    "id": "category_search_001",
+    "query": "เทคโนโลยีดิจิทัล",
+    "description": "Digital technology compound search",
+    "expected_results": ["health_001"],
+    "search_type": "category",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "fuzzy_search_001",
+    "query": "การประมวลผล",
+    "description": "Processing-related compound term",
+    "expected_results": ["tech_001"],
+    "search_type": "fuzzy",
+    "difficulty": "intermediate"
+  }
+]

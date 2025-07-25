@@ -106,11 +106,143 @@ docker/                # Container configuration
 tests/                 # Test suite
 ```
 
+## API Usage Examples
+
+### Basic Tokenization
+```bash
+# Tokenize Thai text
+curl -X POST http://localhost:8000/api/v1/tokenize \
+  -H "Content-Type: application/json" \
+  -d '{"text": "ปัญญาประดิษฐ์และการเรียนรู้ของเครื่อง"}'
+
+# Response
+{
+  "tokens": ["ปัญญาประดิษฐ์", "และ", "การเรียนรู้", "ของ", "เครื่อง"],
+  "token_count": 5,
+  "processing_time_ms": 23
+}
+```
+
+### Document Processing
+```bash
+# Process document for indexing
+curl -X POST http://localhost:8000/api/v1/documents/process \
+  -H "Content-Type: application/json" \
+  -d '{
+    "document": {
+      "id": "tech_001",
+      "title": "การพัฒนา AI ในประเทศไทย",
+      "content": "ปัญญาประดิษฐ์กำลังเปลี่ยนแปลงอุตสาหกรรมต่างๆ ในประเทศไทย...",
+      "category": "technology"
+    },
+    "options": {
+      "auto_index": true
+    }
+  }'
+```
+
+### Search Enhancement
+```bash
+# Process search query with Thai tokenization
+curl -X POST http://localhost:8000/api/v1/search/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "ปัญญาประดิษฐ์",
+    "options": {
+      "expand_compounds": true,
+      "include_synonyms": true
+    }
+  }'
+```
+
+### Configuration Management
+```bash
+# Get current configuration
+curl http://localhost:8000/api/v1/config
+
+# Update tokenizer settings
+curl -X PUT http://localhost:8000/api/v1/config/tokenizer \
+  -H "Content-Type: application/json" \
+  -d '{
+    "engine": "pythainlp",
+    "custom_dictionary": ["AI", "บิ๊กดาต้า", "คลาวด์คอมพิวติ้ง"]
+  }'
+```
+
+## Demonstration
+
+### Run Complete Demo
+```bash
+# Run full demonstration suite
+python scripts/run_demo.py
+
+# This will:
+# 1. Set up sample Thai documents in MeiliSearch
+# 2. Compare search results before/after tokenization  
+# 3. Run performance benchmarks
+# 4. Generate detailed reports
+```
+
+### Individual Demo Scripts
+```bash
+# Set up demo data
+python scripts/setup_demo.py
+
+# Compare search results
+python scripts/compare_results.py
+
+# Run performance benchmarks
+python scripts/benchmark.py
+```
+
+## Performance Benchmarks
+
+The system meets the following performance targets:
+
+- **Tokenization Speed**: < 50ms for 1000 characters
+- **Search Response**: < 100ms for typical queries  
+- **Memory Usage**: < 256MB per container
+- **Indexing Throughput**: > 500 documents/second
+
+Run benchmarks to validate performance:
+```bash
+python scripts/benchmark.py
+```
+
+## Documentation
+
+### Complete Documentation
+- **[API Documentation](docs/api.md)** - Complete API reference with examples
+- **[Deployment Guide](docs/deployment.md)** - Production deployment instructions
+- **[Troubleshooting Guide](docs/troubleshooting.md)** - Common issues and solutions
+
+### Sample Data
+- **[Sample Documents](sample_data/)** - Thai text samples for testing
+- **[Test Queries](sample_data/test_queries.json)** - Search test cases
+- **[Dataset Documentation](sample_data/README.md)** - Sample data usage guide
+
+### Scripts
+- **[Demonstration Scripts](scripts/)** - Automated demo and benchmarking
+- **[Script Documentation](scripts/README.md)** - Usage instructions for all scripts
+
 ## Development
 
+### Setup Development Environment
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Install development dependencies  
+pip install -r requirements.txt[dev]
+
+# Or use uv (recommended)
+uv sync --dev
+```
+
+### Code Quality
 ```bash
 # Run tests
-pytest tests/ -v
+pytest tests/ -v --cov=src
 
 # Lint and format
 ruff check src/ tests/
@@ -118,8 +250,45 @@ ruff format src/ tests/
 
 # Type checking
 mypy src/
+
+# Run all quality checks
+uv run ruff check && uv run ruff format --check && uv run mypy src/
 ```
+
+### Testing
+```bash
+# Unit tests
+pytest tests/unit/ -v
+
+# Integration tests
+pytest tests/integration/ -v
+
+# End-to-end tests
+pytest tests/e2e/ -v
+
+# Performance tests
+python scripts/benchmark.py
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass (`pytest tests/ -v`)
+6. Run code quality checks (`ruff check && mypy src/`)
+7. Commit your changes (`git commit -m 'Add amazing feature'`)
+8. Push to the branch (`git push origin feature/amazing-feature`)
+9. Open a Pull Request
+
+## Support
+
+- **Issues**: Report bugs and request features on GitHub Issues
+- **Documentation**: Check the [docs/](docs/) directory for detailed guides
+- **Examples**: See [sample_data/](sample_data/) and [scripts/](scripts/) for usage examples
+- **Performance**: Run benchmarks with `python scripts/benchmark.py`
 
 ## License
 
-MIT License
+MIT License - see [LICENSE](LICENSE) file for details

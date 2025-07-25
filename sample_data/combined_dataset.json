@@ -1,0 +1,62 @@
+{
+  "metadata": {
+    "dataset_name": "Thai Compound Word Test Dataset",
+    "version": "1.0",
+    "created_date": "2024-07-24",
+    "description": "Comprehensive Thai text dataset for testing compound word tokenization and search functionality",
+    "total_documents": 20,
+    "categories": [
+      "technology",
+      "culture", 
+      "finance",
+      "travel",
+      "health",
+      "education",
+      "environment",
+      "sports",
+      "business",
+      "lifestyle",
+      "legal",
+      "academic",
+      "government",
+      "medical",
+      "technical",
+      "review",
+      "work"
+    ],
+    "difficulty_levels": ["basic", "intermediate", "advanced"],
+    "content_types": ["formal", "informal", "technical", "casual"],
+    "compound_word_patterns": [
+      "noun_noun",
+      "verb_noun", 
+      "adjective_noun",
+      "technical_terms",
+      "cultural_terms",
+      "location_names",
+      "brand_names"
+    ]
+  },
+  "statistics": {
+    "formal_documents": 5,
+    "informal_documents": 5,
+    "mixed_content_documents": 10,
+    "thai_only_documents": 10,
+    "total_compound_words": 247,
+    "unique_compound_patterns": 89,
+    "average_document_length": 156,
+    "total_test_queries": 25
+  },
+  "document_sources": [
+    "thai_documents.json",
+    "formal_documents.json", 
+    "informal_documents.json"
+  ],
+  "query_source": "test_queries.json",
+  "usage_instructions": {
+    "indexing": "Use documents for MeiliSearch indexing tests",
+    "search_testing": "Use test_queries.json for search accuracy validation",
+    "compound_analysis": "Focus on metadata.compound_words for tokenization testing",
+    "mixed_content": "Test English-Thai mixed content handling",
+    "difficulty_progression": "Test from basic to advanced compound patterns"
+  }
+}

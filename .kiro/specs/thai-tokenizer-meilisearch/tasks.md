@@ -114,20 +114,20 @@
     - Implement proper networking and service discovery
     - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 8. Create sample data and demonstration
-  - [ ] 8.1 Prepare Thai text sample dataset
+- [x] 8. Create sample data and demonstration
+  - [x] 8.1 Prepare Thai text sample dataset
     - Create collection of Thai documents with various compound word patterns
     - Include formal, informal, and technical Thai content
     - Add mixed Thai-English documents for comprehensive testing
     - _Requirements: 3.1, 4.1, 4.2, 4.3_
 
-  - [ ] 8.2 Build demonstration scripts
+  - [x] 8.2 Build demonstration scripts
     - Create scripts to populate MeiliSearch with sample Thai documents
     - Implement comparison scripts showing before/after search results
     - Add performance measurement scripts for tokenization and search speed
     - _Requirements: 3.1, 3.2, 3.3, 3.5_
 
-  - [ ] 8.3 Develop usage documentation and examples
+  - [x] 8.3 Develop usage documentation and examples
     - Write setup and deployment instructions for the containerized solution
     - Create API usage examples with Thai text samples
     - Add troubleshooting guide for common configuration issues
