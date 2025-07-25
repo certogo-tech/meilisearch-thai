@@ -21,6 +21,15 @@ services:
       - thai-tokenizer-network
     profiles:
       - production
+    # Performance optimizations
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
 
   thai-tokenizer:
     build:
@@ -38,10 +47,16 @@ services:
       - TOKENIZER_ENGINE=${TOKENIZER_ENGINE:-pythainlp}
       - TOKENIZER_MODEL=${TOKENIZER_MODEL:-}
       
-      # Processing configuration
-      - BATCH_SIZE=${BATCH_SIZE:-100}
+      # Optimized processing configuration
+      - BATCH_SIZE=${BATCH_SIZE:-25}  # Optimized from 100 to 25 for better throughput
       - MAX_RETRIES=${MAX_RETRIES:-3}
       - TIMEOUT_MS=${TIMEOUT_MS:-5000}
+      
+      # Performance optimizations
+      - PYTHONOPTIMIZE=1  # Enable Python optimizations
+      - PYTHONUNBUFFERED=1  # Unbuffered output
+      - TOKENIZER_CACHE_SIZE=1000  # Enable caching
+      - WORKER_PROCESSES=4  # Worker processes
       
       # Service configuration
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
@@ -59,6 +74,23 @@ services:
     restart: unless-stopped
     networks:
       - thai-tokenizer-network
+    # Performance optimizations based on system resources
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'  # Use up to 2 CPUs
+          memory: 1G   # Use up to 1GB memory
+        reservations:
+          cpus: '0.5'  # Reserve 0.5 CPU
+          memory: 256M # Reserve 256MB memory
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
 
   meilisearch:
     image: getmeili/meilisearch:v1.15.2
@@ -68,11 +100,11 @@ services:
       # Core MeiliSearch configuration
       - MEILI_MASTER_KEY=${MEILISEARCH_API_KEY:-masterKey}
       - MEILI_ENV=${MEILI_ENV:-development}
-      - MEILI_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MEILI_LOG_LEVEL=${LOG_LEVEL:-WARN}  # Reduce logging overhead
       
-      # Thai tokenization optimizations
-      - MEILI_MAX_INDEXING_MEMORY=${MEILI_MAX_INDEXING_MEMORY:-2Gb}
-      - MEILI_MAX_INDEXING_THREADS=${MEILI_MAX_INDEXING_THREADS:-4}
+      # Optimized Thai tokenization settings
+      - MEILI_MAX_INDEXING_MEMORY=${MEILI_MAX_INDEXING_MEMORY:-1Gb}  # Optimized memory usage
+      - MEILI_MAX_INDEXING_THREADS=${MEILI_MAX_INDEXING_THREADS:-2}  # Optimized thread count
       
       # Performance settings for Thai text
       - MEILI_SNAPSHOT_DIR=/meili_data/snapshots
@@ -90,6 +122,15 @@ services:
     restart: unless-stopped
     networks:
       - thai-tokenizer-network
+    # Performance optimizations
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'  # Use up to 1.5 CPUs
+          memory: 1.5G # Use up to 1.5GB memory
+        reservations:
+          cpus: '0.5'  # Reserve 0.5 CPU
+          memory: 512M # Reserve 512MB memory
 
 volumes:
   meilisearch_data:

@@ -1,0 +1,615 @@
+{
+  "timestamp": 1753442351,
+  "system_info": {
+    "cpu_count": 12,
+    "memory_total_gb": 16.0,
+    "python_version": "3.9.6 (default, Apr 30 2025, 02:07:17) \n[Clang 17.0.0 (clang-1700.0.13.5)]"
+  },
+  "performance_optimizations": {
+    "tokenization": [
+      {
+        "component": "ThaiSegmenter",
+        "optimization": "Text caching for repeated content",
+        "before_performance": {
+          "operation": "tokenize_batch_default",
+          "total_time": 0.04007315635681152,
+          "calls_count": 147128,
+          "avg_time_per_call": 2.723693406884585e-07,
+          "memory_usage_mb": 0.0625,
+          "cpu_percent": 0.0,
+          "top_functions": [
+            {
+              "function": "~:0(<method 'find' of 'bytearray' objects>)",
+              "calls": 416,
+              "cumulative_time": 0.000226366
+            },
+            {
+              "function": "~:0(<method 'translate' of 'bytearray' objects>)",
+              "calls": 3,
+              "cumulative_time": 1.1240000000000002e-06
+            },
+            {
+              "function": "~:0(<method 'append' of 'list' objects>)",
+              "calls": 11515,
+              "cumulative_time": 0.00041518100000000004
+            },
+            {
+              "function": "~:0(<method 'insert' of 'list' objects>)",
+              "calls": 1,
+              "cumulative_time": 1.67e-07
+            },
+            {
+              "function": "~:0(<method 'extend' of 'list' objects>)",
+              "calls": 7,
+              "cumulative_time": 9.98e-07
+            },
+            {
+              "function": "~:0(<method 'pop' of 'list' objects>)",
+              "calls": 800,
+              "cumulative_time": 4.0714000000000004e-05
+            },
+            {
+              "function": "~:0(<built-in method from_bytes>)",
+              "calls": 6,
+              "cumulative_time": 8.32e-07
+            },
+            {
+              "function": "~:0(<method 'get' of 'dict' objects>)",
+              "calls": 13169,
+              "cumulative_time": 0.0009718530000000001
+            },
+            {
+              "function": "~:0(<method 'pop' of 'dict' objects>)",
+              "calls": 2,
+              "cumulative_time": 1.67e-07
+            },
+            {
+              "function": "~:0(<method 'items' of 'dict' objects>)",
+              "calls": 3,
+              "cumulative_time": 1.66e-07
+            }
+          ]
+        },
+        "after_performance": {
+          "operation": "tokenize_batch_optimized",
+          "total_time": 0.0016489028930664062,
+          "calls_count": 6914,
+          "avg_time_per_call": 2.384875460032407e-07,
+          "memory_usage_mb": 0.0,
+          "cpu_percent": 0.0,
+          "top_functions": [
+            {
+              "function": "~:0(<method 'append' of 'list' objects>)",
+              "calls": 553,
+              "cumulative_time": 1.9707000000000003e-05
+            },
+            {
+              "function": "~:0(<method 'pop' of 'list' objects>)",
+              "calls": 40,
+              "cumulative_time": 2.04e-06
+            },
+            {
+              "function": "~:0(<method 'get' of 'dict' objects>)",
+              "calls": 657,
+              "cumulative_time": 3.584e-05
+            },
+            {
+              "function": "~:0(<method 'values' of 'dict' objects>)",
+              "calls": 10,
+              "cumulative_time": 5.85e-07
+            },
+            {
+              "function": "~:0(<method 'update' of 'dict' objects>)",
+              "calls": 10,
+              "cumulative_time": 1.582e-06
+            },
+            {
+              "function": "~:0(<method 'add' of 'set' objects>)",
+              "calls": 159,
+              "cumulative_time": 8.495e-06
+            },
+            {
+              "function": "~:0(<built-in method __new__ of type object at 0x1028ae860>)",
+              "calls": 10,
+              "cumulative_time": 1.4170000000000002e-06
+            },
+            {
+              "function": "~:0(<method 'join' of 'str' objects>)",
+              "calls": 15,
+              "cumulative_time": 1.8340000000000001e-06
+            },
+            {
+              "function": "~:0(<method 'find' of 'str' objects>)",
+              "calls": 63,
+              "cumulative_time": 7.001e-06
+            },
+            {
+              "function": "~:0(<method 'rfind' of 'str' objects>)",
+              "calls": 30,
+              "cumulative_time": 3.2950000000000002e-06
+            }
+          ]
+        },
+        "improvement_percent": 95.88526823696,
+        "recommendation": "Implement caching for frequently tokenized texts"
+      }
+    ],
+    "batch_processing": [
+      {
+        "component": "DocumentProcessor",
+        "optimization": "Increased batch size from 10 to 25",
+        "before_performance": {
+          "operation": "simulate_batch_processing_default",
+          "total_time": 0.06274604797363281,
+          "calls_count": 151,
+          "avg_time_per_call": 0.0004155367415472372,
+          "memory_usage_mb": 0.0,
+          "cpu_percent": 0.0,
+          "top_functions": [
+            {
+              "function": "~:0(<method 'get' of 'dict' objects>)",
+              "calls": 5,
+              "cumulative_time": 3.7400000000000004e-07
+            },
+            {
+              "function": "~:0(<method 'update' of 'dict' objects>)",
+              "calls": 1,
+              "cumulative_time": 7.5e-07
+            },
+            {
+              "function": "~:0(<method 'join' of 'str' objects>)",
+              "calls": 1,
+              "cumulative_time": 8.3e-08
+            },
+            {
+              "function": "~:0(<method 'find' of 'str' objects>)",
+              "calls": 2,
+              "cumulative_time": 5.420000000000001e-07
+            },
+            {
+              "function": "~:0(<method 'rfind' of 'str' objects>)",
+              "calls": 6,
+              "cumulative_time": 1.416e-06
+            },
+            {
+              "function": "~:0(<built-in method builtins.hasattr>)",
+              "calls": 5,
+              "cumulative_time": 5.249e-06
+            },
+            {
+              "function": "~:0(<built-in method builtins.isinstance>)",
+              "calls": 6,
+              "cumulative_time": 6.25e-07
+            },
+            {
+              "function": "~:0(<built-in method builtins.len>)",
+              "calls": 3,
+              "cumulative_time": 2.49e-07
+            },
+            {
+              "function": "~:0(<method 'get' of 'ContextVar' objects>)",
+              "calls": 2,
+              "cumulative_time": 4.1700000000000004e-07
+            },
+            {
+              "function": "~:0(<built-in method sys._getframe>)",
+              "calls": 1,
+              "cumulative_time": 3.75e-07
+            }
+          ]
+        },
+        "after_performance": {
+          "operation": "simulate_batch_processing_optimized",
+          "total_time": 0.023082971572875977,
+          "calls_count": 142,
+          "avg_time_per_call": 0.00016255613783715476,
+          "memory_usage_mb": 0.0,
+          "cpu_percent": 0.0,
+          "top_functions": [
+            {
+              "function": "~:0(<method 'get' of 'dict' objects>)",
+              "calls": 5,
+              "cumulative_time": 7.49e-07
+            },
+            {
+              "function": "~:0(<method 'update' of 'dict' objects>)",
+              "calls": 1,
+              "cumulative_time": 5.41e-07
+            },
+            {
+              "function": "~:0(<method 'join' of 'str' objects>)",
+              "calls": 1,
+              "cumulative_time": 8.400000000000001e-08
+            },
+            {
+              "function": "~:0(<method 'find' of 'str' objects>)",
+              "calls": 2,
+              "cumulative_time": 5.01e-07
+            },
+            {
+              "function": "~:0(<method 'rfind' of 'str' objects>)",
+              "calls": 6,
+              "cumulative_time": 1.2930000000000002e-06
+            },
+            {
+              "function": "~:0(<built-in method builtins.hasattr>)",
+              "calls": 5,
+              "cumulative_time": 1.001e-06
+            },
+            {
+              "function": "~:0(<built-in method builtins.isinstance>)",
+              "calls": 6,
+              "cumulative_time": 6.280000000000001e-07
+            },
+            {
+              "function": "~:0(<built-in method builtins.len>)",
+              "calls": 3,
+              "cumulative_time": 2.5000000000000004e-07
+            },
+            {
+              "function": "~:0(<method 'get' of 'ContextVar' objects>)",
+              "calls": 2,
+              "cumulative_time": 3.34e-07
+            },
+            {
+              "function": "~:0(<built-in method sys._getframe>)",
+              "calls": 1,
+              "cumulative_time": 5.000000000000001e-07
+            }
+          ]
+        },
+        "improvement_percent": 63.212071009514545,
+        "recommendation": "Use larger batch sizes for better throughput"
+      }
+    ],
+    "memory_usage": [
+      {
+        "component": "TokenProcessor",
+        "optimization": "Explicit garbage collection for large texts",
+        "before_performance": {
+          "operation": "process_large_text_default",
+          "total_time": 2.7292652130126953,
+          "calls_count": 13866228,
+          "avg_time_per_call": 1.9682823713937888e-07,
+          "memory_usage_mb": 40.0,
+          "cpu_percent": 0.0,
+          "top_functions": [
+            {
+              "function": "~:0(<method 'append' of 'list' objects>)",
+              "calls": 1050331,
+              "cumulative_time": 0.036087303
+            },
+            {
+              "function": "~:0(<method 'extend' of 'list' objects>)",
+              "calls": 6,
+              "cumulative_time": 3.7600000000000003e-07
+            },
+            {
+              "function": "~:0(<method 'pop' of 'list' objects>)",
+              "calls": 60000,
+              "cumulative_time": 0.0023204370000000003
+            },
+            {
+              "function": "~:0(<method 'get' of 'dict' objects>)",
+              "calls": 1170385,
+              "cumulative_time": 0.062321084000000006
+            },
+            {
+              "function": "~:0(<method 'items' of 'dict' objects>)",
+              "calls": 4,
+              "cumulative_time": 6.26e-07
+            },
+            {
+              "function": "~:0(<method 'values' of 'dict' objects>)",
+              "calls": 20,
+              "cumulative_time": 2.791e-06
+            },
+            {
+              "function": "~:0(<method 'update' of 'dict' objects>)",
+              "calls": 21,
+              "cumulative_time": 9.919000000000001e-06
+            },
+            {
+              "function": "~:0(<method 'add' of 'set' objects>)",
+              "calls": 240000,
+              "cumulative_time": 0.0096107
+            },
+            {
+              "function": "~:0(<built-in method __new__ of type object at 0x1028ae860>)",
+              "calls": 20,
+              "cumulative_time": 8.204e-06
+            },
+            {
+              "function": "~:0(<method 'join' of 'str' objects>)",
+              "calls": 10041,
+              "cumulative_time": 0.0025962050000000003
+            }
+          ]
+        },
+        "after_performance": {
+          "operation": "process_large_text_optimized",
+          "total_time": 3.9281399250030518,
+          "calls_count": 13865348,
+          "avg_time_per_call": 2.8330626285060076e-07,
+          "memory_usage_mb": 24.140625,
+          "cpu_percent": 0.0,
+          "top_functions": [
+            {
+              "function": "~:0(<method 'append' of 'list' objects>)",
+              "calls": 1050180,
+              "cumulative_time": 0.035508383000000004
+            },
+            {
+              "function": "~:0(<method 'pop' of 'list' objects>)",
+              "calls": 60000,
+              "cumulative_time": 0.002344062
+            },
+            {
+              "function": "~:0(<method 'get' of 'dict' objects>)",
+              "calls": 1170385,
+              "cumulative_time": 0.061395058
+            },
+            {
+              "function": "~:0(<method 'values' of 'dict' objects>)",
+              "calls": 20,
+              "cumulative_time": 3.832e-06
+            },
+            {
+              "function": "~:0(<method 'update' of 'dict' objects>)",
+              "calls": 21,
+              "cumulative_time": 5.832e-06
+            },
+            {
+              "function": "~:0(<method 'add' of 'set' objects>)",
+              "calls": 240000,
+              "cumulative_time": 0.008941052000000001
+            },
+            {
+              "function": "~:0(<built-in method __new__ of type object at 0x1028ae860>)",
+              "calls": 20,
+              "cumulative_time": 7.793e-06
+            },
+            {
+              "function": "~:0(<method 'join' of 'str' objects>)",
+              "calls": 10041,
+              "cumulative_time": 0.002730788
+            },
+            {
+              "function": "~:0(<method 'find' of 'str' objects>)",
+              "calls": 70022,
+              "cumulative_time": 0.005447555000000001
+            },
+            {
+              "function": "~:0(<method 'rfind' of 'str' objects>)",
+              "calls": 66,
+              "cumulative_time": 1.6582e-05
+            }
+          ]
+        },
+        "improvement_percent": 39.6484375,
+        "recommendation": "Implement periodic garbage collection for memory-intensive operations"
+      }
+    ]
+  },
+  "configuration_optimizations": {
+    "meilisearch": {
+      "separatorTokens": [
+        "​",
+        "​​",
+        " ",
+        "\n",
+        "\t",
+        "-",
+        ".",
+        ","
+      ],
+      "nonSeparatorTokens": [
+        "ๆ",
+        "ฯ",
+        "์",
+        "ั",
+        "ิ",
+        "ี",
+        "ึ",
+        "ื",
+        "ุ",
+        "ู",
+        "เ",
+        "แ",
+        "โ",
+        "ใ",
+        "ไ"
+      ],
+      "dictionary": [],
+      "synonyms": {},
+      "stopWords": [
+        "และ",
+        "หรือ",
+        "แต่",
+        "เพราะ",
+        "ถ้า",
+        "เมื่อ",
+        "ที่",
+        "ซึ่ง",
+        "ใน",
+        "บน",
+        "ที่",
+        "จาก",
+        "ไป",
+        "มา",
+        "ได้",
+        "เป็น",
+        "คือ",
+        "มี",
+        "ไม่",
+        "ไม่มี",
+        "ทั้ง",
+        "ทุก",
+        "บาง",
+        "หลาย",
+        "เดียว",
+        "นี้",
+        "นั้น",
+        "เหล่านี้",
+        "เหล่านั้น",
+        "ดัง",
+        "ตาม",
+        "เพื่อ"
+      ],
+      "rankingRules": [
+        "words",
+        "typo",
+        "proximity",
+        "attribute",
+        "sort",
+        "exactness"
+      ],
+      "searchableAttributes": [
+        "title",
+        "content",
+        "tags",
+        "category"
+      ],
+      "displayedAttributes": [
+        "*"
+      ],
+      "filterableAttributes": [
+        "category",
+        "tags",
+        "created_at",
+        "updated_at"
+      ],
+      "sortableAttributes": [
+        "created_at",
+        "updated_at",
+        "title"
+      ],
+      "typoTolerance": {
+        "enabled": true,
+        "minWordSizeForTypos": {
+          "oneTypo": 3,
+          "twoTypos": 6
+        },
+        "disableOnWords": [],
+        "disableOnAttributes": []
+      },
+      "faceting": {
+        "maxValuesPerFacet": 100,
+        "sortFacetValuesBy": {
+          "*": "count"
+        }
+      },
+      "pagination": {
+        "maxTotalHits": 1000
+      }
+    },
+    "containers": {
+      "docker_compose_optimizations": {
+        "thai-tokenizer": {
+          "cpus": 4,
+          "memory": "2g",
+          "environment": {
+            "PYTHONOPTIMIZE": "1",
+            "PYTHONUNBUFFERED": "1",
+            "TOKENIZER_CACHE_SIZE": "1000",
+            "BATCH_SIZE": "25",
+            "WORKER_PROCESSES": "4"
+          },
+          "deploy": {
+            "replicas": 3,
+            "restart_policy": {
+              "condition": "on-failure",
+              "delay": "5s",
+              "max_attempts": 3
+            },
+            "update_config": {
+              "parallelism": 1,
+              "delay": "10s",
+              "failure_action": "rollback"
+            }
+          }
+        },
+        "meilisearch": {
+          "cpus": 2,
+          "memory": "1.5g",
+          "environment": {
+            "MEILI_MAX_INDEXING_MEMORY": "3276MB",
+            "MEILI_MAX_INDEXING_THREADS": "2",
+            "MEILI_LOG_LEVEL": "WARN"
+          }
+        }
+      },
+      "kubernetes_optimizations": {
+        "thai-tokenizer": {
+          "resources": {
+            "requests": {
+              "cpu": "200m",
+              "memory": "256Mi"
+            },
+            "limits": {
+              "cpu": "1000m",
+              "memory": "1Gi"
+            }
+          },
+          "replicas": {
+            "min": 2,
+            "max": 10,
+            "target_cpu_utilization": 70
+          }
+        },
+        "meilisearch": {
+          "resources": {
+            "requests": {
+              "cpu": "500m",
+              "memory": "512Mi"
+            },
+            "limits": {
+              "cpu": "2000m",
+              "memory": "2Gi"
+            }
+          },
+          "storage": {
+            "size": "10Gi",
+            "class": "fast-ssd"
+          }
+        }
+      },
+      "performance_tuning": {
+        "python_optimizations": [
+          "Use Python 3.12+ for improved performance",
+          "Enable bytecode optimization with PYTHONOPTIMIZE=1",
+          "Use uvloop for async operations",
+          "Implement connection pooling for database connections",
+          "Use caching for frequently accessed data"
+        ],
+        "system_optimizations": [
+          "Use SSD storage for better I/O performance",
+          "Optimize network settings for container communication",
+          "Use multi-stage Docker builds to reduce image size",
+          "Implement health checks for better container management",
+          "Use resource limits to prevent resource contention"
+        ]
+      }
+    }
+  },
+  "recommendations": {
+    "immediate_actions": [
+      "Implement text caching for repeated tokenization",
+      "Increase batch processing size to 25",
+      "Add explicit garbage collection for large texts",
+      "Update MeiliSearch settings with Thai-optimized configuration"
+    ],
+    "infrastructure_improvements": [
+      "Use SSD storage for better I/O performance",
+      "Implement horizontal scaling with load balancing",
+      "Add monitoring and alerting for performance metrics",
+      "Optimize container resource allocation based on usage patterns"
+    ],
+    "long_term_optimizations": [
+      "Implement distributed caching with Redis",
+      "Use CDN for static content delivery",
+      "Implement database connection pooling",
+      "Add performance monitoring and profiling tools"
+    ]
+  }
+}

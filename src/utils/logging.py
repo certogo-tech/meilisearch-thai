@@ -19,6 +19,17 @@ correlation_id_var: ContextVar[Optional[str]] = ContextVar('correlation_id', def
 request_id_var: ContextVar[Optional[str]] = ContextVar('request_id', default=None)
 
 
+class DateTimeEncoder(json.JSONEncoder):
+    """Custom JSON encoder that handles datetime objects."""
+    
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, timedelta):
+            return obj.total_seconds()
+        return super().default(obj)
+
+
 @dataclass
 class PerformanceMetrics:
     """Performance metrics for operations."""
@@ -216,7 +227,7 @@ class StructuredLogger:
             level=log_level,
             pathname="",
             lineno=0,
-            msg=json.dumps(context),
+            msg=json.dumps(context, cls=DateTimeEncoder),
             args=(),
             exc_info=None
         )
@@ -257,7 +268,7 @@ class JSONFormatter(logging.Formatter):
             if hasattr(record, attr):
                 log_entry[attr] = getattr(record, attr)
             
-        return json.dumps(log_entry, ensure_ascii=False)
+        return json.dumps(log_entry, ensure_ascii=False, cls=DateTimeEncoder)
 
 
 def performance_monitor(operation_name: str):
@@ -275,7 +286,7 @@ def performance_monitor(operation_name: str):
                 end_memory = _get_memory_usage()
                 
                 # Calculate sizes if possible
-                input_size = _estimate_size(args, kwargs)
+                input_size = _estimate_size(args) + _estimate_size(kwargs)
                 output_size = _estimate_size(result)
                 
                 metrics = PerformanceMetrics(
@@ -296,7 +307,7 @@ def performance_monitor(operation_name: str):
                 metrics = PerformanceMetrics(
                     operation=operation_name,
                     duration_ms=duration_ms,
-                    input_size=_estimate_size(args, kwargs),
+                    input_size=_estimate_size(args) + _estimate_size(kwargs),
                     success=False,
                     error_type=type(e).__name__
                 )
@@ -317,7 +328,7 @@ def performance_monitor(operation_name: str):
                 end_memory = _get_memory_usage()
                 
                 # Calculate sizes if possible
-                input_size = _estimate_size(args, kwargs)
+                input_size = _estimate_size(args) + _estimate_size(kwargs)
                 output_size = _estimate_size(result)
                 
                 metrics = PerformanceMetrics(
@@ -338,7 +349,7 @@ def performance_monitor(operation_name: str):
                 metrics = PerformanceMetrics(
                     operation=operation_name,
                     duration_ms=duration_ms,
-                    input_size=_estimate_size(args, kwargs),
+                    input_size=_estimate_size(args) + _estimate_size(kwargs),
                     success=False,
                     error_type=type(e).__name__
                 )

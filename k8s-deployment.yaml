@@ -1,0 +1,258 @@
+# Kubernetes deployment configuration for Thai Tokenizer
+# Optimized for production scaling and performance
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: thai-tokenizer
+  labels:
+    name: thai-tokenizer
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thai-tokenizer-config
+  namespace: thai-tokenizer
+data:
+  BATCH_SIZE: "25"
+  TOKENIZER_CACHE_SIZE: "1000"
+  WORKER_PROCESSES: "4"
+  PYTHONOPTIMIZE: "2"
+  ENABLE_GC_OPTIMIZATION: "1"
+  LOG_LEVEL: "INFO"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: thai-tokenizer-secrets
+  namespace: thai-tokenizer
+type: Opaque
+data:
+  MEILISEARCH_API_KEY: bWFzdGVyS2V5  # base64 encoded "masterKey"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thai-tokenizer
+  namespace: thai-tokenizer
+  labels:
+    app: thai-tokenizer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: thai-tokenizer
+  template:
+    metadata:
+      labels:
+        app: thai-tokenizer
+    spec:
+      containers:
+      - name: thai-tokenizer
+        image: thai-tokenizer:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MEILISEARCH_HOST
+          value: "http://meilisearch:7700"
+        - name: MEILISEARCH_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: thai-tokenizer-secrets
+              key: MEILISEARCH_API_KEY
+        envFrom:
+        - configMapRef:
+            name: thai-tokenizer-config
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meilisearch
+  namespace: thai-tokenizer
+  labels:
+    app: meilisearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meilisearch
+  template:
+    metadata:
+      labels:
+        app: meilisearch
+    spec:
+      containers:
+      - name: meilisearch
+        image: getmeili/meilisearch:v1.15.2
+        ports:
+        - containerPort: 7700
+        env:
+        - name: MEILI_MASTER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: thai-tokenizer-secrets
+              key: MEILISEARCH_API_KEY
+        - name: MEILI_ENV
+          value: "production"
+        - name: MEILI_LOG_LEVEL
+          value: "WARN"
+        - name: MEILI_MAX_INDEXING_MEMORY
+          value: "1Gb"
+        - name: MEILI_MAX_INDEXING_THREADS
+          value: "2"
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 7700
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 7700
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: meilisearch-data
+          mountPath: /meili_data
+      volumes:
+      - name: meilisearch-data
+        persistentVolumeClaim:
+          claimName: meilisearch-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: meilisearch-pvc
+  namespace: thai-tokenizer
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thai-tokenizer
+  namespace: thai-tokenizer
+  labels:
+    app: thai-tokenizer
+spec:
+  selector:
+    app: thai-tokenizer
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: meilisearch
+  namespace: thai-tokenizer
+  labels:
+    app: meilisearch
+spec:
+  selector:
+    app: meilisearch
+  ports:
+  - port: 7700
+    targetPort: 7700
+  type: ClusterIP
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: thai-tokenizer-hpa
+  namespace: thai-tokenizer
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: thai-tokenizer
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: thai-tokenizer-ingress
+  namespace: thai-tokenizer
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  tls:
+  - hosts:
+    - thai-tokenizer.example.com
+    secretName: thai-tokenizer-tls
+  rules:
+  - host: thai-tokenizer.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: thai-tokenizer
+            port:
+              number: 8000

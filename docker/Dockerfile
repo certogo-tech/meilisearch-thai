@@ -66,10 +66,13 @@ ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Start command with optimized settings
+# Start command with optimized settings for performance
 CMD ["uvicorn", "src.api.main:app", \
      "--host", "0.0.0.0", \
      "--port", "8000", \
-     "--workers", "1", \
+     "--workers", "4", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
      "--access-log", \
-     "--log-level", "info"]
+     "--log-level", "info", \
+     "--loop", "uvloop", \
+     "--http", "httptools"]
