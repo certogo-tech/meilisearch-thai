@@ -1,0 +1,88 @@
+{
+  "summary": {
+    "total_tests": 11,
+    "passed_tests": 11,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "timestamp": "2025-07-26T14:58:41.264888"
+  },
+  "results": [
+    {
+      "test": "Basic Health Check",
+      "success": true,
+      "details": "Status: healthy, Uptime: 1415s",
+      "response_time_ms": 1037.4908447265625,
+      "timestamp": "2025-07-26T14:58:38.111042"
+    },
+    {
+      "test": "Detailed Health Check",
+      "success": true,
+      "details": "Overall: healthy, Healthy checks: 4/4",
+      "response_time_ms": 2026.7319679260254,
+      "timestamp": "2025-07-26T14:58:40.138081"
+    },
+    {
+      "test": "MeiliSearch Health",
+      "success": true,
+      "details": "MeiliSearch is available",
+      "response_time_ms": 14.990091323852539,
+      "timestamp": "2025-07-26T14:58:40.153348"
+    },
+    {
+      "test": "Basic Tokenization",
+      "success": true,
+      "details": "Tokenized into 7 tokens: ['\u0e23\u0e16\u0e22\u0e19\u0e15\u0e4c', '\u0e44\u0e1f\u0e1f\u0e49\u0e32', '\u0e40\u0e1b\u0e47\u0e19']...",
+      "response_time_ms": 19.15597915649414,
+      "timestamp": "2025-07-26T14:58:40.172768"
+    },
+    {
+      "test": "Compound Tokenization",
+      "success": true,
+      "details": "Split compound into 2 tokens: ['\u0e23\u0e16\u0e22\u0e19\u0e15\u0e4c', '\u0e44\u0e1f\u0e1f\u0e49\u0e32']",
+      "response_time_ms": 10.043859481811523,
+      "timestamp": "2025-07-26T14:58:40.182963"
+    },
+    {
+      "test": "Query Processing",
+      "success": true,
+      "details": "Generated 2 tokens, 10 variants",
+      "response_time_ms": 10.320186614990234,
+      "timestamp": "2025-07-26T14:58:40.193453"
+    },
+    {
+      "test": "Configuration",
+      "success": true,
+      "details": "Status: active, Engine: pythainlp",
+      "response_time_ms": 6.845951080322266,
+      "timestamp": "2025-07-26T14:58:40.200512"
+    },
+    {
+      "test": "Tokenizer Metrics",
+      "success": true,
+      "details": "Total requests: 468, Success rate: 99.8%",
+      "response_time_ms": 5.553960800170898,
+      "timestamp": "2025-07-26T14:58:40.206225"
+    },
+    {
+      "test": "System Metrics",
+      "success": true,
+      "details": "CPU: 0.8%, Memory: 30.7%",
+      "response_time_ms": 1012.4132633209229,
+      "timestamp": "2025-07-26T14:58:41.218765"
+    },
+    {
+      "test": "API Documentation",
+      "success": true,
+      "details": "Swagger UI accessible",
+      "response_time_ms": 8.772134780883789,
+      "timestamp": "2025-07-26T14:58:41.227700"
+    },
+    {
+      "test": "Performance Benchmark",
+      "success": true,
+      "details": "Average response time: 12.21ms (3 requests)",
+      "response_time_ms": 0,
+      "timestamp": "2025-07-26T14:58:41.264494"
+    }
+  ]
+}
