@@ -36,21 +36,21 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       # MeiliSearch connection
-      - MEILISEARCH_HOST=http://meilisearch:7700
-      - MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY:-masterKey}
-      - MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
+      - THAI_TOKENIZER_MEILISEARCH_HOST=http://meilisearch:7700
+      - THAI_TOKENIZER_MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY:-masterKey}
+      - THAI_TOKENIZER_MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
       
       # Tokenizer configuration
-      - TOKENIZER_ENGINE=${TOKENIZER_ENGINE:-pythainlp}
-      - TOKENIZER_MODEL=${TOKENIZER_MODEL:-}
+      - THAI_TOKENIZER_TOKENIZER_ENGINE=${TOKENIZER_ENGINE:-pythainlp}
+      - THAI_TOKENIZER_TOKENIZER_MODEL=${TOKENIZER_MODEL:-}
       
       # Optimized processing configuration
-      - BATCH_SIZE=${BATCH_SIZE:-25}  # Optimized from 100 to 25 for better throughput
-      - MAX_RETRIES=${MAX_RETRIES:-3}
-      - TIMEOUT_MS=${TIMEOUT_MS:-5000}
+      - THAI_TOKENIZER_PROCESSING_BATCH_SIZE=${BATCH_SIZE:-25}  # Optimized from 100 to 25 for better throughput
+      - THAI_TOKENIZER_MEILISEARCH_MAX_RETRIES=${MAX_RETRIES:-3}
+      - THAI_TOKENIZER_MEILISEARCH_TIMEOUT_MS=${TIMEOUT_MS:-5000}
       
       # Performance optimizations
       - PYTHONOPTIMIZE=1  # Enable Python optimizations
@@ -59,9 +59,9 @@ services:
       - WORKER_PROCESSES=4  # Worker processes
       
       # Service configuration
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - SERVICE_NAME=${SERVICE_NAME:-thai-tokenizer}
-      - VERSION=${VERSION:-0.1.0}
+      - THAI_TOKENIZER_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - THAI_TOKENIZER_SERVICE_NAME=${SERVICE_NAME:-thai-tokenizer}
+      - THAI_TOKENIZER_VERSION=${VERSION:-0.1.0}
     depends_on:
       meilisearch:
         condition: service_healthy

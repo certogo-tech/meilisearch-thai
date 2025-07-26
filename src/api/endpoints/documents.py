@@ -28,7 +28,18 @@ def get_document_processor() -> DocumentProcessor:
     global _document_processor, _meilisearch_client
     if _document_processor is None:
         if _meilisearch_client is None:
-            _meilisearch_client = MeiliSearchClient()
+            from src.tokenizer.config_manager import ConfigManager
+            from src.meilisearch_integration.client import MeiliSearchConfig as ClientConfig
+            
+            config_manager = ConfigManager()
+            meilisearch_config = config_manager.get_meilisearch_config()
+            client_config = ClientConfig(
+                host=meilisearch_config.host,
+                api_key=meilisearch_config.api_key,
+                timeout=meilisearch_config.timeout_ms // 1000,
+                max_retries=meilisearch_config.max_retries
+            )
+            _meilisearch_client = MeiliSearchClient(client_config)
         _document_processor = DocumentProcessor(meilisearch_client=_meilisearch_client)
     return _document_processor
 
@@ -37,7 +48,18 @@ def get_meilisearch_client() -> MeiliSearchClient:
     """Dependency to get MeiliSearch client instance."""
     global _meilisearch_client
     if _meilisearch_client is None:
-        _meilisearch_client = MeiliSearchClient()
+        from src.tokenizer.config_manager import ConfigManager
+        from src.meilisearch_integration.client import MeiliSearchConfig as ClientConfig
+        
+        config_manager = ConfigManager()
+        meilisearch_config = config_manager.get_meilisearch_config()
+        client_config = ClientConfig(
+            host=meilisearch_config.host,
+            api_key=meilisearch_config.api_key,
+            timeout=meilisearch_config.timeout_ms // 1000,
+            max_retries=meilisearch_config.max_retries
+        )
+        _meilisearch_client = MeiliSearchClient(client_config)
     return _meilisearch_client
 
 

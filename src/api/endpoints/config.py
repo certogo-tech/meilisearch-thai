@@ -35,15 +35,18 @@ def get_meilisearch_client() -> MeiliSearchClient:
     """Dependency to get MeiliSearch client instance."""
     global _meilisearch_client
     if _meilisearch_client is None:
-        # Create a default config for the client
-        from src.meilisearch_integration.client import MeiliSearchConfig
-        default_config = MeiliSearchConfig(
-            host="http://localhost:7700",
-            api_key="masterKey",
-            timeout=30,
-            max_retries=3
+        from src.tokenizer.config_manager import ConfigManager
+        from src.meilisearch_integration.client import MeiliSearchConfig as ClientConfig
+        
+        config_manager = ConfigManager()
+        meilisearch_config = config_manager.get_meilisearch_config()
+        client_config = ClientConfig(
+            host=meilisearch_config.host,
+            api_key=meilisearch_config.api_key,
+            timeout=meilisearch_config.timeout_ms // 1000,
+            max_retries=meilisearch_config.max_retries
         )
-        _meilisearch_client = MeiliSearchClient(config=default_config)
+        _meilisearch_client = MeiliSearchClient(config=client_config)
     return _meilisearch_client
 
 

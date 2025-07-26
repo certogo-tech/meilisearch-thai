@@ -218,7 +218,7 @@ async def health_check():
     # Convert results to simple status format
     dependencies = {}
     for name, result in check_results.items():
-        dependencies[name] = result["status"]
+        dependencies[name] = result.status.value
     
     # Get overall status
     status = health_checker.get_overall_status(check_results)
