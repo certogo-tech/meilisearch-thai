@@ -1,0 +1,4 @@
+# Keep ssl directory in git
+# Add your SSL certificates here:
+# - cert.pem
+# - key.pem

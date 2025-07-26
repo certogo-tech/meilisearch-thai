@@ -1,0 +1,47 @@
+# Prometheus configuration for Thai Tokenizer monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Thai Tokenizer metrics
+  - job_name: 'thai-tokenizer'
+    static_configs:
+      - targets: ['thai-tokenizer:8000']
+    metrics_path: '/api/v1/metrics/prometheus'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # MeiliSearch metrics (if available)
+  - job_name: 'meilisearch'
+    static_configs:
+      - targets: ['meilisearch:7700']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Nginx metrics (if nginx-prometheus-exporter is added)
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:9113']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Node exporter for system metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+# Alerting rules
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
