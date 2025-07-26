@@ -85,6 +85,11 @@ class SearchResultEnhancementResult(BaseModel):
     enhanced_hits: List[EnhancedSearchHit] = Field(..., description="Enhanced search hits")
     query_analysis: Dict[str, Any] = Field(..., description="Query analysis results")
     enhancement_metadata: Dict[str, Any] = Field(..., description="Enhancement metadata")
+    
+    class Config:
+        json_encoders = {
+            datetime: lambda dt: dt.isoformat()
+        }
 
 
 class ErrorResponse(BaseModel):

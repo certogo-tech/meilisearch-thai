@@ -672,11 +672,13 @@ async def check_tokenizer_health(config_manager) -> Dict[str, Any]:
             }
         
         # Test configuration access
-        config = config_manager.get_config()
-        if config is None:
+        try:
+            tokenizer_config = config_manager.get_tokenizer_config()
+            meilisearch_config = config_manager.get_meilisearch_config()
+        except Exception as e:
             return {
                 "status": "unhealthy",
-                "message": "Failed to load tokenizer configuration"
+                "message": f"Failed to load tokenizer configuration: {str(e)}"
             }
         
         # Test tokenizer initialization
@@ -760,7 +762,7 @@ async def check_dependencies() -> Dict[str, Any]:
         
         dependencies = {
             "pythainlp": pythainlp.__version__,
-            "meilisearch": meilisearch.__version__,
+            "meilisearch": meilisearch.version.__version__,
             "fastapi": fastapi.__version__
         }
         
