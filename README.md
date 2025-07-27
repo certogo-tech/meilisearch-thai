@@ -45,7 +45,7 @@ thai-tokenizer-meilisearch/
 │   ├── integration/      # Integration tests
 │   ├── performance/      # Performance tests
 │   └── production/       # Production validation
-├── docs/                  # Documentation
+├── docs/                  # [Documentation](docs/index.md)
 │   ├── api/              # API documentation
 │   ├── deployment/       # Deployment guides
 │   ├── development/      # Development setup
@@ -55,10 +55,10 @@ thai-tokenizer-meilisearch/
 │   ├── k8s/             # Kubernetes manifests
 │   ├── environments/    # Environment configs
 │   └── scripts/         # Deployment scripts
-├── config/               # Configuration files
-├── data/                 # Sample data and fixtures
-├── monitoring/           # Monitoring and observability
-└── reports/             # Generated reports
+├── config/               # [Configuration files](config/index.md)
+├── data/                 # [Sample data and fixtures](data/index.md)
+├── monitoring/           # [Monitoring and observability](monitoring/index.md)
+└── reports/             # [Generated reports](reports/index.md)
 ```
 
 ## 🛠️ Technology Stack

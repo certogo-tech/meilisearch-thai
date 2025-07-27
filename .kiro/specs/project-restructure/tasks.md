@@ -109,7 +109,7 @@
     - Organize by monitoring tool (Grafana, Prometheus, etc.)
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-- [-] 8. Update file references and imports
+- [x] 8. Update file references and imports
   - [x] 8.1 Update Python import paths
     - Update any Python files that reference moved test files
     - Update pytest configuration for new test directory structure
@@ -122,7 +122,7 @@
     - Update deployment script paths and file references
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ] 8.3 Update documentation links
+  - [x] 8.3 Update documentation links
     - Update all internal documentation links to reflect new file locations
     - Update README files with new project structure
     - Create navigation index files for major directory sections
