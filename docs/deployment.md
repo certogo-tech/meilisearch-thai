@@ -28,7 +28,7 @@ git clone <repository-url>
 cd thai-tokenizer-meilisearch
 
 # Copy environment configuration
-cp .env.example .env
+cp config/development/.env.example .env
 
 # Edit configuration as needed
 nano .env
@@ -53,7 +53,7 @@ curl http://localhost:7700/health  # MeiliSearch
 curl http://localhost/health       # Nginx proxy (production only)
 
 # Run demonstration
-python scripts/run_demo.py
+python deployment/scripts/run_demo.py
 ```
 
 ## Development Deployment
@@ -129,7 +129,7 @@ mypy src/
 #### 1. Production Configuration
 
 ```bash
-# .env.production
+# config/production/.env.prod
 MEILISEARCH_HOST=http://meilisearch:7700
 MEILISEARCH_API_KEY=your-secure-api-key
 MEILI_ENV=production
@@ -575,7 +575,7 @@ docker stats
 curl http://localhost:7700/indexes/documents/stats
 
 # Run performance benchmark
-python scripts/benchmark.py
+python deployment/scripts/benchmark.py
 ```
 
 #### Memory Issues
@@ -627,7 +627,7 @@ docker compose up -d
 
 # Reset MeiliSearch index
 curl -X DELETE http://localhost:7700/indexes/documents
-python scripts/setup_demo.py
+python deployment/scripts/setup_demo.py
 ```
 
 ## Security Considerations

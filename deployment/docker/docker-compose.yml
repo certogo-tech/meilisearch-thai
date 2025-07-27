@@ -1,0 +1,145 @@
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      thai-tokenizer:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    profiles:
+      - production
+    # Performance optimizations
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  thai-tokenizer:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      # MeiliSearch connection
+      - THAI_TOKENIZER_MEILISEARCH_HOST=http://meilisearch:7700
+      - THAI_TOKENIZER_MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY:-masterKey}
+      - THAI_TOKENIZER_MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
+      
+      # Tokenizer configuration
+      - THAI_TOKENIZER_TOKENIZER_ENGINE=${TOKENIZER_ENGINE:-pythainlp}
+      - THAI_TOKENIZER_TOKENIZER_MODEL=${TOKENIZER_MODEL:-}
+      
+      # Optimized processing configuration
+      - THAI_TOKENIZER_PROCESSING_BATCH_SIZE=${BATCH_SIZE:-25}  # Optimized from 100 to 25 for better throughput
+      - THAI_TOKENIZER_MEILISEARCH_MAX_RETRIES=${MAX_RETRIES:-3}
+      - THAI_TOKENIZER_MEILISEARCH_TIMEOUT_MS=${TIMEOUT_MS:-5000}
+      
+      # Performance optimizations
+      - PYTHONOPTIMIZE=1  # Enable Python optimizations
+      - PYTHONUNBUFFERED=1  # Unbuffered output
+      - TOKENIZER_CACHE_SIZE=1000  # Enable caching
+      - WORKER_PROCESSES=4  # Worker processes
+      
+      # Service configuration
+      - THAI_TOKENIZER_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - THAI_TOKENIZER_SERVICE_NAME=${SERVICE_NAME:-thai-tokenizer}
+      - THAI_TOKENIZER_VERSION=${VERSION:-0.1.0}
+    depends_on:
+      meilisearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    # Performance optimizations based on system resources
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'  # Use up to 2 CPUs
+          memory: 1G   # Use up to 1GB memory
+        reservations:
+          cpus: '0.5'  # Reserve 0.5 CPU
+          memory: 256M # Reserve 256MB memory
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.15.2
+    ports:
+      - "7700:7700"
+    environment:
+      # Core MeiliSearch configuration
+      - MEILI_MASTER_KEY=${MEILISEARCH_API_KEY:-masterKey}
+      - MEILI_ENV=${MEILI_ENV:-development}
+      - MEILI_LOG_LEVEL=${LOG_LEVEL:-WARN}  # Reduce logging overhead
+      
+      # Optimized Thai tokenization settings
+      - MEILI_MAX_INDEXING_MEMORY=${MEILI_MAX_INDEXING_MEMORY:-1Gb}  # Optimized memory usage
+      - MEILI_MAX_INDEXING_THREADS=${MEILI_MAX_INDEXING_THREADS:-2}  # Optimized thread count
+      
+      # Performance settings for Thai text
+      - MEILI_SNAPSHOT_DIR=/meili_data/snapshots
+      - MEILI_DUMP_DIR=/meili_data/dumps
+    volumes:
+      - meilisearch_data:/meili_data
+      - meilisearch_snapshots:/meili_data/snapshots
+      - meilisearch_dumps:/meili_data/dumps
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    # Performance optimizations
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'  # Use up to 1.5 CPUs
+          memory: 1.5G # Use up to 1.5GB memory
+        reservations:
+          cpus: '0.5'  # Reserve 0.5 CPU
+          memory: 512M # Reserve 512MB memory
+
+volumes:
+  meilisearch_data:
+    driver: local
+  meilisearch_snapshots:
+    driver: local
+  meilisearch_dumps:
+    driver: local
+
+networks:
+  thai-tokenizer-network:
+    driver: bridge
