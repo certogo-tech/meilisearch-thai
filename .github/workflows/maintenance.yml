@@ -1,0 +1,153 @@
+name: Maintenance
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+
+    - name: Check for dependency updates
+      run: |
+        uv venv
+        uv pip install -r requirements.txt
+        
+        # Check for outdated packages
+        uv pip list --outdated > outdated-packages.txt || true
+        
+        if [ -s outdated-packages.txt ]; then
+          echo "Outdated packages found:"
+          cat outdated-packages.txt
+          
+          # Create issue if outdated packages exist
+          gh issue create \
+            --title "Dependency Updates Available" \
+            --body "$(cat outdated-packages.txt)" \
+            --label "dependencies,maintenance" || true
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Security audit
+      run: |
+        uv pip install safety
+        uv run safety check --json --output security-audit.json || true
+        
+        if [ -f security-audit.json ] && [ -s security-audit.json ]; then
+          echo "Security vulnerabilities found:"
+          cat security-audit.json
+          
+          # Create security issue
+          gh issue create \
+            --title "Security Vulnerabilities Detected" \
+            --body "$(cat security-audit.json)" \
+            --label "security,critical" || true
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup-artifacts:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Cleanup old artifacts
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const artifacts = await github.rest.actions.listArtifactsForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            per_page: 100
+          });
+          
+          const cutoffDate = new Date();
+          cutoffDate.setDate(cutoffDate.getDate() - 30); // Keep artifacts for 30 days
+          
+          for (const artifact of artifacts.data.artifacts) {
+            const createdAt = new Date(artifact.created_at);
+            if (createdAt < cutoffDate) {
+              console.log(`Deleting artifact: ${artifact.name} (${artifact.created_at})`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id
+              });
+            }
+          }
+
+  performance-monitoring:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    services:
+      meilisearch:
+        image: getmeili/meilisearch:v1.15.2
+        env:
+          MEILI_MASTER_KEY: test-master-key
+          MEILI_ENV: development
+        ports:
+          - 7700:7700
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+
+    - name: Install dependencies
+      run: |
+        uv venv
+        uv pip install -r requirements.txt
+        uv pip install -e .
+
+    - name: Run performance benchmarks
+      run: |
+        uv run python deployment/scripts/benchmark.py \
+          --output reports/performance/nightly-benchmark.json
+      env:
+        MEILI_HOST: http://localhost:7700
+        MEILI_MASTER_KEY: test-master-key
+
+    - name: Compare with baseline
+      run: |
+        uv run python deployment/scripts/compare_results.py \
+          --current reports/performance/nightly-benchmark.json \
+          --baseline reports/performance/performance_optimization_report.json \
+          --output reports/performance/performance-comparison.json
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-performance-${{ github.run_number }}
+        path: reports/performance/
+
+    - name: Create performance report issue
+      if: failure()
+      run: |
+        gh issue create \
+          --title "Performance Regression Detected" \
+          --body "Nightly performance tests failed. Check the artifacts for details." \
+          --label "performance,regression" || true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

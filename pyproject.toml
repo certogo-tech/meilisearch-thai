@@ -75,7 +75,12 @@ module = [
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = [
+    "tests/unit",
+    "tests/integration", 
+    "tests/performance",
+    "tests/production"
+]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -85,6 +90,19 @@ addopts = [
     "--verbose",
     "--cov=src",
     "--cov-report=term-missing",
-    "--cov-report=html",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml:coverage.xml",
+    "--cov-fail-under=80",
 ]
 asyncio_mode = "auto"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests", 
+    "performance: Performance tests",
+    "production: Production validation tests",
+    "slow: Slow running tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]

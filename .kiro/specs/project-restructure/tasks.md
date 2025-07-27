@@ -128,14 +128,14 @@
     - Create navigation index files for major directory sections
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 9. Update build and CI configuration
-  - [ ] 9.1 Update pytest configuration
+- [x] 9. Update build and CI configuration
+  - [x] 9.1 Update pytest configuration
     - Update pyproject.toml or pytest.ini with new test directory paths
     - Verify test discovery works with new directory structure
     - Update test coverage configuration for new paths
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-  - [ ] 9.2 Update GitHub Actions workflows
+  - [x] 9.2 Update GitHub Actions workflows
     - Create .github/workflows/ directory if needed
     - Update any CI/CD workflows with new file paths
     - Update build and deployment workflows for new structure
