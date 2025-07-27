@@ -102,7 +102,7 @@ src/
 ├── api/               # FastAPI application
 └── utils/             # Utility modules
 
-docker/                # Container configuration
+deployment/docker/     # Container configuration
 tests/                 # Test suite
 ```
 
@@ -174,7 +174,7 @@ curl -X PUT http://localhost:8000/api/v1/config/tokenizer \
 ### Run Complete Demo
 ```bash
 # Run full demonstration suite
-python scripts/run_demo.py
+python deployment/scripts/run_demo.py
 
 # This will:
 # 1. Set up sample Thai documents in MeiliSearch
@@ -186,13 +186,13 @@ python scripts/run_demo.py
 ### Individual Demo Scripts
 ```bash
 # Set up demo data
-python scripts/setup_demo.py
+python deployment/scripts/setup_demo.py
 
 # Compare search results
-python scripts/compare_results.py
+python deployment/scripts/compare_results.py
 
 # Run performance benchmarks
-python scripts/benchmark.py
+python deployment/scripts/benchmark.py
 ```
 
 ## Performance Benchmarks
@@ -206,7 +206,7 @@ The system meets the following performance targets:
 
 Run benchmarks to validate performance:
 ```bash
-python scripts/benchmark.py
+python deployment/scripts/benchmark.py
 ```
 
 ## Documentation
@@ -267,7 +267,7 @@ pytest tests/integration/ -v
 pytest tests/e2e/ -v
 
 # Performance tests
-python scripts/benchmark.py
+python deployment/scripts/benchmark.py
 ```
 
 ## Contributing

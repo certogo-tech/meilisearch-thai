@@ -454,7 +454,7 @@ MEILI_MAX_INDEXING_THREADS=4
 
 ### Nginx Configuration
 
-For custom nginx configuration, modify `docker/nginx.conf`:
+For custom nginx configuration, modify `deployment/docker/nginx.conf`:
 
 ```nginx
 # Rate limiting

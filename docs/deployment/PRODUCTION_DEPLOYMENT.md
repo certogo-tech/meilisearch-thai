@@ -84,7 +84,7 @@ cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem ssl/cert.pem
 cp /etc/letsencrypt/live/yourdomain.com/privkey.pem ssl/key.pem
 ```
 
-3. **Enable HTTPS** in `docker/nginx.prod.conf`:
+3. **Enable HTTPS** in `deployment/docker/nginx.prod.conf`:
    - Uncomment the HTTPS server block
    - Update server_name with your domain
    - Enable HTTP to HTTPS redirect
@@ -248,7 +248,7 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml up -d --scale thai-tokenizer=3
 
 # Update Nginx upstream configuration
-# Edit docker/nginx.prod.conf to add more upstream servers
+# Edit deployment/docker/nginx.prod.conf to add more upstream servers
 ```
 
 ### Optimization

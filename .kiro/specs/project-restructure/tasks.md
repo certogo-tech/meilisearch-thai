@@ -109,14 +109,14 @@
     - Organize by monitoring tool (Grafana, Prometheus, etc.)
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-- [ ] 8. Update file references and imports
-  - [ ] 8.1 Update Python import paths
+- [-] 8. Update file references and imports
+  - [x] 8.1 Update Python import paths
     - Update any Python files that reference moved test files
     - Update pytest configuration for new test directory structure
     - Verify all Python imports work with new structure
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-  - [ ] 8.2 Update Docker and deployment references
+  - [x] 8.2 Update Docker and deployment references
     - Update Dockerfile paths and build contexts
     - Update Docker Compose file references to moved files
     - Update deployment script paths and file references

@@ -555,7 +555,7 @@ docker compose build --no-cache thai-tokenizer
 docker run --rm python:3.12-slim python --version
 
 # Check Dockerfile syntax
-docker build -f docker/Dockerfile .
+docker build -f deployment/docker/Dockerfile .
 ```
 
 #### Solutions

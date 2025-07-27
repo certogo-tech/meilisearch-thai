@@ -27,7 +27,7 @@ The performance optimization process identified and implemented several key impr
 
 **Files Modified**:
 - `docker-compose.yml`: Added caching environment variables
-- `docker/docker-compose.optimized.yml`: Enhanced caching configuration
+- `deployment/docker/docker-compose.optimized.yml`: Enhanced caching configuration
 
 ### 2. Batch Processing Optimization (63.2% Improvement)
 
@@ -56,7 +56,7 @@ The performance optimization process identified and implemented several key impr
 - Memory allocation optimizations with `MALLOC_TRIM_THRESHOLD`
 
 **Files Modified**:
-- `docker/docker-compose.optimized.yml`: Added memory optimization flags
+- `deployment/docker/docker-compose.optimized.yml`: Added memory optimization flags
 
 ### 4. Container Resource Optimization
 
@@ -143,7 +143,7 @@ CMD ["uvicorn", "src.api.main:app", \
 - Basic optimizations applied
 - Suitable for development and small-scale production
 
-### 2. Optimized Docker Compose (`docker/docker-compose.optimized.yml`)
+### 2. Optimized Docker Compose (`deployment/docker/docker-compose.optimized.yml`)
 - All performance optimizations enabled
 - Redis caching support
 - Advanced resource management
