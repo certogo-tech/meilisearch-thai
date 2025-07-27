@@ -134,13 +134,13 @@ class DemoRunner:
             print("- Explore the MeiliSearch interface at http://localhost:7700")
             print("- Try the Thai Tokenizer API at http://localhost:8000/docs")
             print("- Review generated reports: comparison_report.json, benchmark_report.json")
-            print("- Check sample data in the sample_data/ directory")
+            print("- Check sample data in the data/samples/ directory")
         else:
             print("DEMONSTRATION COMPLETED WITH ERRORS")
             print("\nTroubleshooting:")
             print("- Check that services are running: docker-compose ps")
             print("- View service logs: docker-compose logs")
-            print("- Ensure sample data files exist in sample_data/")
+            print("- Ensure sample data files exist in data/samples/")
         print("=" * 80)
     
     async def run_full_demo(self, skip_setup: bool = False, 

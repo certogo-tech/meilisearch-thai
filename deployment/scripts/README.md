@@ -27,7 +27,7 @@ python deployment/scripts/run_demo.py --skip-benchmark      # Skip performance t
 **Usage**: `python deployment/scripts/setup_demo.py`
 
 **Features**:
-- Loads sample documents from `sample_data/` directory
+- Loads sample documents from `data/samples/` directory
 - Preprocesses documents with Thai tokenization
 - Configures MeiliSearch index for optimal Thai search
 - Runs sample searches to verify functionality
@@ -97,7 +97,7 @@ pip install -r requirements.txt
 ```
 
 ### Sample Data
-Ensure sample data files exist in `sample_data/`:
+Ensure sample data files exist in `data/samples/`:
 - `thai_documents.json`
 - `formal_documents.json`
 - `informal_documents.json`
@@ -167,7 +167,7 @@ docker-compose logs thai-tokenizer
 **Missing Sample Data**
 ```bash
 # Verify sample data files exist
-ls -la sample_data/
+ls -la data/samples/
 ```
 
 **Permission Errors**
@@ -202,7 +202,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
 ## Customization
 
 ### Adding New Test Cases
-1. Add documents to `sample_data/` JSON files
+1. Add documents to `data/samples/` JSON files
 2. Add queries to `test_queries.json`
 3. Update expected results in query metadata
 

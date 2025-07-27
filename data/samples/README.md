@@ -6,7 +6,7 @@ This directory contains comprehensive Thai text samples designed to test and dem
 
 ### Files Structure
 ```
-sample_data/
+data/samples/
 ├── thai_documents.json      # General Thai documents (10 docs)
 ├── formal_documents.json    # Formal/official documents (5 docs)  
 ├── informal_documents.json  # Casual/social media style (5 docs)
@@ -81,11 +81,11 @@ sample_data/
 import json
 
 # Load general documents
-with open('sample_data/thai_documents.json', 'r', encoding='utf-8') as f:
+with open('data/samples/thai_documents.json', 'r', encoding='utf-8') as f:
     general_docs = json.load(f)
 
 # Load formal documents  
-with open('sample_data/formal_documents.json', 'r', encoding='utf-8') as f:
+with open('data/samples/formal_documents.json', 'r', encoding='utf-8') as f:
     formal_docs = json.load(f)
 
 # Combine all documents
@@ -95,7 +95,7 @@ all_documents = general_docs + formal_docs + informal_docs
 ### 2. Running Search Tests
 ```python
 # Load test queries
-with open('sample_data/test_queries.json', 'r', encoding='utf-8') as f:
+with open('data/samples/test_queries.json', 'r', encoding='utf-8') as f:
     test_queries = json.load(f)
 
 # Test compound word search

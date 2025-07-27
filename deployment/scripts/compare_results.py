@@ -64,7 +64,7 @@ class SearchComparison:
         self.api_key = api_key
         self.client = MeiliSearchClient(url=meilisearch_host, api_key=api_key)
         self.tokenizer = ThaiSegmenter()
-        self.sample_data_dir = Path(__file__).parent.parent / "sample_data"
+        self.sample_data_dir = Path(__file__).parent.parent / "data" / "samples"
         
     def setup_comparison_indexes(self) -> Tuple[str, str]:
         """Set up two indexes: one with original text, one with tokenized text."""

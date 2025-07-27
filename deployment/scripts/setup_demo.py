@@ -44,7 +44,7 @@ class DemoSetup:
         self.api_key = api_key
         self.client = MeiliSearchClient(url=meilisearch_host, api_key=api_key)
         self.tokenizer = ThaiSegmenter()
-        self.sample_data_dir = Path(__file__).parent.parent / "sample_data"
+        self.sample_data_dir = Path(__file__).parent.parent / "data" / "samples"
         
     async def check_services(self) -> bool:
         """Check if required services are running."""

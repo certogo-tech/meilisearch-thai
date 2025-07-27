@@ -98,13 +98,13 @@
     - Update documentation with new configuration paths
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 7. Move data and sample files
-  - [ ] 7.1 Move sample data
+- [x] 7. Move data and sample files
+  - [x] 7.1 Move sample data
     - Move sample_data/ directory to data/samples/
     - Update references to sample data in tests and documentation
     - _Requirements: 6.1_
 
-  - [ ] 7.2 Organize monitoring files
+  - [x] 7.2 Organize monitoring files
     - Move monitoring/ directory contents to appropriate monitoring subdirectories
     - Organize by monitoring tool (Grafana, Prometheus, etc.)
     - _Requirements: 8.1, 8.2, 8.3, 8.4_

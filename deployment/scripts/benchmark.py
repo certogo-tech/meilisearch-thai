@@ -63,7 +63,7 @@ class PerformanceBenchmark:
         self.tokenizer_host = tokenizer_host
         self.client = MeiliSearchClient(url=meilisearch_host, api_key=api_key)
         self.tokenizer = ThaiSegmenter()
-        self.sample_data_dir = Path(__file__).parent.parent / "sample_data"
+        self.sample_data_dir = Path(__file__).parent.parent / "data" / "samples"
         
     def get_memory_usage(self) -> float:
         """Get current memory usage in MB."""

@@ -42,9 +42,10 @@ thai-tokenizer-meilisearch/
 │   ├── Dockerfile                 # Thai tokenizer service
 │   ├── docker-compose.yml         # Service orchestration
 │   └── nginx.conf                 # Nginx proxy configuration
-├── sample_data/
-│   ├── thai_documents.json        # Sample Thai documents
-│   └── test_queries.json          # Sample search queries
+├── data/
+│   ├── samples/
+│   │   ├── thai_documents.json    # Sample Thai documents
+│   │   └── test_queries.json      # Sample search queries
 ├── scripts/
 │   ├── setup_demo.py              # Demo data setup
 │   ├── benchmark.py               # Performance testing
@@ -70,7 +71,7 @@ thai-tokenizer-meilisearch/
 - **src/**: All source code organized by functional area
 - **tests/**: Comprehensive test suite with unit and integration tests
 - **docker/**: Container configuration and orchestration
-- **sample_data/**: Thai text samples for testing and demonstration
+- **data/samples/**: Thai text samples for testing and demonstration
 - **scripts/**: Utility scripts for setup, testing, and benchmarking
 
 ### Naming Conventions
