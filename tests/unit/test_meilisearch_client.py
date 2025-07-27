@@ -30,7 +30,7 @@ def config():
 @pytest.fixture
 def mock_meilisearch_client():
     """Mock MeiliSearch client."""
-    with patch('src.meilisearch.client.meilisearch.Client') as mock_client_class:
+    with patch('src.meilisearch_integration.client.ms_client.Client') as mock_client_class:
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         yield mock_client

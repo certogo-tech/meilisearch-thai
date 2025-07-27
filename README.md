@@ -33,33 +33,64 @@ curl -X POST http://localhost:8000/api/v1/tokenize \
 
 ## 📁 Project Structure
 
+This project follows modern Python project organization standards with clear separation of concerns:
+
 ```
 thai-tokenizer-meilisearch/
-├── src/                    # Source code
-│   ├── api/               # FastAPI application
-│   ├── tokenizer/         # Thai tokenization logic
-│   ├── meilisearch_integration/  # MeiliSearch integration
-│   └── utils/             # Utility modules
-├── tests/                 # Comprehensive test suite
-│   ├── unit/             # Unit tests
-│   ├── integration/      # Integration tests
-│   ├── performance/      # Performance tests
-│   └── production/       # Production validation
-├── docs/                  # [Documentation](docs/index.md)
-│   ├── api/              # API documentation
-│   ├── deployment/       # Deployment guides
-│   ├── development/      # Development setup
-│   └── architecture/     # System architecture
-├── deployment/            # Deployment configurations
-│   ├── docker/           # Docker configurations
-│   ├── k8s/             # Kubernetes manifests
-│   ├── environments/    # Environment configs
-│   └── scripts/         # Deployment scripts
-├── config/               # [Configuration files](config/index.md)
-├── data/                 # [Sample data and fixtures](data/index.md)
-├── monitoring/           # [Monitoring and observability](monitoring/index.md)
-└── reports/             # [Generated reports](reports/index.md)
+├── src/                           # 🔧 Source code
+│   ├── api/                      # FastAPI application and endpoints
+│   ├── tokenizer/                # Core Thai tokenization logic
+│   ├── meilisearch_integration/  # MeiliSearch client and integration
+│   └── utils/                    # Shared utility modules
+├── tests/                         # 🧪 Comprehensive test suite
+│   ├── unit/                     # Unit tests for individual components
+│   ├── integration/              # Integration tests for component interaction
+│   ├── performance/              # Performance and load testing
+│   └── production/               # Production validation tests
+├── docs/                          # 📚 [Documentation hub](docs/index.md)
+│   ├── api/                      # API reference and examples
+│   ├── deployment/               # Deployment and operations guides
+│   ├── development/              # Development setup and guidelines
+│   └── architecture/             # System design and architecture
+├── deployment/                    # 🚀 Deployment configurations
+│   ├── docker/                   # Docker containers and compose files
+│   ├── k8s/                      # Kubernetes manifests and configs
+│   ├── environments/             # Environment-specific configurations
+│   └── scripts/                  # Deployment automation scripts
+├── config/                        # ⚙️ [Configuration management](config/index.md)
+│   ├── development/              # Development environment settings
+│   ├── production/               # Production environment settings
+│   ├── testing/                  # Testing environment settings
+│   └── shared/                   # Shared configuration files
+├── data/                          # 📊 [Data and samples](data/index.md)
+│   ├── samples/                  # Thai text samples and test data
+│   ├── fixtures/                 # Test fixtures and mock data
+│   ├── benchmarks/               # Benchmark datasets
+│   └── migrations/               # Data migration scripts
+├── monitoring/                    # 📈 [Observability stack](monitoring/index.md)
+│   ├── grafana/                  # Grafana dashboards and configs
+│   ├── prometheus/               # Prometheus monitoring setup
+│   ├── logging/                  # Centralized logging configuration
+│   └── alerts/                   # Alerting rules and notifications
+├── reports/                       # 📋 [Generated reports](reports/index.md)
+│   ├── performance/              # Performance analysis reports
+│   ├── testing/                  # Test execution reports
+│   └── production/               # Production readiness reports
+├── build/                         # 🔨 Build and CI/CD artifacts
+├── backups/                       # 💾 Project backups and snapshots
+├── logs/                          # 📝 Application and service logs
+└── ssl/                           # 🔒 SSL certificates and security
 ```
+
+### 🗂️ Directory Navigation
+
+Each major directory contains detailed documentation about its contents and usage:
+
+- **[📚 Documentation](docs/index.md)** - Complete project documentation
+- **[⚙️ Configuration](config/index.md)** - Environment and application settings
+- **[📊 Data & Samples](data/index.md)** - Test data, fixtures, and samples
+- **[📈 Monitoring](monitoring/index.md)** - Observability and monitoring setup
+- **[📋 Reports](reports/index.md)** - Generated analysis and test reports
 
 ## 🛠️ Technology Stack
 
@@ -72,19 +103,35 @@ thai-tokenizer-meilisearch/
 
 ## 📚 Documentation
 
-### Getting Started
-- **[Development Guide](docs/development/README.md)** - Complete development setup and API usage
-- **[API Documentation](docs/api/index.md)** - REST API reference with examples
+Our documentation is organized by audience and use case. Start with the section most relevant to your needs:
 
-### Deployment & Operations
-- **[Production Deployment](docs/deployment/PRODUCTION_DEPLOYMENT.md)** - Production deployment guide
-- **[Performance Optimizations](docs/deployment/PERFORMANCE_OPTIMIZATIONS.md)** - Performance tuning guide
-- **[Architecture Overview](docs/architecture/index.md)** - System design and architecture
+### 🚀 Getting Started
+- **[Development Guide](docs/development/README.md)** - Complete development setup, API usage, and contribution guidelines
+- **[Quick Start Examples](docs/examples.md)** - Ready-to-run code examples and integration patterns
+- **[API Documentation](docs/api/index.md)** - Comprehensive REST API reference with interactive examples
 
-### Additional Resources
-- **[Troubleshooting Guide](docs/troubleshooting.md)** - Common issues and solutions
-- **[Sample Data](data/samples/README.md)** - Thai text samples and test cases
-- **[Examples](docs/examples.md)** - Usage examples and integration patterns
+### 🏗️ Architecture & Design
+- **[System Architecture](docs/architecture/index.md)** - High-level system design, components, and data flow
+- **[Project Structure Guide](docs/architecture/project-structure.md)** - Detailed explanation of directory organization
+
+### 🚀 Deployment & Operations
+- **[Production Deployment](docs/deployment/PRODUCTION_DEPLOYMENT.md)** - Complete production deployment guide
+- **[Performance Optimizations](docs/deployment/PERFORMANCE_OPTIMIZATIONS.md)** - Performance tuning and scaling strategies
+- **[Deployment Index](docs/deployment/index.md)** - All deployment-related documentation
+
+### 🔧 Development Resources
+- **[Development Setup](docs/development/index.md)** - Local development environment setup
+- **[Testing Guide](docs/development/testing.md)** - Testing strategies and best practices
+- **[Contributing Guidelines](docs/development/contributing.md)** - How to contribute to the project
+
+### 📊 Data & Configuration
+- **[Sample Data Guide](data/samples/README.md)** - Thai text samples, test cases, and usage examples
+- **[Configuration Reference](config/index.md)** - Environment settings and configuration options
+- **[Monitoring Setup](monitoring/index.md)** - Observability, logging, and alerting configuration
+
+### 🆘 Support & Troubleshooting
+- **[Troubleshooting Guide](docs/troubleshooting.md)** - Common issues, solutions, and debugging tips
+- **[Performance Reports](reports/index.md)** - System performance analysis and benchmarks
 
 ## 🚀 Deployment Options
 
