@@ -1,119 +1,141 @@
-# Technology Stack
+---
+inclusion: always
+---
 
-## Core Technologies
-- **Python 3.12+**: Latest Python with improved performance and type hints
-- **FastAPI 0.116+**: Modern async REST API framework with automatic OpenAPI docs
-- **PyThaiNLP 5.1.2+**: Latest Thai NLP library with improved tokenization models
-- **Meilisearch 1.15.2+**: Latest search engine with enhanced tokenization features
-- **Docker & Docker Compose V2**: Modern containerization with BuildKit support
-- **Pydantic V2.11+**: Fast data validation with improved performance
+# Technology Stack & Development Guidelines
 
-## Alternative Libraries
-- **attacut 1.1+** or **deepcut 0.7+**: Alternative Thai tokenization engines
-- **Traefik 3.0+**: Modern reverse proxy with automatic service discovery (alternative to Nginx)
-- **spaCy 3.7+**: Advanced NLP pipeline for mixed-language processing
+## Required Technology Stack
+- **Python 3.12+**: Use latest Python features, type hints, and async/await patterns
+- **FastAPI 0.116+**: All API endpoints must use FastAPI with Pydantic V2 models
+- **PyThaiNLP 5.1.2+**: Primary Thai tokenization engine - implement fallback to attacut/deepcut
+- **Meilisearch 1.15.2+**: Configure with custom Thai tokenization settings
+- **uv**: Use for all dependency management and script execution
+- **ruff**: Use for linting and formatting (replaces black, flake8, isort)
 
-## Development Tools
-- **Python**: Primary development language with modern tooling
-- **uv**: Ultra-fast Python package manager and project manager
-- **ruff**: Extremely fast Python linter and formatter (replaces flake8, black, isort)
-- **mypy 1.7+**: Static type checker with latest improvements
-- **pytest 7.4+**: Modern testing framework with async support
-- **pytest-asyncio**: Async testing support for FastAPI endpoints
+## Development Commands (Use These Exactly)
+When working with this project, use these specific commands:
 
-## Common Commands
-
-### Development Setup
+### Setup & Dependencies
 ```bash
-# Install uv (modern Python package manager)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Create virtual environment and install dependencies
-uv venv
+# Install dependencies (preferred method)
 uv pip install -r requirements.txt
 
-# Alternative: Use uv to manage project entirely
-uv init --python 3.12
-uv add fastapi uvicorn pythainlp meilisearch pydantic
+# Run the tokenizer service
+uv run uvicorn src.api.main:app --reload --port 8000
 ```
 
-### Development
+### Code Quality (Run Before Commits)
 ```bash
-# Run tokenizer service with hot reload
-uv run uvicorn src.api.main:app --reload --port 8000
-
-# Run tests with coverage
-uv run pytest tests/ -v --cov=src --cov-report=html
-
-# Lint and format code (extremely fast)
-uv run ruff check src/ tests/
+# Format and lint code
 uv run ruff format src/ tests/
+uv run ruff check src/ tests/
 
 # Type checking
 uv run mypy src/
 
-# Run all quality checks
-uv run ruff check && uv run ruff format --check && uv run mypy src/
+# Run tests with coverage
+uv run pytest tests/ -v --cov=src --cov-report=html
 ```
 
-### Docker Operations (Compose V2)
+### Docker Operations
 ```bash
-# Build containers with BuildKit
-DOCKER_BUILDKIT=1 docker compose build
-
 # Start all services
 docker compose up -d
 
-# View logs with follow
+# View service logs
 docker compose logs -f thai-tokenizer
 
-# Stop services
-docker compose down
-
-# Rebuild and restart specific service
+# Rebuild after code changes
 docker compose up --build -d thai-tokenizer
-
-# Scale services
-docker compose up -d --scale thai-tokenizer=3
 ```
 
-### Meilisearch Management
+## Code Standards (Enforce These)
+
+### Import Organization
+```python
+# Standard library first
+import asyncio
+from typing import List, Optional, Dict
+
+# Third-party libraries
+from fastapi import FastAPI, HTTPException, Depends
+from pydantic import BaseModel, Field
+
+# Local imports last
+from src.tokenizer.thai_segmenter import ThaiSegmenter
+from src.utils.logging import get_logger
+```
+
+### Async Patterns (Required)
+- Use `async/await` for all I/O operations (Meilisearch, file operations)
+- Implement proper connection pooling for external services
+- Handle timeouts gracefully with `asyncio.timeout()`
+- Use FastAPI dependency injection for shared resources
+
+### Error Handling (Critical)
+```python
+# Always include context in exceptions
+raise HTTPException(
+    status_code=422,
+    detail=f"Thai tokenization failed for text length {len(text)}: {str(e)}"
+)
+
+# Log errors with structured data
+logger.error("Tokenization failed", extra={
+    "text_length": len(text),
+    "error": str(e),
+    "tokenizer": "pythainlp"
+})
+```
+
+### Thai Text Handling Rules
+- Always use UTF-8 encoding
+- Preserve original text alongside tokenized versions
+- Test with both formal and informal Thai content
+- Handle mixed Thai-English content appropriately
+- Never log actual Thai text content (privacy)
+
+## Meilisearch Integration Patterns
+
+### Configuration (Use These Settings)
+```python
+# Configure Meilisearch with Thai tokenization
+settings = {
+    "searchableAttributes": ["content", "title"],
+    "filterableAttributes": ["language", "type"],
+    "sortableAttributes": ["created_at"],
+    "stopWords": [],  # Don't use English stop words for Thai
+    "synonyms": {},
+    "distinctAttribute": None
+}
+```
+
+### Health Checks (Implement These)
 ```bash
-# Check Meilisearch health (latest API)
+# Check Meilisearch connectivity
 curl http://localhost:7700/health
 
-# View index settings with API key
+# Verify index settings
 curl -H "Authorization: Bearer YOUR_API_KEY" \
   http://localhost:7700/indexes/documents/settings
-
-# Create index with custom settings
-curl -X POST http://localhost:7700/indexes \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -d '{"uid": "documents", "primaryKey": "id"}'
-
-# Reset index
-curl -X DELETE http://localhost:7700/indexes/documents \
-  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-## Modern Development Practices
-- **Async/await**: Full async support throughout the application
-- **Type hints**: Complete type coverage with Pydantic V2 models
-- **Dependency injection**: FastAPI's modern DI system for testability
-- **Structured logging**: JSON logging with correlation IDs
-- **Health checks**: Comprehensive health endpoints for all services
-- **Observability**: Metrics and tracing with OpenTelemetry support
+## Performance Requirements (Must Meet)
+- **Tokenization**: < 50ms for 1000 Thai characters
+- **API Response**: < 100ms for typical requests  
+- **Memory Usage**: < 256MB per container
+- **Throughput**: > 500 documents/second for batch processing
+- **Cold Start**: < 2 seconds container startup
 
-## Container Optimization
-- **Multi-stage builds**: Minimal production images
-- **Distroless images**: Security-focused base images
-- **BuildKit**: Faster builds with advanced caching
-- **Health checks**: Proper container health monitoring
+## Testing Requirements
+- Use Thai fixtures from `data/samples/` for consistent testing
+- Test both formal and informal Thai content
+- Include performance benchmarks in tests
+- Test graceful degradation when PyThaiNLP fails
+- Validate mixed Thai-English content handling
 
-## Performance Targets
-- Tokenization: < 50ms for 1000 characters (improved with latest PyThaiNLP)
-- Search response: < 100ms for typical queries (Meilisearch 1.5+ optimizations)
-- Memory usage: < 256MB per container (optimized with Python 3.12)
-- Throughput: > 500 documents/second indexing (async processing)
-- Cold start: < 2 seconds container startup time
+## Fallback Strategy (Implement This Order)
+1. **PyThaiNLP** (primary) - Most accurate for Thai
+2. **attacut** (fallback) - Faster alternative
+3. **deepcut** (fallback) - Basic segmentation
+4. **Character splitting** (last resort) - Preserve functionality

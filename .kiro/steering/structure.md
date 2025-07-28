@@ -1,103 +1,103 @@
-# Project Structure
+---
+inclusion: always
+---
 
-## Planned Directory Layout
+# Project Structure & Conventions
 
-```
-thai-tokenizer-meilisearch/
-├── src/
-│   ├── tokenizer/
-│   │   ├── __init__.py
-│   │   ├── thai_segmenter.py      # Core Thai tokenization logic
-│   │   ├── token_processor.py     # Token processing utilities
-│   │   └── config_manager.py      # Configuration management
-│   ├── meilisearch/
-│   │   ├── __init__.py
-│   │   ├── client.py              # MeiliSearch client wrapper
-│   │   ├── settings_manager.py    # Custom tokenization settings
-│   │   └── document_processor.py  # Document processing pipeline
-│   ├── api/
-│   │   ├── __init__.py
-│   │   ├── main.py                # FastAPI application
-│   │   ├── endpoints/
-│   │   │   ├── tokenize.py        # Tokenization endpoints
-│   │   │   ├── documents.py       # Document processing endpoints
-│   │   │   └── config.py          # Configuration endpoints
-│   │   └── models/
-│   │       ├── requests.py        # Request models
-│   │       └── responses.py       # Response models
-│   └── utils/
-│       ├── __init__.py
-│       ├── logging.py             # Logging configuration
-│       └── health.py              # Health check utilities
-├── tests/
-│   ├── unit/
-│   │   ├── test_tokenizer.py      # Tokenization unit tests
-│   │   ├── test_meilisearch.py    # MeiliSearch integration tests
-│   │   └── test_api.py            # API endpoint tests
-│   ├── integration/
-│   │   └── test_end_to_end.py     # Full workflow tests
-│   └── fixtures/
-│       └── thai_samples.py        # Thai text test data
-├── docker/
-│   ├── Dockerfile                 # Thai tokenizer service
-│   ├── docker-compose.yml         # Service orchestration
-│   └── nginx.conf                 # Nginx proxy configuration
-├── data/
-│   ├── samples/
-│   │   ├── thai_documents.json    # Sample Thai documents
-│   │   └── test_queries.json      # Sample search queries
-├── scripts/
-│   ├── setup_demo.py              # Demo data setup
-│   ├── benchmark.py               # Performance testing
-│   └── compare_results.py         # Before/after comparison
-├── docs/
-│   ├── api.md                     # API documentation
-│   ├── deployment.md              # Deployment guide
-│   └── troubleshooting.md         # Common issues
-├── pyproject.toml                 # Modern Python project config (uv/pip)
-├── requirements.txt               # Fallback dependencies file
-├── uv.lock                        # Lockfile for reproducible builds
-├── docker-compose.yml             # Main orchestration file
-├── .dockerignore                  # Docker build optimization
-├── .gitignore                     # Git ignore patterns
-├── ruff.toml                      # Linting and formatting config
-├── mypy.ini                       # Type checking configuration
-└── README.md                      # Project overview
+## Core Architecture
+This Thai tokenizer project follows a layered architecture with clear separation of concerns:
+
+- **src/tokenizer/**: Core Thai NLP processing (PyThaiNLP integration)
+- **src/meilisearch_integration/**: MeiliSearch client and document processing
+- **src/api/**: FastAPI REST endpoints with Pydantic models
+- **src/utils/**: Shared utilities (logging, health checks)
+
+## File Organization Rules
+
+### Source Code Structure
+- Place all business logic in `src/` with functional modules
+- Use `__init__.py` files to define public APIs for each module
+- Keep API endpoints in `src/api/endpoints/` with one file per resource
+- Store Pydantic models in `src/api/models/` (separate requests/responses)
+
+### Configuration Hierarchy
+1. **Environment files**: Use `.env` files in `config/` subdirectories
+2. **Settings classes**: Pydantic Settings models with validation
+3. **Runtime config**: Store in `config/` with environment-specific folders
+4. **Secrets**: Environment variables only, never commit to code
+
+### Testing Organization
+- **Unit tests**: Mirror `src/` structure in `tests/unit/`
+- **Integration tests**: Full component interactions in `tests/integration/`
+- **Performance tests**: Benchmarking in `tests/performance/`
+- **Thai fixtures**: Use `data/samples/` for consistent test data
+
+## Naming Conventions (Strict)
+- **Python files/modules**: `snake_case` (e.g., `thai_segmenter.py`)
+- **Classes**: `PascalCase` (e.g., `ThaiTokenizer`, `DocumentProcessor`)
+- **Functions/variables**: `snake_case` (e.g., `tokenize_text`, `process_document`)
+- **Constants**: `UPPER_SNAKE_CASE` (e.g., `DEFAULT_TIMEOUT`, `MAX_RETRIES`)
+- **API endpoints**: `kebab-case` (e.g., `/tokenize-document`, `/health-check`)
+- **Environment variables**: `UPPER_SNAKE_CASE` with prefixes (e.g., `MEILISEARCH_URL`)
+
+## Code Organization Patterns
+
+### Import Structure
+```python
+# Standard library imports first
+import asyncio
+from typing import List, Optional
+
+# Third-party imports
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+# Local imports last
+from src.tokenizer.thai_segmenter import ThaiSegmenter
+from src.utils.logging import get_logger
 ```
 
-## Key Conventions
+### Error Handling
+- Use custom exception classes in each module
+- Always include context in error messages
+- Log errors with structured data (JSON format)
+- Return consistent error responses from API endpoints
 
-### File Organization
-- **src/**: All source code organized by functional area
-- **tests/**: Comprehensive test suite with unit and integration tests
-- **docker/**: Container configuration and orchestration
-- **data/samples/**: Thai text samples for testing and demonstration
-- **scripts/**: Utility scripts for setup, testing, and benchmarking
+### Async Patterns
+- Use `async/await` for all I/O operations
+- Implement proper connection pooling for external services
+- Use dependency injection for shared resources
+- Handle timeouts and retries gracefully
 
-### Naming Conventions
-- **Python files**: snake_case (e.g., `thai_segmenter.py`)
-- **Classes**: PascalCase (e.g., `ThaiTokenizer`)
-- **Functions/variables**: snake_case (e.g., `tokenize_text`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `DEFAULT_TIMEOUT`)
-- **API endpoints**: kebab-case (e.g., `/tokenize-document`)
+## File Placement Rules
 
-### Configuration Management
-- **pyproject.toml**: Modern Python project configuration
-- **Environment-specific settings**: `.env` files with Pydantic Settings
-- **Configuration schema**: Pydantic V2 models with validation
-- **Secrets management**: Environment variables and Docker secrets
-- **Feature flags**: Runtime configuration for A/B testing
+### New Features
+- Core tokenization logic → `src/tokenizer/`
+- MeiliSearch operations → `src/meilisearch_integration/`
+- API endpoints → `src/api/endpoints/`
+- Data models → `src/api/models/`
+- Utilities → `src/utils/`
 
-### Testing Structure
-- Unit tests mirror source code structure
-- Integration tests focus on component interactions
-- End-to-end tests validate complete workflows
-- Thai text fixtures for consistent testing
+### Configuration Files
+- Development config → `config/development/`
+- Production config → `config/production/`
+- Shared config → `config/shared/`
+- Docker configs → `deployment/docker/`
 
-### Docker Organization
-- **Multi-stage Dockerfiles**: Optimized production images
-- **Docker Compose V2**: Modern orchestration with profiles
-- **BuildKit optimization**: Faster builds with advanced caching
-- **Distroless base images**: Security-focused minimal containers
-- **Health checks**: Comprehensive monitoring for all services
-- **Resource limits**: Proper CPU and memory constraints
+### Documentation
+- API docs → `docs/api/`
+- Deployment guides → `docs/deployment/`
+- Architecture docs → `docs/architecture/`
+
+## Thai Language Handling
+- Always use UTF-8 encoding for Thai text
+- Include Thai text samples in all tokenization tests
+- Test with both formal and informal Thai content
+- Preserve original text alongside tokenized versions
+- Handle mixed Thai-English content appropriately
+
+## Performance Requirements
+- Tokenization: < 50ms for 1000 characters
+- API response: < 100ms for typical requests
+- Memory usage: < 256MB per container
+- Support concurrent requests with async processing

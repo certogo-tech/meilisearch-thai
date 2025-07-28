@@ -8,12 +8,18 @@ A high-performance Thai tokenization service that integrates with MeiliSearch to
 # Clone and start services
 git clone <repository-url>
 cd thai-tokenizer-meilisearch
-docker compose up -d
+docker compose -f deployment/docker/docker-compose.yml up -d
 
 # Test the service
-curl -X POST http://localhost:8000/api/v1/tokenize \
+curl -X POST http://localhost:8001/api/v1/tokenize \
   -H "Content-Type: application/json" \
   -d '{"text": "ปัญญาประดิษฐ์และการเรียนรู้ของเครื่อง"}'
+
+# Run interactive demos
+python3 deployment/scripts/demo_thai_tokenizer.py
+
+# Run comprehensive tests
+python3 tests/integration/test_comprehensive_system.py
 ```
 
 ## 🎯 Problem & Solution

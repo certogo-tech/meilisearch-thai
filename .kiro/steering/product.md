@@ -2,58 +2,74 @@
 inclusion: always
 ---
 
-# Product Overview
+# Thai Tokenizer Product Guidelines
 
-This project implements a custom Thai tokenizer for MeiliSearch to address the challenge of searching Thai compound words. Thai language lacks spaces between words, making compound word segmentation critical for accurate search results.
+## Core Mission
+Build a production-ready Thai tokenization service that solves MeiliSearch's inability to properly segment Thai compound words, enabling accurate search for Thai content.
 
-## Core Problem
-MeiliSearch's default tokenization cannot properly handle Thai compound words, leading to poor search accuracy when users search for partial compound terms.
+## Critical Requirements
 
-## Solution Architecture
-A containerized Thai tokenization service that integrates with MeiliSearch through:
-- Pre-processing pipeline for Thai text segmentation using PyThaiNLP
-- Custom MeiliSearch configuration for Thai word boundaries
-- REST API for tokenization and document processing
-- Async processing pipeline for high-throughput document indexing
+### Performance Constraints
+- **Tokenization Speed**: < 50ms for 1000 Thai characters
+- **API Response Time**: < 100ms for typical requests
+- **Memory Usage**: < 256MB per container
+- **Throughput**: > 500 documents/second for batch processing
 
-## Key Features
-- Accurate Thai compound word segmentation using PyThaiNLP with attacut/deepcut fallbacks
-- Docker containerization with multi-stage builds for production deployment
-- FastAPI-based REST API with automatic OpenAPI documentation
-- Support for mixed Thai-English content with language detection
-- Performance monitoring, health checks, and structured logging
-- Configurable tokenization strategies (formal/informal text handling)
+### Thai Language Handling Rules
+- **Always preserve original text** alongside tokenized versions for debugging
+- **Use UTF-8 encoding** exclusively for all Thai text processing
+- **Test with complex Thai characters** including tone marks and special characters
+- **Support mixed Thai-English content** with automatic language detection
+- **Handle both formal and informal Thai text** with appropriate tokenization strategies
 
-## Business Rules
-- **Text Processing**: Always preserve original text alongside tokenized versions for debugging
-- **Language Detection**: Automatically detect Thai vs mixed content and apply appropriate tokenization
-- **Performance SLA**: Tokenization must complete within 50ms for 1000 characters
-- **Error Handling**: Graceful degradation to basic tokenization if advanced methods fail
-- **Data Privacy**: Never log or persist user document content, only metadata
+### Data Privacy & Security
+- **Never log user document content** - only log metadata and processing statistics
+- **Sanitize Thai text in logs** to prevent encoding issues
+- **Use environment variables for secrets** - never hardcode API keys or credentials
 
-## API Design Principles
-- **Consistency**: All endpoints follow RESTful conventions with consistent error responses
-- **Async-First**: Use async/await throughout for better concurrency
-- **Validation**: Strict input validation using Pydantic V2 models
-- **Versioning**: API versioning through URL paths (`/v1/tokenize`)
-- **Documentation**: Auto-generated OpenAPI docs with comprehensive examples
+## Architecture Patterns
 
-## Integration Patterns
-- **MeiliSearch Integration**: Use custom tokenizer settings, not document preprocessing
-- **Batch Processing**: Support bulk document operations for efficient indexing
-- **Health Monitoring**: Implement comprehensive health checks for all dependencies
-- **Configuration Management**: Environment-based config with validation and hot-reload
-- **Error Recovery**: Implement circuit breakers and retry logic for external services
+### Service Integration
+- **MeiliSearch Integration**: Configure custom tokenizer settings, avoid document preprocessing
+- **Fallback Strategy**: PyThaiNLP primary → attacut → deepcut → basic segmentation
+- **Async Processing**: Use async/await throughout for I/O operations
+- **Circuit Breakers**: Implement retry logic for external service failures
 
-## Development Conventions
-- **Thai Text Handling**: Always use UTF-8 encoding and test with complex Thai characters
-- **Testing Strategy**: Include Thai text fixtures in all tokenization tests
-- **Performance Testing**: Benchmark against both formal and informal Thai text samples
-- **Documentation**: Include Thai language examples in API documentation
-- **Logging**: Use structured logging with Thai text safely encoded
+### API Design Standards
+- **RESTful Endpoints**: Follow `/v1/tokenize`, `/v1/documents` patterns
+- **Pydantic V2 Models**: Strict input/output validation with type hints
+- **Error Responses**: Consistent JSON error format with Thai-safe encoding
+- **Batch Operations**: Support bulk document processing for efficiency
 
-## Target Users
-- **Developers**: Integrating Thai search capabilities into applications
-- **System Administrators**: Deploying and monitoring search infrastructure
-- **Content Managers**: Processing Thai documents for search indexing
-- **DevOps Engineers**: Managing containerized deployment and scaling
+### Code Organization Rules
+- **Core tokenization logic** → `src/tokenizer/`
+- **MeiliSearch operations** → `src/meilisearch_integration/`
+- **API endpoints** → `src/api/endpoints/`
+- **Thai test fixtures** → `data/samples/` with both formal and informal content
+
+## Development Guidelines
+
+### When Adding Features
+1. **Include Thai text examples** in all API documentation
+2. **Add corresponding test cases** with Thai fixtures from `data/samples/`
+3. **Benchmark performance** against the 50ms tokenization target
+4. **Test graceful degradation** when advanced tokenization fails
+5. **Validate mixed-language handling** for Thai-English content
+
+### Error Handling Strategy
+- **Graceful degradation**: Fall back to simpler tokenization if advanced methods fail
+- **Structured logging**: Use JSON format with correlation IDs
+- **Health checks**: Monitor all dependencies (MeiliSearch, PyThaiNLP models)
+- **Timeout handling**: Set reasonable timeouts for all external calls
+
+### Testing Requirements
+- **Unit tests**: Mirror `src/` structure in `tests/unit/`
+- **Thai fixtures**: Use consistent test data from `data/samples/`
+- **Performance tests**: Benchmark both formal and informal Thai content
+- **Integration tests**: Test full MeiliSearch integration pipeline
+
+## Configuration Management
+- **Environment-based config** with Pydantic Settings validation
+- **Hot-reload capability** for tokenization strategy changes
+- **Separate configs** for development/production in `config/` subdirectories
+- **Docker health checks** for container orchestration

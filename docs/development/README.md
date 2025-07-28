@@ -242,6 +242,9 @@ python deployment/scripts/benchmark.py
 ### Complete Documentation
 - **[API Documentation](../api/index.md)** - Complete API reference with examples
 - **[Deployment Guide](../deployment/index.md)** - Production deployment instructions
+- **[Production Setup Guide](../deployment/production-setup-guide.md)** - Production deployment setup
+- **[Testing Summary](testing-summary.md)** - Comprehensive testing results and validation
+- **[Migration Guide](migration-guide.md)** - Project structure migration information
 - **[Troubleshooting Guide](../troubleshooting.md)** - Common issues and solutions
 
 ### Sample Data
@@ -249,8 +252,10 @@ python deployment/scripts/benchmark.py
 - **[Test Queries](../../data/samples/test_queries.json)** - Search test cases
 - **[Dataset Documentation](../../data/samples/README.md)** - Sample data usage guide
 
-### Scripts
+### Scripts and Testing
 - **[Demonstration Scripts](../../deployment/scripts/)** - Automated demo and benchmarking
+- **[Demo Script](../../deployment/scripts/demo_thai_tokenizer.py)** - Interactive Thai tokenizer demonstrations
+- **[Comprehensive Tests](../../tests/integration/test_comprehensive_system.py)** - Full system integration tests
 - **[Script Documentation](../../deployment/scripts/README.md)** - Usage instructions for all scripts
 
 ## Development

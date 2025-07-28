@@ -1,0 +1,83 @@
+{
+  "health_check": true,
+  "meilisearch_connection": true,
+  "tokenization_tests": [
+    {
+      "test": "Simple compound words",
+      "success": true,
+      "token_count": 5,
+      "processing_time": 1
+    },
+    {
+      "test": "Mixed Thai-English",
+      "success": true,
+      "token_count": 12,
+      "processing_time": 0
+    },
+    {
+      "test": "Technical terms",
+      "success": true,
+      "token_count": 4,
+      "processing_time": 1
+    },
+    {
+      "test": "Formal language",
+      "success": true,
+      "token_count": 5,
+      "processing_time": 3
+    },
+    {
+      "test": "Numbers and punctuation",
+      "success": true,
+      "token_count": 13,
+      "processing_time": 0
+    }
+  ],
+  "query_processing_tests": [
+    {
+      "query": "ปัญญาประดิษฐ์",
+      "success": true,
+      "token_count": 1,
+      "variant_count": 6
+    },
+    {
+      "query": "การเรียนรู้",
+      "success": true,
+      "token_count": 1,
+      "variant_count": 7
+    },
+    {
+      "query": "AI และ ML",
+      "success": true,
+      "token_count": 3,
+      "variant_count": 6
+    },
+    {
+      "query": "เทคโนโลยี",
+      "success": true,
+      "token_count": 1,
+      "variant_count": 6
+    }
+  ],
+  "configuration_test": true,
+  "performance_benchmarks": [
+    {
+      "text_length": 13,
+      "avg_api_time": 0.2,
+      "avg_total_time": 8.77995491027832,
+      "chars_per_second": 65000.0
+    },
+    {
+      "text_length": 49,
+      "avg_api_time": 1.0,
+      "avg_total_time": 13.935279846191406,
+      "chars_per_second": 49000.0
+    },
+    {
+      "text_length": 190,
+      "avg_api_time": 2.6,
+      "avg_total_time": 8.327817916870117,
+      "chars_per_second": 73076.92307692308
+    }
+  ]
+}

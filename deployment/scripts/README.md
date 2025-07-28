@@ -75,6 +75,26 @@ python deployment/scripts/run_demo.py --skip-benchmark      # Skip performance t
 
 **Output**: `benchmark_report.json` with detailed metrics
 
+### 5. `demo_thai_tokenizer.py` - Interactive Demonstrations
+**Purpose**: Interactive demonstrations of Thai tokenizer capabilities  
+**Usage**: `python deployment/scripts/demo_thai_tokenizer.py`
+
+**Features**:
+- Basic Thai tokenization examples
+- Compound word handling demonstrations
+- Mixed Thai-English content processing
+- Search query processing examples
+- Performance comparisons
+- Real-world usage scenarios
+
+**Demonstrations**:
+- Simple Thai text tokenization
+- Complex compound word segmentation
+- Mixed language content handling
+- Search query enhancement
+- Performance benchmarking
+- Real-world text examples (news, academic, business, government)
+
 ## Prerequisites
 
 ### Required Services
@@ -116,11 +136,17 @@ python deployment/scripts/run_demo.py
 # 1. Set up demo data
 python deployment/scripts/setup_demo.py
 
-# 2. Compare search results
+# 2. Run interactive demonstrations
+python deployment/scripts/demo_thai_tokenizer.py
+
+# 3. Compare search results
 python deployment/scripts/compare_results.py
 
-# 3. Run performance benchmarks
+# 4. Run performance benchmarks
 python deployment/scripts/benchmark.py
+
+# 5. Run comprehensive system tests
+python tests/integration/test_comprehensive_system.py
 ```
 
 ### Custom Configuration
