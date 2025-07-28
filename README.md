@@ -111,7 +111,14 @@ Each major directory contains detailed documentation about its contents and usag
 
 Our documentation is organized by audience and use case. Start with the section most relevant to your needs:
 
+### 🎯 Choose Your Path
+- **New to Thai tokenization?** → [Complete Newcomer Guide (0 to 100)](docs/getting-started/newcomer-guide.md)
+- **Have existing MeiliSearch?** → [Integration Guide](docs/integration/existing-meilisearch-integration.md)
+- **Want to see it in action?** → Run `python3 deployment/scripts/demo_thai_tokenizer.py`
+
 ### 🚀 Getting Started
+- **[Complete Newcomer Guide (0 to 100)](docs/getting-started/newcomer-guide.md)** - Start here if you're new to Thai tokenization
+- **[Existing MeiliSearch Integration](docs/integration/existing-meilisearch-integration.md)** - Add Thai tokenization to your current setup
 - **[Development Guide](docs/development/README.md)** - Complete development setup, API usage, and contribution guidelines
 - **[Quick Start Examples](docs/examples.md)** - Ready-to-run code examples and integration patterns
 - **[API Documentation](docs/api/index.md)** - Comprehensive REST API reference with interactive examples

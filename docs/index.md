@@ -1,121 +1,156 @@
-# Thai Tokenizer for MeiliSearch - Documentation
+# Thai Tokenizer Documentation Hub
 
-Welcome to the comprehensive documentation for the Thai Tokenizer MeiliSearch integration system. This documentation is organized by audience and use case to help you find the information you need quickly.
+Welcome to the comprehensive documentation for the Thai Tokenizer for MeiliSearch. This documentation is organized to help you quickly find what you need based on your experience level and use case.
 
-## 📖 Documentation Sections
+## 🎯 Quick Navigation
 
-### 🚀 [Getting Started](development/README.md)
-**For developers and new users**
-- Quick start guide with Docker Compose
-- Development environment setup
-- API usage examples and testing
-- Code quality tools and procedures
+### New Users
+- **[Complete Newcomer Guide (0 to 100)](getting-started/newcomer-guide.md)** - Start here if you're completely new
+- **[Getting Started Hub](getting-started/index.md)** - All beginner resources in one place
 
-### 🏗️ [API Reference](api/index.md)
-**For API integration and usage**
-- Complete REST API documentation
-- Request/response schemas
-- Authentication and configuration
-- Code examples in multiple languages
+### Existing MeiliSearch Users
+- **[Integration Guide](integration/existing-meilisearch-integration.md)** - Add Thai tokenization to your current setup
+- **[Integration Hub](integration/index.md)** - All integration resources
 
-### 🚀 [Deployment](deployment/index.md)
-**For DevOps and system administrators**
-- [Production Deployment Guide](deployment/PRODUCTION_DEPLOYMENT.md)
-- [Performance Optimizations](deployment/PERFORMANCE_OPTIMIZATIONS.md)
-- Container orchestration and scaling
-- Monitoring and observability
+### Developers
+- **[Development Guide](development/README.md)** - Setup, contribution, and customization
+- **[API Reference](api/index.md)** - Complete API documentation
 
-### 🏛️ [Architecture](architecture/index.md)
-**For system architects and advanced users**
-- System design and architecture overview
-- Component interactions and data flow
-- Technology stack and design decisions
-- Scalability and performance considerations
+### Operations Teams
+- **[Production Deployment](deployment/production-setup-guide.md)** - Production-ready deployment
+- **[Performance Optimization](deployment/PERFORMANCE_OPTIMIZATIONS.md)** - Tuning and scaling
 
-### 🔧 [Troubleshooting](troubleshooting.md)
-**For debugging and problem resolution**
-- Common issues and solutions
-- Performance debugging
-- Configuration problems
-- Error message reference
+## 📚 Documentation Structure
 
-### 📊 [Examples](examples.md)
-**For practical usage patterns**
-- Integration examples
-- Common use cases
-- Sample code and configurations
-- Best practices
+### 🚀 Getting Started
+Perfect for newcomers and those wanting to understand the basics.
 
-## 🎯 Quick Navigation by Role
+- **[Newcomer Guide](getting-started/newcomer-guide.md)** - Complete 0-to-100 setup guide
+- **[Quick Examples](examples.md)** - Ready-to-run code examples
+- **[Interactive Demo](../deployment/scripts/demo_thai_tokenizer.py)** - Hands-on demonstrations
 
-### New Developer
-1. Start with [Development Setup](development/README.md)
-2. Review [API Documentation](api/index.md)
-3. Check [Examples](examples.md) for usage patterns
-4. Explore [Architecture](architecture/index.md) for deeper understanding
+### 🔄 Integration
+For users with existing systems who want to add Thai tokenization.
 
-### DevOps Engineer
-1. Begin with [Deployment Guide](deployment/index.md)
-2. Follow [Production Deployment](deployment/PRODUCTION_DEPLOYMENT.md)
-3. Implement [Performance Optimizations](deployment/PERFORMANCE_OPTIMIZATIONS.md)
-4. Set up monitoring and troubleshooting procedures
+- **[Existing MeiliSearch Integration](integration/existing-meilisearch-integration.md)** - Comprehensive integration guide
+- **[Migration Strategies](integration/existing-meilisearch-integration.md#migration-strategies)** - Safe deployment approaches
+- **[Architecture Patterns](integration/index.md#architecture-patterns)** - Different integration approaches
 
-### System Integrator
-1. Review [API Reference](api/index.md)
-2. Study [Examples](examples.md) for integration patterns
-3. Check [Architecture](architecture/index.md) for system understanding
-4. Use [Troubleshooting](troubleshooting.md) for issue resolution
+### 🏗️ Architecture & Design
+Understanding the system design and components.
 
-### Performance Engineer
-1. Start with [Performance Optimizations](deployment/PERFORMANCE_OPTIMIZATIONS.md)
-2. Review [Architecture](architecture/index.md) for system design
-3. Use [Troubleshooting](troubleshooting.md) for performance issues
-4. Check [Development Guide](development/README.md) for benchmarking tools
+- **[System Architecture](architecture/index.md)** - High-level system design
+- **[Project Structure](architecture/project-structure.md)** - Code organization and navigation
+- **[Component Overview](architecture/components.md)** - Individual component details
 
-## 📁 Additional Resources
+### 🔧 Development
+For developers who want to contribute, customize, or extend the system.
 
-### Sample Data
-- [Thai Text Samples](../data/samples/) - Test data and examples
-- [Sample Data Documentation](../data/samples/README.md) - Usage guide
+- **[Development Setup](development/README.md)** - Local development environment
+- **[Testing Guide](development/testing-summary.md)** - Testing strategies and results
+- **[Migration Guide](development/migration-guide.md)** - Project structure migration details
+- **[Contributing Guidelines](development/contributing.md)** - How to contribute
 
-### Scripts and Tools
-- [Deployment Scripts](../deployment/scripts/) - Automation tools
-- [Script Documentation](../deployment/scripts/README.md) - Usage instructions
+### 🚀 Deployment & Operations
+Production deployment, monitoring, and maintenance.
 
-### Configuration
-- [Environment Templates](../config/) - Configuration examples
-- [Docker Configurations](../deployment/docker/) - Container setup
+- **[Production Deployment](deployment/production-setup-guide.md)** - Complete production setup
+- **[Performance Optimization](deployment/PERFORMANCE_OPTIMIZATIONS.md)** - Tuning for performance
+- **[Deployment Hub](deployment/index.md)** - All deployment resources
 
-### Reports
-- [Performance Reports](../reports/performance/) - Benchmark results
-- [Testing Reports](../reports/testing/) - Test results and coverage
-- [Production Reports](../reports/production/) - Production readiness
+### 📊 Configuration & Data
+Settings, configuration, and data management.
 
-## 🆘 Getting Help
+- **[Configuration Guide](../config/index.md)** - All configuration options
+- **[Sample Data](../data/index.md)** - Test data and examples
+- **[Monitoring Setup](../monitoring/index.md)** - Observability configuration
 
-1. **Check the documentation** - Most questions are answered in the guides above
-2. **Search existing issues** - Someone may have already solved your problem
-3. **Review troubleshooting** - Common issues and solutions are documented
-4. **Ask questions** - Create a GitHub issue for help
-5. **Contribute back** - Help improve the documentation for others
+### 🆘 Support & Troubleshooting
+When you need help or encounter issues.
 
-## 🤝 Contributing to Documentation
+- **[Troubleshooting Guide](troubleshooting.md)** - Common issues and solutions
+- **[FAQ](faq.md)** - Frequently asked questions
+- **[Performance Reports](../reports/index.md)** - System performance analysis
 
-We welcome documentation improvements! To contribute:
+## 🎯 Recommended Learning Paths
 
-1. Fork the repository
-2. Make your changes to the relevant documentation files
-3. Test any code examples you add
-4. Submit a pull request with a clear description
-5. Follow the documentation style guide
+### Path 1: Complete Beginner
+1. **[Newcomer Guide](getting-started/newcomer-guide.md)** (30 minutes)
+2. **[Interactive Demo](../deployment/scripts/demo_thai_tokenizer.py)** (15 minutes)
+3. **[API Examples](examples.md)** (15 minutes)
+4. **[Production Deployment](deployment/production-setup-guide.md)** (30 minutes)
 
-### Documentation Style Guide
-- Use clear, concise language
-- Include practical examples
-- Keep sections focused and well-organized
-- Update navigation links when adding new content
-- Test all code examples before submitting
+### Path 2: Existing MeiliSearch User
+1. **[Integration Guide](integration/existing-meilisearch-integration.md)** (45 minutes)
+2. **[Migration Strategies](integration/existing-meilisearch-integration.md#migration-strategies)** (15 minutes)
+3. **[Performance Comparison](integration/existing-meilisearch-integration.md#monitoring-and-validation)** (15 minutes)
+4. **[Production Deployment](deployment/production-setup-guide.md)** (15 minutes)
+
+### Path 3: Developer/Contributor
+1. **[Development Setup](development/README.md)** (30 minutes)
+2. **[Architecture Overview](architecture/index.md)** (20 minutes)
+3. **[Testing Guide](development/testing-summary.md)** (20 minutes)
+4. **[Contributing Guidelines](development/contributing.md)** (10 minutes)
+
+### Path 4: Operations/DevOps
+1. **[Production Deployment](deployment/production-setup-guide.md)** (30 minutes)
+2. **[Performance Optimization](deployment/PERFORMANCE_OPTIMIZATIONS.md)** (20 minutes)
+3. **[Monitoring Setup](../monitoring/index.md)** (20 minutes)
+4. **[Troubleshooting Guide](troubleshooting.md)** (10 minutes)
+
+## 🔍 Find What You Need
+
+### By Task
+- **Setting up for the first time** → [Newcomer Guide](getting-started/newcomer-guide.md)
+- **Integrating with existing MeiliSearch** → [Integration Guide](integration/existing-meilisearch-integration.md)
+- **Understanding the API** → [API Reference](api/index.md)
+- **Deploying to production** → [Production Guide](deployment/production-setup-guide.md)
+- **Troubleshooting issues** → [Troubleshooting Guide](troubleshooting.md)
+- **Contributing code** → [Development Guide](development/README.md)
+
+### By Role
+- **Product Manager** → [Getting Started](getting-started/index.md) + [Examples](examples.md)
+- **Developer** → [Development Guide](development/README.md) + [API Reference](api/index.md)
+- **DevOps Engineer** → [Deployment Guide](deployment/index.md) + [Monitoring](../monitoring/index.md)
+- **System Architect** → [Architecture Guide](architecture/index.md) + [Integration Patterns](integration/index.md)
+
+### By Experience Level
+- **Beginner** → [Getting Started Hub](getting-started/index.md)
+- **Intermediate** → [Integration Hub](integration/index.md) + [API Reference](api/index.md)
+- **Advanced** → [Architecture Guide](architecture/index.md) + [Development Guide](development/README.md)
+
+## 🆘 Need Help?
+
+### Quick Support
+- **[Troubleshooting Guide](troubleshooting.md)** - Common issues and solutions
+- **[FAQ](faq.md)** - Frequently asked questions
+- **[Examples](examples.md)** - Working code examples
+
+### Community Support
+- **[GitHub Discussions](https://github.com/your-repo/discussions)** - Community Q&A
+- **[Issue Tracker](https://github.com/your-repo/issues)** - Bug reports and feature requests
+
+### Professional Support
+- **Enterprise Support** - Contact for professional support options
+- **Consulting Services** - Custom implementation and optimization
+
+## 📈 Latest Updates
+
+### Recent Additions
+- ✅ **Complete Newcomer Guide** - Comprehensive 0-to-100 setup guide
+- ✅ **Integration Guide** - Detailed guide for existing MeiliSearch users
+- ✅ **Interactive Demo Script** - Hands-on demonstrations
+- ✅ **Comprehensive Testing Suite** - Full system validation
+- ✅ **Production Deployment Guide** - Production-ready setup
+
+### Coming Soon
+- 🔄 **SDK Documentation** - Official SDKs for popular languages
+- 🔄 **Advanced Configuration** - Custom tokenization models
+- 🔄 **Monitoring Dashboards** - Pre-built Grafana dashboards
+- 🔄 **Performance Benchmarks** - Detailed performance analysis
 
 ---
 
-**Need help getting started?** Jump to the [Development Guide](development/README.md) or [API Documentation](api/index.md) to begin!
+**Ready to start?** Choose your path above and begin your Thai search journey! 🚀
+
+**Questions?** Check our [FAQ](faq.md) or join the [community discussions](https://github.com/your-repo/discussions).
