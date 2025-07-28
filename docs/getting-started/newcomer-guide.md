@@ -5,6 +5,7 @@ Welcome! This guide will take you from zero knowledge to running a production-re
 ## 🎯 What You'll Learn
 
 By the end of this guide, you'll have:
+
 - ✅ A running Thai tokenization service
 - ✅ MeiliSearch configured for Thai text
 - ✅ Understanding of how Thai tokenization works
@@ -14,12 +15,14 @@ By the end of this guide, you'll have:
 ## 📋 Prerequisites
 
 ### System Requirements
+
 - **Operating System**: macOS, Linux, or Windows with WSL2
 - **Memory**: At least 4GB RAM (8GB recommended)
 - **Storage**: 2GB free space
 - **Network**: Internet connection for downloading dependencies
 
 ### Required Software
+
 1. **Docker & Docker Compose** (we'll install this)
 2. **Git** (we'll install this)
 3. **Python 3.9+** (optional, for development)
@@ -30,6 +33,7 @@ By the end of this guide, you'll have:
 ### Step 1: Install Required Software
 
 #### On macOS:
+
 ```bash
 # Install Homebrew (if not already installed)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -45,6 +49,7 @@ brew install curl
 ```
 
 #### On Ubuntu/Debian Linux:
+
 ```bash
 # Update package list
 sudo apt update
@@ -61,6 +66,7 @@ newgrp docker
 ```
 
 #### On Windows:
+
 1. Install [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
 2. Install [Git for Windows](https://git-scm.com/download/win)
 3. Use PowerShell or Command Prompt for commands
@@ -89,6 +95,7 @@ docker compose -f deployment/docker/docker-compose.yml ps
 ```
 
 **Expected Output:**
+
 ```
 NAME                      IMAGE                          STATUS
 docker-meilisearch-1      getmeili/meilisearch:v1.15.2   Up (healthy)
@@ -98,6 +105,7 @@ docker-thai-tokenizer-1   docker-thai-tokenizer          Up (healthy)
 ### Step 4: Verify Everything Works
 
 #### Test 1: Health Check
+
 ```bash
 # Test Thai Tokenizer health
 curl http://localhost:8001/health
@@ -107,6 +115,7 @@ curl http://localhost:8001/health
 ```
 
 #### Test 2: Basic Thai Tokenization
+
 ```bash
 # Test Thai text tokenization
 curl -X POST http://localhost:8001/api/v1/tokenize \
@@ -118,6 +127,7 @@ curl -X POST http://localhost:8001/api/v1/tokenize \
 ```
 
 #### Test 3: MeiliSearch Connection
+
 ```bash
 # Test MeiliSearch
 curl http://localhost:7700/health
@@ -131,12 +141,14 @@ curl http://localhost:7700/health
 ## 🧪 Interactive Learning
 
 ### Run the Demo Script
+
 ```bash
 # Run interactive demonstrations
 python3 deployment/scripts/demo_thai_tokenizer.py
 ```
 
 This will show you:
+
 - Basic Thai tokenization examples
 - Compound word handling
 - Mixed Thai-English content
@@ -145,12 +157,14 @@ This will show you:
 - Real-world examples
 
 ### Run Comprehensive Tests
+
 ```bash
 # Run full system tests
 python3 tests/integration/test_comprehensive_system.py
 ```
 
 This validates:
+
 - All API endpoints
 - Performance benchmarks
 - Error handling
@@ -159,18 +173,23 @@ This validates:
 ## 📖 Understanding Thai Tokenization
 
 ### The Problem
+
 Thai language doesn't use spaces between words:
+
 - **Thai text**: `ปัญญาประดิษฐ์และการเรียนรู้ของเครื่อง`
 - **Meaning**: "Artificial Intelligence and Machine Learning"
 - **Without tokenization**: Search engines can't find compound words properly
 
 ### The Solution
+
 Our tokenizer breaks Thai text into meaningful words:
+
 - **Input**: `ปัญญาประดิษฐ์และการเรียนรู้ของเครื่อง`
 - **Output**: `["ปัญญาประดิษฐ์", "และ", "การเรียนรู้", "ของ", "เครื่อง"]`
 - **Result**: Users can search for "ปัญญาประดิษฐ์" and find documents containing this compound word
 
 ### Real-World Example
+
 ```bash
 # Without tokenization: Searching "ปัญญา" might not find "ปัญญาประดิษฐ์"
 # With tokenization: Searching "ปัญญา" will find "ปัญญาประดิษฐ์" correctly
@@ -181,12 +200,37 @@ curl -X POST http://localhost:8001/api/v1/query/process \
   -d '{"query": "ปัญญา", "options": {"expand_compounds": true}}'
 ```
 
+### Advanced Example: Thai-Japanese Compound Words
+
+Thai cuisine uses many Japanese ingredients, creating complex compound words:
+
+```bash
+# Test Thai-Japanese compound word
+curl -X POST http://localhost:8001/api/v1/tokenize \
+  -H "Content-Type: application/json" \
+  -d '{"text": "สาหร่ายวากาเมะเป็นอาหารทะเลที่มีประโยชน์"}'
+
+# Expected result: ["สาหร่ายวากาเมะ", "เป็น", "อาหารทะเล", "ที่", "มี", "ประโยชน์"]
+# "สาหร่ายวากาเมะ" = wakame seaweed (Thai + Japanese)
+
+# Test partial searches:
+curl -X POST http://localhost:8001/api/v1/query/process \
+  -H "Content-Type: application/json" \
+  -d '{"query": "สาหร่าย", "options": {"expand_compounds": true}}'
+
+curl -X POST http://localhost:8001/api/v1/query/process \
+  -H "Content-Type: application/json" \
+  -d '{"query": "วากาเมะ", "options": {"expand_compounds": true}}'
+```
+
 ## 🌐 API Documentation
 
 ### Access Interactive API Docs
-Open your browser and go to: **http://localhost:8001/docs**
+
+Open your browser and go to: **<http://localhost:8001/docs>**
 
 This provides:
+
 - Complete API reference
 - Interactive testing interface
 - Request/response examples
@@ -195,6 +239,7 @@ This provides:
 ### Key Endpoints
 
 #### 1. Tokenize Thai Text
+
 ```bash
 POST /api/v1/tokenize
 {
@@ -203,6 +248,7 @@ POST /api/v1/tokenize
 ```
 
 #### 2. Process Search Queries
+
 ```bash
 POST /api/v1/query/process
 {
@@ -212,6 +258,7 @@ POST /api/v1/query/process
 ```
 
 #### 3. Get Configuration
+
 ```bash
 GET /api/v1/config
 ```
@@ -265,19 +312,23 @@ curl -X POST http://localhost:7700/indexes/documents/search \
 ## 🚀 Production Deployment
 
 ### Option 1: Docker Compose (Recommended for beginners)
+
 ```bash
 # Production deployment with monitoring
 COMPOSE_PROFILES=monitoring docker compose -f deployment/docker/docker-compose.yml up -d
 ```
 
 ### Option 2: Using Production Script
+
 ```bash
 # Automated production setup
 ./deployment/scripts/setup_production_local.sh
 ```
 
 ### Option 3: Cloud Deployment
+
 See [Production Deployment Guide](../deployment/production-setup-guide.md) for:
+
 - AWS deployment
 - Google Cloud deployment
 - Azure deployment
@@ -286,6 +337,7 @@ See [Production Deployment Guide](../deployment/production-setup-guide.md) for:
 ## 📊 Monitoring and Maintenance
 
 ### Check Service Status
+
 ```bash
 # View service status
 docker compose -f deployment/docker/docker-compose.yml ps
@@ -296,6 +348,7 @@ docker compose -f deployment/docker/docker-compose.yml logs meilisearch
 ```
 
 ### Performance Monitoring
+
 ```bash
 # Check health endpoints
 curl http://localhost:8001/health
@@ -306,6 +359,7 @@ python3 tests/integration/test_comprehensive_system.py
 ```
 
 ### Backup and Recovery
+
 ```bash
 # Backup MeiliSearch data
 docker compose -f deployment/docker/docker-compose.yml exec meilisearch \
@@ -320,6 +374,7 @@ cp -r config/ backups/config-$(date +%Y%m%d)
 ### Common Issues
 
 #### Services Won't Start
+
 ```bash
 # Check Docker is running
 docker --version
@@ -333,6 +388,7 @@ docker compose -f deployment/docker/docker-compose.yml restart
 ```
 
 #### Tokenization Not Working
+
 ```bash
 # Check service logs
 docker compose -f deployment/docker/docker-compose.yml logs thai-tokenizer
@@ -344,12 +400,14 @@ curl -X POST http://localhost:8001/api/v1/tokenize \
 ```
 
 #### Search Results Poor
+
 1. Verify Thai tokenization is working
 2. Check MeiliSearch index settings
 3. Review stop words and synonyms configuration
 4. Test with the demo script
 
 ### Getting Help
+
 - **Documentation**: Check `docs/` directory
 - **Examples**: Run `python3 deployment/scripts/demo_thai_tokenizer.py`
 - **Issues**: Create GitHub issue with error logs
@@ -358,19 +416,23 @@ curl -X POST http://localhost:8001/api/v1/tokenize \
 ## 🎓 Next Steps
 
 ### Learn More
+
 1. **[Development Guide](../development/README.md)** - Contribute to the project
 2. **[API Documentation](../api/index.md)** - Advanced API usage
 3. **[Performance Optimization](../deployment/PERFORMANCE_OPTIMIZATIONS.md)** - Tune for your needs
 4. **[Architecture Guide](../architecture/index.md)** - Understand the system design
 
 ### Advanced Topics
+
 1. **Custom Dictionary**: Add domain-specific Thai terms
 2. **Multi-language Support**: Handle Thai-English mixed content
 3. **Scaling**: Deploy across multiple servers
 4. **Integration**: Connect with your existing applications
 
 ### Build Something Cool
+
 Ideas for your first Thai search project:
+
 - **Thai News Search**: Search Thai news articles
 - **E-commerce Search**: Thai product search
 - **Document Management**: Thai document search system
@@ -379,6 +441,7 @@ Ideas for your first Thai search project:
 ## 🎉 Congratulations!
 
 You've successfully:
+
 - ✅ Set up a complete Thai tokenization system
 - ✅ Learned how Thai tokenization works
 - ✅ Built your first Thai search application

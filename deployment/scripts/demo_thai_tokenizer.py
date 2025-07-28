@@ -152,16 +152,44 @@ def demo_performance_comparison():
             print(f"  Speed: {speed:.0f} chars/sec")
             print()
 
+def demo_thai_japanese_compounds():
+    """Demo Thai-Japanese compound words like wakame seaweed"""
+    print("🌊 DEMO 6: Thai-Japanese Compound Words")
+    print("=" * 40)
+    
+    thai_japanese_examples = {
+        "Wakame Seaweed": "สาหร่ายวากาเมะเป็นอาหารทะเลที่มีประโยชน์",
+        "Ramen Noodles": "ราเมนต้นตำรับจากญี่ปุ่นรสชาติเข้มข้น", 
+        "Sashimi Fish": "ซาชิมิปลาแซลมอนสดใหม่จากตลาดปลา",
+        "Miso Soup": "ซุปมิโซะร้อนๆ เหมาะกับอากาศหนาว",
+        "Tempura Style": "เทมปุระผักสไตล์ญี่ปุ่นแท้"
+    }
+    
+    for category, text in thai_japanese_examples.items():
+        response = requests.post(
+            f"{BASE_URL}/api/v1/tokenize",
+            json={"text": text}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print(f"{category}:")
+            print(f"  Text: {text}")
+            print(f"  Tokens: {' | '.join(data['tokens'])}")
+            print(f"  Count: {len(data['tokens'])} tokens")
+            print()
+
 def demo_real_world_examples():
     """Demo with real-world Thai text examples"""
-    print("🌍 DEMO 6: Real-World Examples")
+    print("🌍 DEMO 7: Real-World Examples")
     print("=" * 40)
     
     examples = {
         "News Headline": "รัฐบาลเร่งพัฒนาเทคโนโลยีดิจิทัลเพื่อเศรษฐกิจไทย",
         "Academic Text": "การวิจัยด้านปัญญาประดิษฐ์ในมหาวิทยาลัยไทย",
         "Business": "บริษัทเทคโนโลยีสารสนเทศแห่งประเทศไทย จำกัด",
-        "Government": "กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม"
+        "Government": "กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม",
+        "Food Review": "ร้านอาหารญี่ปุ่นเสิร์ฟสาหร่ายวากาเมะสดใหม่"
     }
     
     for category, text in examples.items():
@@ -201,6 +229,7 @@ def main():
     demo_mixed_content()
     demo_search_query_processing()
     demo_performance_comparison()
+    demo_thai_japanese_compounds()
     demo_real_world_examples()
     
     print("🎉 All demos completed!")

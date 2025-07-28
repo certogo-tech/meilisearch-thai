@@ -198,5 +198,85 @@
     "expected_results": ["tech_001"],
     "search_type": "fuzzy",
     "difficulty": "intermediate"
+  },
+  {
+    "id": "wakame_001",
+    "query": "สาหร่ายวากาเมะ",
+    "description": "Thai-Japanese compound word for wakame seaweed",
+    "expected_results": ["seaweed_001", "seaweed_002", "seaweed_003", "seaweed_004", "seaweed_005"],
+    "search_type": "thai_japanese_compound",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "wakame_002",
+    "query": "สาหร่าย",
+    "description": "Thai part of compound word - should find all seaweed documents",
+    "expected_results": ["seaweed_001", "seaweed_002", "seaweed_003", "seaweed_004", "seaweed_005"],
+    "search_type": "thai_partial_compound",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "wakame_003",
+    "query": "วากาเมะ",
+    "description": "Japanese part of compound word - should find all seaweed documents",
+    "expected_results": ["seaweed_001", "seaweed_002", "seaweed_003", "seaweed_004", "seaweed_005"],
+    "search_type": "japanese_partial_compound",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "wakame_004",
+    "query": "สลัดสาหร่าย",
+    "description": "Context-specific search for seaweed salad",
+    "expected_results": ["seaweed_001", "seaweed_005"],
+    "search_type": "contextual_compound",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "wakame_005",
+    "query": "อาหารญี่ปุ่น สาหร่าย",
+    "description": "Multi-term search for Japanese food with seaweed",
+    "expected_results": ["seaweed_001", "seaweed_005"],
+    "search_type": "multi_term_compound",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "wakame_006",
+    "query": "ประโยชน์สาหร่าย",
+    "description": "Health benefits of seaweed compound search",
+    "expected_results": ["seaweed_002"],
+    "search_type": "health_compound",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "wakame_007",
+    "query": "เทคนิคการทำอาหาร วากาเมะ",
+    "description": "Cooking technique search with Japanese term",
+    "expected_results": ["seaweed_003"],
+    "search_type": "cooking_technique_compound",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "wakame_008",
+    "query": "สาหร่ายโนริ คอมบุ",
+    "description": "Multiple Japanese seaweed types search",
+    "expected_results": ["seaweed_004"],
+    "search_type": "multiple_japanese_terms",
+    "difficulty": "advanced"
+  },
+  {
+    "id": "wakame_009",
+    "query": "ร้านอาหารญี่ปุ่น วากาเมะ",
+    "description": "Japanese restaurant with wakame search",
+    "expected_results": ["seaweed_005"],
+    "search_type": "restaurant_compound",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "wakame_010",
+    "query": "ไอโอดีน สาหร่าย",
+    "description": "Nutritional compound search",
+    "expected_results": ["seaweed_002", "seaweed_004"],
+    "search_type": "nutritional_compound",
+    "difficulty": "intermediate"
   }
 ]
