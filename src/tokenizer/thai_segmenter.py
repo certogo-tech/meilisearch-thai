@@ -104,10 +104,8 @@ class ThaiSegmenter:
         try:
             # Use custom tokenizer if available, otherwise use specified engine
             if self._custom_tokenizer:
-                tokens = self._custom_tokenizer.word_tokenize(
-                    text, 
-                    keep_whitespace=self.keep_whitespace
-                )
+                # Custom tokenizer doesn't support keep_whitespace parameter
+                tokens = self._custom_tokenizer.word_tokenize(text)
                 engine_used = f"{self.engine}_custom"
             else:
                 tokens = word_tokenize(

@@ -1,0 +1,7 @@
+{
+  "custom_dictionary_path": "data/dictionaries/thai_compounds.json",
+  "tokenizer_handle_compounds": true,
+  "tokenizer_engine": "newmm",
+  "tokenizer_keep_whitespace": true,
+  "debug": true
+}

@@ -293,7 +293,13 @@ class ConfigManager:
     def _load_custom_dictionary(self) -> None:
         """Load custom dictionary from file if specified."""
         if not self._settings.custom_dictionary_path:
-            return
+            # Try default compound words dictionary
+            default_dict_path = Path("data/dictionaries/thai_compounds.json")
+            if default_dict_path.exists():
+                self._settings.custom_dictionary_path = str(default_dict_path)
+                logger.info(f"Using default compound dictionary: {default_dict_path}")
+            else:
+                return
         
         dict_path = Path(self._settings.custom_dictionary_path)
         if not dict_path.exists():
@@ -303,7 +309,24 @@ class ConfigManager:
         try:
             with open(dict_path, 'r', encoding='utf-8') as f:
                 if dict_path.suffix.lower() == '.json':
-                    self._custom_dictionary = json.load(f)
+                    data = json.load(f)
+                    
+                    # Handle different JSON formats
+                    if isinstance(data, list):
+                        # Simple list format
+                        self._custom_dictionary = data
+                    elif isinstance(data, dict):
+                        # Compound words format with categories
+                        compound_words = []
+                        for category, words in data.items():
+                            if isinstance(words, list):
+                                compound_words.extend(words)
+                            elif isinstance(words, str):
+                                compound_words.append(words)
+                        self._custom_dictionary = compound_words
+                    else:
+                        logger.warning(f"Unexpected JSON format in dictionary file: {dict_path}")
+                        self._custom_dictionary = []
                 else:
                     # Assume text file with one word per line
                     self._custom_dictionary = [
@@ -311,10 +334,19 @@ class ConfigManager:
                         if line.strip() and not line.startswith('#')
                     ]
             
+            # Remove duplicates and empty entries
+            self._custom_dictionary = list(set(word.strip() for word in self._custom_dictionary if word.strip()))
+            
             logger.info(f"Loaded {len(self._custom_dictionary)} custom dictionary entries")
+            
+            # Log some examples for debugging
+            if self._custom_dictionary:
+                examples = self._custom_dictionary[:5]
+                logger.info(f"Dictionary examples: {examples}")
             
         except Exception as e:
             logger.error(f"Failed to load custom dictionary: {e}")
+            self._custom_dictionary = []
     
     @property
     def settings(self) -> ThaiTokenizerSettings:

@@ -1,0 +1,11 @@
+{
+  "custom_dictionary_path": "data/dictionaries/thai_compounds.json",
+  "enable_compound_processing": true,
+  "priority_compounds": [
+    "วากาเมะ",
+    "สาหร่ายวากาเมะ",
+    "ซาชิมิ",
+    "เทมปุระ",
+    "ซูชิ"
+  ]
+}

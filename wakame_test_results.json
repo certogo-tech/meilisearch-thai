@@ -1,0 +1,188 @@
+{
+  "tokenization_results": [
+    {
+      "description": "Simple wakame compound word",
+      "text": "สาหร่ายวากาเมะ",
+      "tokens": [
+        "สาหร่าย",
+        "วา",
+        "กา",
+        "เมะ"
+      ],
+      "processing_time_ms": 1,
+      "contains_expected": false,
+      "success": false
+    },
+    {
+      "description": "Wakame in sentence context",
+      "text": "สาหร่ายวากาเมะเป็นอาหารทะเล",
+      "tokens": [
+        "สาหร่าย",
+        "วา",
+        "กา",
+        "เมะ",
+        "เป็น",
+        "อาหารทะเล"
+      ],
+      "processing_time_ms": 1,
+      "contains_expected": false,
+      "success": false
+    },
+    {
+      "description": "Wakame salad with context",
+      "text": "สลัดสาหร่ายวากาเมะแบบญี่ปุ่น",
+      "tokens": [
+        "สลัด",
+        "สาหร่าย",
+        "วา",
+        "กา",
+        "เมะ",
+        "แบบ",
+        "ญี่ปุ่น"
+      ],
+      "processing_time_ms": 4,
+      "contains_expected": false,
+      "success": false
+    },
+    {
+      "description": "Multiple seaweed types",
+      "text": "สาหร่ายวากาเมะและสาหร่ายโนริ",
+      "tokens": [
+        "สาหร่าย",
+        "วา",
+        "กา",
+        "เมะ",
+        "และ",
+        "สาหร่าย",
+        "โน",
+        "ริ"
+      ],
+      "processing_time_ms": 3,
+      "contains_expected": false,
+      "success": false
+    }
+  ],
+  "query_results": [
+    {
+      "description": "Exact compound word query",
+      "query": "สาหร่ายวากาเมะ",
+      "processed_query": "สาหร่าย วา กา เมะ",
+      "query_tokens": 4,
+      "search_variants": 18,
+      "processing_time": 0.06890296936035156,
+      "success": true
+    },
+    {
+      "description": "Thai part only",
+      "query": "สาหร่าย",
+      "processed_query": "สาหร่าย",
+      "query_tokens": 1,
+      "search_variants": 6,
+      "processing_time": 0.03457069396972656,
+      "success": true
+    },
+    {
+      "description": "Japanese part only",
+      "query": "วากาเมะ",
+      "processed_query": "วา กา เมะ",
+      "query_tokens": 3,
+      "search_variants": 12,
+      "processing_time": 0.06580352783203125,
+      "success": true
+    },
+    {
+      "description": "Contextual search",
+      "query": "สลัดสาหร่าย",
+      "processed_query": "สลัด สาหร่าย",
+      "query_tokens": 2,
+      "search_variants": 10,
+      "processing_time": 0.0324249267578125,
+      "success": true
+    }
+  ],
+  "performance_results": [
+    {
+      "text": "สาหร่ายวากาเมะ",
+      "length": 14,
+      "avg_time_ms": 4.300284385681152,
+      "chars_per_second": 3255.598640549546,
+      "success": true
+    },
+    {
+      "text": "สาหร่ายวากาเมะเป็นอาหารทะเลที่มีประโยชน์ต่อสุขภาพ",
+      "length": 49,
+      "avg_time_ms": 4.024338722229004,
+      "chars_per_second": 12175.913456126736,
+      "success": true
+    },
+    {
+      "text": "ร้านอาหารญี่ปุ่นเสิร์ฟสลัดสาหร่ายวากาเมะแบบดั้งเดิ...",
+      "length": 51,
+      "avg_time_ms": 3.195786476135254,
+      "chars_per_second": 15958.512992293403,
+      "success": true
+    },
+    {
+      "text": "สาหร่ายวากาเมะ โนริ คอมบุ และสาหร่ายทะเลชนิดอื่นๆ ...",
+      "length": 60,
+      "avg_time_ms": 5.917882919311523,
+      "chars_per_second": 10138.760907926224,
+      "success": true
+    }
+  ],
+  "accuracy_results": [
+    {
+      "description": "Should recognize wakame as single compound",
+      "input": "สาหร่ายวากาเมะมีประโยชน์",
+      "tokens": [
+        "สาหร่าย",
+        "วา",
+        "กา",
+        "เมะ",
+        "มีประโยชน์"
+      ],
+      "accuracy": 0.0,
+      "expected_found": false,
+      "success": false
+    },
+    {
+      "description": "Should recognize separated parts",
+      "input": "สาหร่าย วากาเมะ แยกกัน",
+      "tokens": [
+        "สาหร่าย",
+        " ",
+        "วา",
+        "กา",
+        "เมะ",
+        " ",
+        "แยกกัน"
+      ],
+      "accuracy": 0.0,
+      "expected_found": false,
+      "success": false
+    },
+    {
+      "description": "Should recognize compound in shopping context",
+      "input": "ซื้อสาหร่ายวากาเมะแห้งจากญี่ปุ่น",
+      "tokens": [
+        "ซื้อ",
+        "สาหร่าย",
+        "วา",
+        "กา",
+        "เมะ",
+        "แห้ง",
+        "จาก",
+        "ญี่ปุ่น"
+      ],
+      "accuracy": 0.0,
+      "expected_found": false,
+      "success": false
+    }
+  ],
+  "summary": {
+    "total_tests": 11,
+    "successful_tests": 4,
+    "success_rate": 0.36363636363636365,
+    "average_speed": 10382.196499223977
+  }
+}

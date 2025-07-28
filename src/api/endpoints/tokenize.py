@@ -1,6 +1,8 @@
 """Tokenization endpoints for the Thai tokenizer API."""
 
+import json
 import logging
+from pathlib import Path
 from typing import Dict, Any
 from datetime import datetime
 
@@ -27,11 +29,65 @@ _result_enhancer: SearchResultEnhancer = None
 
 
 def get_thai_segmenter() -> ThaiSegmenter:
-    """Dependency to get Thai segmenter instance."""
+    """Dependency to get Thai segmenter instance with compound dictionary support."""
     global _thai_segmenter
     if _thai_segmenter is None:
-        _thai_segmenter = ThaiSegmenter()
+        # Load compound dictionary for improved tokenization
+        compound_words = _load_compound_dictionary()
+        _thai_segmenter = ThaiSegmenter(
+            engine="newmm",
+            custom_dict=compound_words,
+            keep_whitespace=True
+        )
+        logger.info(f"Thai segmenter initialized with {len(compound_words)} compound words")
     return _thai_segmenter
+
+
+def _load_compound_dictionary() -> list:
+    """Load compound words dictionary for enhanced tokenization."""
+    import json
+    from pathlib import Path
+    
+    dict_path = Path("data/dictionaries/thai_compounds.json")
+    
+    if not dict_path.exists():
+        logger.warning(f"Compound dictionary not found: {dict_path}")
+        return []
+    
+    try:
+        with open(dict_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # Extract compound words from JSON structure
+        compounds = []
+        if isinstance(data, list):
+            compounds = data
+        elif isinstance(data, dict):
+            for category, words in data.items():
+                if isinstance(words, list):
+                    compounds.extend(words)
+        
+        # Remove duplicates and empty entries
+        compounds = list(set(word.strip() for word in compounds if word.strip()))
+        
+        logger.info(f"Loaded {len(compounds)} compound words from dictionary")
+        
+        # Log some examples for verification
+        if compounds:
+            examples = compounds[:5]
+            logger.info(f"Compound dictionary examples: {examples}")
+            
+            # Specifically check for wakame
+            if "วากาเมะ" in compounds:
+                logger.info("✅ วากาเมะ found in compound dictionary - tokenization issue should be resolved!")
+            else:
+                logger.warning("⚠️ วากาเมะ not found in compound dictionary")
+        
+        return compounds
+        
+    except Exception as e:
+        logger.error(f"Failed to load compound dictionary: {e}")
+        return []
 
 
 def get_token_processor() -> TokenProcessor:
