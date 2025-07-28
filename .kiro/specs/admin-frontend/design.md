@@ -45,13 +45,14 @@ graph TB
 ### Technology Stack
 
 **Frontend:**
-- React 18 with TypeScript for type safety and modern development
-- Material-UI (MUI) v5 for consistent, accessible component library
-- React Query (TanStack Query) for efficient API state management and caching
-- React Router v6 for client-side routing and navigation
+- Next.js 15 with TypeScript for full-stack React framework with SSR/SSG capabilities
+- Tailwind CSS v4.x for utility-first styling with modern CSS features
+- ShadCN/UI for high-quality, accessible component library built on Radix UI
+- TanStack Query v5 for efficient API state management and caching
 - React Hook Form for performant form handling with validation
 - Recharts for interactive data visualization and analytics
 - React Dropzone for drag-and-drop file upload functionality
+- Framer Motion for smooth animations and transitions
 
 **Backend Extensions:**
 - FastAPI extensions for admin-specific endpoints
@@ -356,66 +357,151 @@ interface BulkOperationRequest {
 ### Responsive Design Breakpoints
 
 ```typescript
+// Tailwind CSS breakpoints (mobile-first)
 const breakpoints = {
-  xs: 0,      // Mobile portrait
-  sm: 600,    // Mobile landscape
-  md: 900,    // Tablet
-  lg: 1200,   // Desktop
-  xl: 1536    // Large desktop
+  sm: '640px',   // Mobile landscape
+  md: '768px',   // Tablet
+  lg: '1024px',  // Desktop
+  xl: '1280px',  // Large desktop
+  '2xl': '1536px' // Extra large desktop
 };
 
-// Responsive behavior:
-// xs-sm: Collapsed sidebar, stacked layout
-// md: Collapsible sidebar, adaptive layout
-// lg-xl: Full sidebar, multi-column layout
+// Responsive behavior using Tailwind classes:
+// Default (mobile): Collapsed sidebar, stacked layout
+// md: Collapsible sidebar, adaptive layout  
+// lg: Full sidebar, multi-column layout
+// xl+: Enhanced spacing and larger content areas
+
+// Example responsive component:
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+  {/* Cards adapt to screen size */}
+</div>
 ```
 
 ### Theme and Styling
 
 ```typescript
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
-    },
-    secondary: {
-      main: '#dc004e',
-      light: '#ff5983',
-      dark: '#9a0036',
-    },
-    background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Noto Sans Thai", sans-serif',
-    h1: { fontSize: '2.5rem', fontWeight: 300 },
-    h2: { fontSize: '2rem', fontWeight: 400 },
-    body1: { fontSize: '1rem', lineHeight: 1.5 },
-    body2: { fontSize: '0.875rem', lineHeight: 1.43 },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          borderRadius: 8,
+// tailwind.config.ts
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
       },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      fontFamily: {
+        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+        thai: ['Noto Sans Thai', 'sans-serif'],
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
-});
+  plugins: [require("tailwindcss-animate")],
+}
+
+export default config
+
+// CSS Variables for theming
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 94.1%;
+}
 ```
 
 ## API Integration
