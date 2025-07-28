@@ -1,10 +1,12 @@
 # Project Structure Documentation
 
-This document provides a comprehensive overview of the Thai Tokenizer project structure, explaining the purpose and organization of each directory and key files.
+This document provides a comprehensive overview of the Thai Tokenizer project structure after the 2025 restructuring migration, explaining the purpose and organization of each directory and key files.
 
 ## Overview
 
-The project follows modern Python project organization standards with clear separation of concerns, making it easy for developers to navigate, understand, and contribute to the codebase.
+The project follows modern Python project organization standards with clear separation of concerns, making it easy for developers to navigate, understand, and contribute to the codebase. The structure was migrated from a flat directory layout to this organized hierarchy to improve maintainability, developer experience, and deployment management.
+
+> **Migration Note**: This project was restructured in 2025 from a flat directory structure to the current organized layout. For detailed migration information, see the [Migration Guide](../development/migration-guide.md).
 
 ## Directory Structure
 
@@ -260,19 +262,27 @@ reports/
 1. Start with the [Development Guide](../development/README.md)
 2. Review the [API Documentation](../api/index.md)
 3. Explore the source code structure in `src/`
-4. Run tests to understand system behavior
+4. Run tests to understand system behavior: `pytest tests/`
+
+### For Existing Team Members (Post-Migration)
+1. Review the [Migration Guide](../development/migration-guide.md) for changes
+2. Update local development commands (see migration guide)
+3. Update any personal scripts or aliases for new paths
+4. Review updated development setup instructions
 
 ### For DevOps Engineers
 1. Review the [Deployment Documentation](../deployment/index.md)
 2. Examine deployment configurations in `deployment/`
-3. Set up monitoring using `monitoring/` configurations
-4. Review production readiness reports in `reports/production/`
+3. Update deployment scripts for new file paths
+4. Set up monitoring using `monitoring/` configurations
+5. Review production readiness reports in `reports/production/`
 
 ### For System Architects
 1. Study this project structure documentation
 2. Review the system architecture documentation
 3. Examine the modular design in `src/`
 4. Understand the testing strategy in `tests/`
+5. Review the migration rationale and benefits
 
 ## Maintenance and Evolution
 

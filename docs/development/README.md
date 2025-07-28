@@ -21,20 +21,20 @@ Thai language lacks spaces between words, making compound word segmentation crit
 #### Development Mode (Default)
 ```bash
 # Start services for development (no nginx proxy)
-docker compose up -d
+docker compose -f deployment/docker/docker-compose.yml up -d
 
 # Check service health
 curl http://localhost:8000/health
 curl http://localhost:7700/health
 
 # View logs
-docker compose logs -f thai-tokenizer
+docker compose -f deployment/docker/docker-compose.yml logs -f thai-tokenizer
 ```
 
 #### Production Mode (With Nginx Proxy)
 ```bash
 # Start all services including nginx proxy
-docker compose --profile production up -d
+docker compose -f deployment/docker/docker-compose.yml --profile production up -d
 
 # Access through nginx proxy
 curl http://localhost/health
@@ -60,16 +60,16 @@ cp config/development/.env.example .env
 #### Container Management
 ```bash
 # Stop services
-docker compose down
+docker compose -f deployment/docker/docker-compose.yml down
 
 # Rebuild and restart
-docker compose up --build -d
+docker compose -f deployment/docker/docker-compose.yml up --build -d
 
 # View service status
-docker compose ps
+docker compose -f deployment/docker/docker-compose.yml ps
 
 # Clean up volumes (WARNING: deletes data)
-docker compose down -v
+docker compose -f deployment/docker/docker-compose.yml down -v
 ```
 
 ### Development Setup
@@ -96,15 +96,43 @@ uvicorn src.api.main:app --reload --port 8000
 ## Project Structure
 
 ```
-src/
-├── tokenizer/          # Core Thai tokenization logic
-├── meilisearch/        # MeiliSearch integration
-├── api/               # FastAPI application
-└── utils/             # Utility modules
-
-deployment/docker/     # Container configuration
-tests/                 # Test suite
+thai-tokenizer-meilisearch/
+├── src/                           # Source code
+│   ├── tokenizer/                 # Core Thai tokenization logic
+│   ├── meilisearch_integration/   # MeiliSearch integration
+│   ├── api/                       # FastAPI application
+│   └── utils/                     # Utility modules
+├── tests/                         # Test suite organized by type
+│   ├── unit/                      # Unit tests
+│   ├── integration/               # Integration tests
+│   ├── performance/               # Performance tests
+│   └── production/                # Production validation tests
+├── docs/                          # Documentation
+│   ├── api/                       # API documentation
+│   ├── deployment/                # Deployment guides
+│   ├── development/               # Development guides (this file)
+│   └── architecture/              # Architecture documentation
+├── deployment/                    # Deployment configuration
+│   ├── docker/                    # Docker configurations
+│   ├── k8s/                       # Kubernetes configurations
+│   ├── environments/              # Environment-specific configs
+│   └── scripts/                   # Deployment scripts
+├── config/                        # Configuration by environment
+│   ├── development/               # Development configuration
+│   ├── production/                # Production configuration
+│   ├── testing/                   # Testing configuration
+│   └── shared/                    # Shared configuration
+├── data/                          # Data files and samples
+│   ├── samples/                   # Thai text samples
+│   ├── fixtures/                  # Test fixtures
+│   ├── benchmarks/                # Benchmark data
+│   └── migrations/                # Data migration scripts
+├── monitoring/                    # Monitoring and observability
+├── reports/                       # Generated reports
+└── [root files]                   # Essential project files
 ```
+
+For detailed information about the project structure and recent migration, see the [Migration Guide](migration-guide.md).
 
 ## API Usage Examples
 
@@ -257,16 +285,22 @@ uv run ruff check && uv run ruff format --check && uv run mypy src/
 
 ### Testing
 ```bash
+# All tests
+pytest tests/ -v
+
 # Unit tests
 pytest tests/unit/ -v
 
 # Integration tests
 pytest tests/integration/ -v
 
-# End-to-end tests
-pytest tests/e2e/ -v
-
 # Performance tests
+pytest tests/performance/ -v
+
+# Production validation tests
+pytest tests/production/ -v
+
+# Run benchmarks
 python deployment/scripts/benchmark.py
 ```
 

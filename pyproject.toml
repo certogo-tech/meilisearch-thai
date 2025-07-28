@@ -6,7 +6,25 @@ authors = [
     {name = "Thai Tokenizer Team"}
 ]
 readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.12"
+keywords = ["thai", "tokenizer", "meilisearch", "nlp", "search"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch"
+Documentation = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch/tree/main/docs"
+Repository = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch"
+Issues = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch/issues"
+
 dependencies = [
     "fastapi>=0.116.0",
     "uvicorn[standard]>=0.32.0",
@@ -35,6 +53,21 @@ build-backend = "hatchling.build"
 [tool.ruff]
 target-version = "py312"
 line-length = 88
+src = ["src"]
+exclude = [
+    ".git",
+    ".pytest_cache",
+    ".ruff_cache",
+    "__pycache__",
+    "build",
+    "dist",
+    "htmlcov",
+    "logs",
+    "data/samples",
+    "deployment/docker/volumes",
+    "monitoring/grafana/data",
+    "monitoring/prometheus/data",
+]
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -57,6 +90,17 @@ line-ending = "auto"
 
 [tool.mypy]
 python_version = "3.12"
+mypy_path = "src"
+packages = ["src"]
+exclude = [
+    "build/",
+    "dist/",
+    "htmlcov/",
+    "logs/",
+    "data/samples/",
+    "deployment/",
+    "monitoring/",
+]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -106,3 +150,35 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
 ]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/conftest.py",
+    "*/venv/*",
+    "*/.venv/*",
+    "*/build/*",
+    "*/dist/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"

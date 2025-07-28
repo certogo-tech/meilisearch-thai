@@ -290,34 +290,34 @@ temp/
 meili_data/
 *.mdb
 
-# Generated reports
-comparison_report.json
-benchmark_report.json
-performance_report.json
+# Generated reports (organized in reports/ directory)
+reports/performance/benchmark_report.json
+reports/performance/comparison_report.json
+reports/testing/test_results/
+reports/production/production_test_results.json
 
-# Test outputs
-test_results/
-test_reports/
-
-# Backup files
+# Backup files (organized in backups/ directory)
 *.bak
 *.backup
-backup/
-backups/
+backups/*.tar.gz
+backups/*.zip
 
 # Generated documentation
 docs/build/
 docs/_build/
 
-# Local configuration files
-config.local.json
-settings.local.json
+# Configuration files (organized in config/ directory)
+config/development/.env.development
+config/production/.env.production
+config/testing/.env.testing
+config/shared/config.local.json
+config/shared/settings.local.json
 
-# SSL certificates
-*.pem
-*.key
-*.crt
-*.cert
+# SSL certificates (organized in ssl/ directory)
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+ssl/*.cert
 
 # Database files
 *.db
@@ -328,20 +328,18 @@ settings.local.json
 .cache/
 cache/
 
-# Temporary API test files
-test_*.py
-!tests/
+# Generated sample data (keep original samples in data/samples/)
+data/samples/generated_*
+data/fixtures/temp_*
+data/benchmarks/temp_*
 
-# Generated sample data (keep original samples)
-generated_samples/
-temp_samples/
-
-# Docker volumes
+# Docker volumes and data
 docker_data/
+deployment/docker/volumes/
 
 # Kubernetes secrets
-k8s-secrets/
-*.secret.yaml
+deployment/k8s/secrets/
+deployment/k8s/*.secret.yaml
 
 # Terraform
 *.tfstate
@@ -350,9 +348,8 @@ k8s-secrets/
 .terraform.lock.hcl
 
 # Local development overrides
-docker-compose.local.yml
-.env.development
-.env.production
+deployment/docker/docker-compose.local.yml
+deployment/environments/.env.local
 
 # IDE specific files
 *.iml
@@ -368,8 +365,19 @@ profile_*
 *.hprof
 heapdump*
 
-# Application specific
-# Uncomment if you want to ignore these
-# *.json  # Be careful with this as it might ignore important config files
-# *.yaml
-# *.yml
+# Build artifacts (organized in build/ directory)
+build/dist/
+build/artifacts/
+
+# Monitoring data
+monitoring/grafana/data/
+monitoring/prometheus/data/
+monitoring/logging/logs/
+
+# Log files (organized in logs/ directory)
+logs/**/*.log
+logs/**/
+
+# uv specific files (modern Python package manager)
+uv.lock
+.uv/
