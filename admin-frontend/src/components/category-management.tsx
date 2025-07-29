@@ -39,6 +39,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,8 +55,27 @@ import {
   BarChart3,
   Filter,
   Search,
+  TrendingUp,
+  Activity,
+  Users,
+  Clock,
 } from 'lucide-react';
 import { Category, CompoundWord } from '@/types';
+import { MultiSelect } from '@/components/ui/multi-select';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+} from 'recharts';
 
 interface CategoryWithStats extends Category {
   compoundCount: number;
@@ -99,14 +119,18 @@ function SortableCategoryItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`${isDragging ? 'opacity-50' : ''}`}
+      className={`${isDragging ? 'opacity-50 scale-105 rotate-2 shadow-lg' : ''} transition-all duration-200`}
     >
-      <Card className={`${isSelected ? 'ring-2 ring-primary' : ''} hover:shadow-md transition-shadow`}>
+      <Card className={`${isSelected ? 'ring-2 ring-primary' : ''} ${isDragging ? 'shadow-2xl border-primary' : ''} hover:shadow-md transition-all duration-200`}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={(checked) => onCategorySelect(category.id, !!checked)}
+              />
               <button
-                className="cursor-grab hover:text-primary"
+                className="cursor-grab hover:text-primary hover:bg-muted/50 p-1 rounded transition-colors"
                 {...attributes}
                 {...listeners}
               >
@@ -217,6 +241,8 @@ export function CategoryManagement({ compounds, onCategoryUpdate }: CategoryMana
   const [sortBy, setSortBy] = useState<'name' | 'compounds' | 'usage' | 'confidence'>('name');
   const [editingCategory, setEditingCategory] = useState<CategoryWithStats | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [selectedCategoriesForFilter, setSelectedCategoriesForFilter] = useState<string[]>([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -257,10 +283,13 @@ export function CategoryManagement({ compounds, onCategoryUpdate }: CategoryMana
   };
 
   const filteredCategories = categories
-    .filter(category =>
-      category.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter(category => {
+      const matchesSearch = category.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter = selectedCategoriesForFilter.length === 0 || 
+        selectedCategoriesForFilter.includes(category.id);
+      return matchesSearch && matchesFilter;
+    })
     .sort((a, b) => {
       switch (sortBy) {
         case 'compounds':
@@ -273,6 +302,33 @@ export function CategoryManagement({ compounds, onCategoryUpdate }: CategoryMana
           return a.label.localeCompare(b.label);
       }
     });
+
+  // Analytics data for charts
+  const analyticsData = {
+    categoryUsage: categories.map(cat => ({
+      name: cat.label,
+      compounds: cat.compoundCount,
+      usage: cat.totalUsage,
+      confidence: cat.averageConfidence * 100,
+      activity: cat.recentActivity,
+    })),
+    totalStats: {
+      totalCategories: categories.length,
+      totalCompounds: categories.reduce((sum, cat) => sum + cat.compoundCount, 0),
+      totalUsage: categories.reduce((sum, cat) => sum + cat.totalUsage, 0),
+      averageConfidence: categories.reduce((sum, cat) => sum + cat.averageConfidence, 0) / categories.length,
+    },
+    trendData: [
+      { month: 'Jan', compounds: 28, usage: 45000 },
+      { month: 'Feb', compounds: 30, usage: 52000 },
+      { month: 'Mar', compounds: 32, usage: 58000 },
+      { month: 'Apr', compounds: 32, usage: 61000 },
+      { month: 'May', compounds: 32, usage: 65000 },
+      { month: 'Jun', compounds: 32, usage: 77823 },
+    ],
+  };
+
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
   return (
     <div className="space-y-6">
@@ -318,13 +374,236 @@ export function CategoryManagement({ compounds, onCategoryUpdate }: CategoryMana
               </SelectContent>
             </Select>
 
-            <Button variant="outline" size="sm">
+            <MultiSelect
+              options={categories.map(cat => ({ label: cat.label, value: cat.id }))}
+              selected={selectedCategoriesForFilter}
+              onChange={setSelectedCategoriesForFilter}
+              placeholder="Filter categories..."
+              className="w-[250px]"
+            />
+
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
               <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
+              {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
             </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Analytics Dashboard */}
+      {showAnalytics && (
+        <div className="space-y-6">
+          {/* Overview Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Categories</p>
+                    <p className="text-2xl font-bold">{analyticsData.totalStats.totalCategories}</p>
+                  </div>
+                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Filter className="h-4 w-4 text-blue-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Compounds</p>
+                    <p className="text-2xl font-bold">{analyticsData.totalStats.totalCompounds}</p>
+                  </div>
+                  <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <Activity className="h-4 w-4 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Usage</p>
+                    <p className="text-2xl font-bold">{analyticsData.totalStats.totalUsage.toLocaleString()}</p>
+                  </div>
+                  <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Users className="h-4 w-4 text-orange-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Avg Confidence</p>
+                    <p className="text-2xl font-bold">{(analyticsData.totalStats.averageConfidence * 100).toFixed(1)}%</p>
+                  </div>
+                  <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                    <TrendingUp className="h-4 w-4 text-purple-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Category Usage Bar Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Category Usage Distribution</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Compound count and usage by category
+                </p>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={analyticsData.categoryUsage}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="name" 
+                      tick={{ fontSize: 12 }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="compounds" fill="#3b82f6" name="Compounds" />
+                    <Bar dataKey="activity" fill="#10b981" name="Recent Activity" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Category Distribution Pie Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Category Distribution</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Proportion of compounds by category
+                </p>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={analyticsData.categoryUsage}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="compounds"
+                    >
+                      {analyticsData.categoryUsage.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Usage Trends Line Chart */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Usage Trends Over Time</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Monthly compound usage and growth trends
+                </p>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={analyticsData.trendData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis yAxisId="left" />
+                    <YAxis yAxisId="right" orientation="right" />
+                    <Tooltip />
+                    <Bar yAxisId="left" dataKey="compounds" fill="#3b82f6" name="Compounds" />
+                    <Line 
+                      yAxisId="right" 
+                      type="monotone" 
+                      dataKey="usage" 
+                      stroke="#10b981" 
+                      strokeWidth={3}
+                      name="Usage"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Category Performance Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Category Performance Metrics</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Detailed performance analysis for each category
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2">Category</th>
+                      <th className="text-right p-2">Compounds</th>
+                      <th className="text-right p-2">Usage</th>
+                      <th className="text-right p-2">Confidence</th>
+                      <th className="text-right p-2">Recent Activity</th>
+                      <th className="text-center p-2">Trend</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analyticsData.categoryUsage.map((category, index) => (
+                      <tr key={index} className="border-b hover:bg-muted/50">
+                        <td className="p-2">
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-3 h-3 rounded-full" 
+                              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                            />
+                            {category.name}
+                          </div>
+                        </td>
+                        <td className="text-right p-2 font-medium">{category.compounds}</td>
+                        <td className="text-right p-2">{category.usage.toLocaleString()}</td>
+                        <td className="text-right p-2">
+                          <div className="flex items-center justify-end gap-2">
+                            <Progress value={category.confidence} className="w-16" />
+                            <span className="text-sm">{category.confidence.toFixed(0)}%</span>
+                          </div>
+                        </td>
+                        <td className="text-right p-2">
+                          <span className="text-green-600 font-medium">+{category.activity}</span>
+                        </td>
+                        <td className="text-center p-2">
+                          <TrendingUp className="h-4 w-4 text-green-600 mx-auto" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Bulk Actions */}
       {selectedCategories.length > 0 && (

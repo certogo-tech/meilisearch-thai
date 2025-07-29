@@ -53,7 +53,7 @@
     - Implement bulk operations using ShadCN Checkbox and DropdownMenu
     - _Requirements: 1.3, 1.4, 1.5_
 
-  - [ ] 4.3 Add category management with drag-and-drop
+  - [x] 4.3 Add category management with drag-and-drop
     - Create category interface using ShadCN Card and Badge components
     - Implement drag-and-drop with @dnd-kit and ShadCN visual feedback
     - Add category filtering with ShadCN Select and multi-select
