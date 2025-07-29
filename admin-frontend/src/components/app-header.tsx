@@ -13,10 +13,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { NotificationCenter } from "@/components/notification-center"
 import { useAuth } from "@/hooks/use-auth"
+import { useNotifications } from "@/contexts/notification-context"
 
 interface AppHeaderProps {
   onMenuToggle: () => void
@@ -26,6 +27,7 @@ interface AppHeaderProps {
 export function AppHeader({ onMenuToggle, showMenuButton = false }: AppHeaderProps) {
   const { theme, setTheme } = useTheme()
   const { user, logout } = useAuth()
+  const { notifications, markAsRead, markAllAsRead, dismissNotification } = useNotifications()
 
   const handleLogout = async () => {
     try {
@@ -78,7 +80,12 @@ export function AppHeader({ onMenuToggle, showMenuButton = false }: AppHeaderPro
           </Button>
 
           {/* Notifications */}
-          <NotificationCenter />
+          <NotificationCenter 
+            notifications={notifications}
+            onMarkAsRead={markAsRead}
+            onMarkAllAsRead={markAllAsRead}
+            onDismiss={dismissNotification}
+          />
 
           {/* User menu */}
           <DropdownMenu>

@@ -2,27 +2,15 @@
 
 import * as React from "react"
 import { toast } from "sonner"
-
-export interface Notification {
-  id: string
-  title: string
-  message: string
-  type: 'info' | 'success' | 'warning' | 'error'
-  timestamp: Date
-  read: boolean
-  actionUrl?: string
-  actionLabel?: string
-}
+import { Notification } from "@/types"
 
 interface NotificationContextType {
   notifications: Notification[]
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void
   markAsRead: (id: string) => void
   markAllAsRead: () => void
-  removeNotification: (id: string) => void
-  clearAll: () => void
-  unreadCount: number
-  showToast: (message: string, type?: 'info' | 'success' | 'warning' | 'error') => void
+  dismissNotification: (id: string) => void
+  showToast: (type: 'success' | 'error' | 'warning' | 'info', title: string, message?: string) => void
 }
 
 const NotificationContext = React.createContext<NotificationContextType | undefined>(undefined)
@@ -43,46 +31,42 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   const [notifications, setNotifications] = React.useState<Notification[]>([
     {
       id: '1',
-      title: 'System Update',
-      message: 'New compound word added to dictionary',
       type: 'success',
+      title: 'System Update',
+      message: 'Dictionary has been successfully updated with 5 new compound words',
       timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
       read: false,
-      actionUrl: '/dictionary',
-      actionLabel: 'View Dictionary'
     },
     {
       id: '2',
-      title: 'Health Check',
-      message: 'System health check completed successfully',
       type: 'info',
-      timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
-      read: false
+      title: 'Performance Report',
+      message: 'Weekly tokenization performance report is now available',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      read: false,
     },
     {
       id: '3',
-      title: 'User Activity',
-      message: 'New user registered: editor@example.com',
-      type: 'info',
-      timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+      type: 'warning',
+      title: 'High Memory Usage',
+      message: 'System memory usage is at 85%. Consider optimizing queries.',
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
       read: true,
-      actionUrl: '/admin/users',
-      actionLabel: 'Manage Users'
-    }
+    },
   ])
 
   const addNotification = React.useCallback((notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     const newNotification: Notification = {
       ...notification,
-      id: Math.random().toString(36).substr(2, 9),
+      id: Date.now().toString(),
       timestamp: new Date(),
-      read: false
+      read: false,
     }
     
     setNotifications(prev => [newNotification, ...prev])
     
     // Also show as toast
-    showToast(notification.message, notification.type)
+    showToast(notification.type, notification.title, notification.message)
   }, [])
 
   const markAsRead = React.useCallback((id: string) => {
@@ -101,55 +85,72 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     )
   }, [])
 
-  const removeNotification = React.useCallback((id: string) => {
+  const dismissNotification = React.useCallback((id: string) => {
     setNotifications(prev => prev.filter(notification => notification.id !== id))
   }, [])
 
-  const clearAll = React.useCallback(() => {
-    setNotifications([])
-  }, [])
-
-  const showToast = React.useCallback((message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
+  const showToast = React.useCallback((
+    type: 'success' | 'error' | 'warning' | 'info', 
+    title: string, 
+    message?: string
+  ) => {
+    const content = message ? `${title}: ${message}` : title
+    
     switch (type) {
       case 'success':
-        toast.success(message)
+        toast.success(content)
         break
       case 'error':
-        toast.error(message)
+        toast.error(content)
         break
       case 'warning':
-        toast.warning(message)
+        toast.warning(content)
         break
-      default:
-        toast(message)
+      case 'info':
+        toast.info(content)
         break
     }
   }, [])
 
-  const unreadCount = React.useMemo(() => 
-    notifications.filter(n => !n.read).length, 
-    [notifications]
-  )
+  // Simulate real-time notifications (in production, this would come from WebSocket or SSE)
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      // Randomly add a notification every 30 seconds (for demo purposes)
+      if (Math.random() < 0.1) { // 10% chance every 30 seconds
+        const demoNotifications = [
+          {
+            type: 'info' as const,
+            title: 'New API Request',
+            message: 'Tokenization request processed successfully',
+          },
+          {
+            type: 'success' as const,
+            title: 'Compound Word Added',
+            message: 'New compound word "ราเมน" has been added to the dictionary',
+          },
+          {
+            type: 'warning' as const,
+            title: 'Rate Limit Warning',
+            message: 'API rate limit approaching for user session',
+          },
+        ]
+        
+        const randomNotification = demoNotifications[Math.floor(Math.random() * demoNotifications.length)]
+        addNotification(randomNotification)
+      }
+    }, 30000) // Check every 30 seconds
+
+    return () => clearInterval(interval)
+  }, [addNotification])
 
   const value = React.useMemo(() => ({
     notifications,
     addNotification,
     markAsRead,
     markAllAsRead,
-    removeNotification,
-    clearAll,
-    unreadCount,
-    showToast
-  }), [
-    notifications,
-    addNotification,
-    markAsRead,
-    markAllAsRead,
-    removeNotification,
-    clearAll,
-    unreadCount,
-    showToast
-  ])
+    dismissNotification,
+    showToast,
+  }), [notifications, addNotification, markAsRead, markAllAsRead, dismissNotification, showToast])
 
   return (
     <NotificationContext.Provider value={value}>

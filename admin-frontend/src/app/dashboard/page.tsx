@@ -1,11 +1,14 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProtectedRoute } from '@/components/protected-route';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { SystemAlerts } from '@/components/system-alerts';
+import { SystemAlerts, useSystemAlerts } from '@/components/system-alerts';
 import { Permission } from '@/types';
 
 export default function DashboardPage() {
+  const { alerts, removeAlert } = useSystemAlerts();
   return (
     <ProtectedRoute requiredPermissions={[Permission.VIEW_COMPOUNDS]}>
       <DashboardLayout>
@@ -18,7 +21,7 @@ export default function DashboardPage() {
 
         {/* System Alerts */}
         <div className="mb-8">
-          <SystemAlerts />
+          <SystemAlerts alerts={alerts} onDismiss={removeAlert} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

@@ -63,7 +63,8 @@
 }
 
 /* Thai text styling */
-.thai-text {
+.thai-text,
+.font-thai {
   font-family: 'Noto Sans Thai', sans-serif;
   font-feature-settings: 'liga' 1, 'calt' 1;
 }

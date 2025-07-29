@@ -34,8 +34,8 @@ const navigationItems = [
     permissions: [Permission.VIEW_COMPOUNDS]
   },
   {
-    title: "Dictionary",
-    href: "/dictionary",
+    title: "Compounds",
+    href: "/admin/compounds",
     icon: BookOpen,
     permissions: [Permission.VIEW_COMPOUNDS]
   },
