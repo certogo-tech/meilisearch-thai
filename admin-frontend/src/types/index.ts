@@ -31,6 +31,50 @@ export interface AuthState {
   isLoading: boolean;
 }
 
+export interface LoginCredentials {
+  username: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: UserInfo;
+  expiresIn: number;
+}
+
+export interface TokenPayload {
+  sub: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  permissions: Permission[];
+  exp: number;
+  iat: number;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface UserProfileUpdateRequest {
+  email?: string;
+  username?: string;
+}
+
+export interface PasswordValidationResult {
+  isValid: boolean;
+  errors: string[];
+  strength: 'weak' | 'medium' | 'strong';
+}
+
 // Compound Word Types
 export interface CompoundWord {
   id: string;
@@ -126,4 +170,41 @@ export interface Notification {
   message: string;
   timestamp: Date;
   read: boolean;
+}
+
+// Audit Log Types
+export interface AuditLog {
+  id: string;
+  userId: string;
+  username: string;
+  action: AuditAction;
+  resource: string;
+  resourceId?: string;
+  details: Record<string, any>;
+  ipAddress: string;
+  userAgent: string;
+  timestamp: Date;
+}
+
+export enum AuditAction {
+  LOGIN = 'login',
+  LOGOUT = 'logout',
+  PASSWORD_CHANGE = 'password_change',
+  PROFILE_UPDATE = 'profile_update',
+  ROLE_ASSIGNMENT = 'role_assignment',
+  COMPOUND_CREATE = 'compound_create',
+  COMPOUND_UPDATE = 'compound_update',
+  COMPOUND_DELETE = 'compound_delete',
+  BULK_IMPORT = 'bulk_import',
+  BULK_EXPORT = 'bulk_export',
+  SYSTEM_CONFIG = 'system_config',
+}
+
+export interface AuditLogFilters {
+  userId?: string;
+  action?: AuditAction;
+  resource?: string;
+  startDate?: Date;
+  endDate?: Date;
+  search?: string;
 }

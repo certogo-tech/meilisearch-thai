@@ -3,6 +3,8 @@ import { Inter, Noto_Sans_Thai } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { QueryProvider } from '@/components/query-provider';
+import { AuthProvider } from '@/components/auth-provider';
+import { NotificationProvider } from '@/contexts/notification-context';
 import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({
@@ -44,8 +46,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            {children}
-            <Toaster />
+            <AuthProvider>
+              <NotificationProvider>
+                {children}
+                <Toaster />
+              </NotificationProvider>
+            </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
