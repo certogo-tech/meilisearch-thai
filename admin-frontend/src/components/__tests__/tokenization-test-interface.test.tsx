@@ -263,4 +263,65 @@ describe('TokenizationTestInterface', () => {
     expect(screen.getByText('Start typing to see tokenization results')).toBeInTheDocument();
     expect(screen.getByText('Enter Thai text above and watch as it gets tokenized in real-time')).toBeInTheDocument();
   });
+
+  it('renders tabs for different testing modes', () => {
+    render(<TokenizationTestInterface />);
+    
+    expect(screen.getByText('Live Testing')).toBeInTheDocument();
+    expect(screen.getByText('Comparison')).toBeInTheDocument();
+    expect(screen.getByText('Test History')).toBeInTheDocument();
+    expect(screen.getByText('Batch Testing')).toBeInTheDocument();
+  });
+
+  it('shows sample templates selector', () => {
+    render(<TokenizationTestInterface />);
+    
+    expect(screen.getByText('Quick Templates')).toBeInTheDocument();
+    expect(screen.getByText('Load predefined text samples for testing')).toBeInTheDocument();
+  });
+
+  it('displays save result button when result is available', async () => {
+    const mockResponse = {
+      success: true,
+      data: {
+        originalText: 'วากาเมะ',
+        tokens: [
+          {
+            text: 'วากาเมะ',
+            startIndex: 0,
+            endIndex: 7,
+            isCompound: true,
+            confidence: 0.95,
+            category: 'thai_compound'
+          }
+        ],
+        wordBoundaries: [0],
+        compoundsFound: [
+          {
+            word: 'วากาเมะ',
+            startIndex: 0,
+            endIndex: 7,
+            confidence: 0.95
+          }
+        ],
+        processingTime: 45.2,
+        engine: 'pythainlp-mock',
+        confidence: 0.95
+      }
+    };
+
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockResponse,
+    });
+
+    render(<TokenizationTestInterface />);
+    
+    const textarea = screen.getByPlaceholderText(/Enter Thai text here to test tokenization/);
+    fireEvent.change(textarea, { target: { value: 'วากาเมะ' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('Save Result')).toBeInTheDocument();
+    });
+  });
 });

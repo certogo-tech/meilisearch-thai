@@ -68,7 +68,7 @@
     - Create metrics display using ShadCN Card and progress indicators
     - _Requirements: 2.1, 2.3_
 
-  - [ ] 5.2 Implement comparison functionality with ShadCN Tabs
+  - [x] 5.2 Implement comparison functionality with ShadCN Tabs
     - Build side-by-side view using ShadCN Tabs and diff highlighting
     - Create test history using ShadCN Table and save functionality
     - Add sample templates with ShadCN Select and predefined options

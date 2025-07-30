@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Noto_Sans_Thai } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -22,11 +22,15 @@ export const metadata: Metadata = {
   description: 'Administrative interface for managing Thai compound words',
   keywords: ['Thai', 'tokenizer', 'compound words', 'admin', 'NLP'],
   authors: [{ name: 'Thai Tokenizer Team' }],
-  viewport: 'width=device-width, initial-scale=1',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: 'white' },
     { media: '(prefers-color-scheme: dark)', color: 'black' },
   ],
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
