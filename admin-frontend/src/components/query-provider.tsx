@@ -13,15 +13,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             staleTime: 5 * 60 * 1000, // 5 minutes
             gcTime: 10 * 60 * 1000, // 10 minutes
             refetchOnWindowFocus: false,
-            retry: (failureCount, error: any) => {
-              if (error?.status === 404) return false;
+            retry: (failureCount, error: unknown) => {
+              if ((error as { status?: number })?.status === 404) return false;
               return failureCount < 3;
             },
           },
           mutations: {
-            onError: (error: any) => {
+            onError: (error: unknown) => {
               console.error('Mutation error:', error);
-              // TODO: Add toast notification
             },
           },
         },
