@@ -12,6 +12,7 @@ This guide explains how to deploy the wakame tokenization fix using the compound
 ### 1. Verify Dictionary File
 
 Ensure the compound dictionary exists:
+
 ```bash
 ls -la data/dictionaries/thai_compounds.json
 ```
@@ -21,11 +22,13 @@ The file should contain 32+ compound words including "วากาเมะ".
 ### 2. Start API with Compound Support
 
 **Option A: Using the startup script (Recommended)**
+
 ```bash
 python3 start_api_with_compounds.py
 ```
 
 **Option B: Manual startup**
+
 ```bash
 # Set environment variables
 export THAI_TOKENIZER_CUSTOM_DICTIONARY_PATH="data/dictionaries/thai_compounds.json"
@@ -53,6 +56,7 @@ Expected result: 100% success rate with wakame preserved as single token.
    - Tokenizer now uses custom dictionary by default
 
 2. **Dictionary Structure**:
+
    ```json
    {
      "thai_japanese_compounds": ["วากาเมะ", "ซาชิมิ", "เทมปุระ", ...],
@@ -63,6 +67,7 @@ Expected result: 100% success rate with wakame preserved as single token.
 ### Configuration Options
 
 **Environment Variables**:
+
 - `THAI_TOKENIZER_CUSTOM_DICTIONARY_PATH`: Path to dictionary file
 - `THAI_TOKENIZER_TOKENIZER_HANDLE_COMPOUNDS`: Enable compound processing
 - `THAI_TOKENIZER_TOKENIZER_ENGINE`: Tokenization engine (default: "newmm")
@@ -99,6 +104,7 @@ curl -X POST "http://localhost:8000/api/v1/tokenize" \
 ### Docker Integration
 
 Add to your Dockerfile:
+
 ```dockerfile
 # Copy compound dictionary
 COPY data/dictionaries/thai_compounds.json /app/data/dictionaries/
@@ -126,6 +132,7 @@ data:
 ### Health Checks
 
 The API includes health checks that verify dictionary loading:
+
 ```bash
 curl http://localhost:8000/health
 curl http://localhost:8000/api/v1/tokenize/stats
@@ -148,21 +155,27 @@ The system is designed to support hot-reload of dictionary updates without servi
 ### Common Issues
 
 1. **Dictionary not found**:
+
    ```
    ❌ Compound dictionary not found: data/dictionaries/thai_compounds.json
    ```
+
    **Solution**: Ensure the dictionary file exists and is readable.
 
 2. **Empty dictionary**:
+
    ```
    ⚠️ Custom dictionary appears to be empty
    ```
+
    **Solution**: Check dictionary file format and content.
 
 3. **Import errors**:
+
    ```
    ImportError: attempted relative import beyond top-level package
    ```
+
    **Solution**: Run from project root directory.
 
 ### Verification Steps
@@ -188,6 +201,7 @@ The wakame tokenization issue is now **completely resolved**. Users searching fo
 ## 📞 Support
 
 If you encounter issues:
+
 1. Check the troubleshooting section above
 2. Review API server logs
 3. Run the test scripts to verify functionality

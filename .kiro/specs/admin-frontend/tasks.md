@@ -38,7 +38,7 @@
     - Implement alert severity levels with ShadCN Alert component variants
     - _Requirements: 3.3, 4.2_
 
-- [-] 4. Develop dictionary management interface with ShadCN components
+- [x] 4. Develop dictionary management interface with ShadCN components
   - [x] 4.1 Create compound word listing with ShadCN Table
     - Build searchable table using ShadCN Table with virtual scrolling
     - Implement filtering with ShadCN Select, Input, and DatePicker components
@@ -61,7 +61,7 @@
     - _Requirements: 1.2, 3.1_
 
 - [ ] 5. Build tokenization testing interface with real-time updates
-  - [ ] 5.1 Create live testing component with ShadCN Textarea
+  - [x] 5.1 Create live testing component with ShadCN Textarea
     - Build text input using ShadCN Textarea with Thai font support
     - Implement real-time tokenization with debouncing and ShadCN loading states
     - Add visual highlighting using ShadCN Badge and color-coded tokens

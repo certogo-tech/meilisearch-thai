@@ -112,11 +112,13 @@ Each major directory contains detailed documentation about its contents and usag
 Our documentation is organized by audience and use case. Start with the section most relevant to your needs:
 
 ### 🎯 Choose Your Path
+
 - **New to Thai tokenization?** → [Complete Newcomer Guide (0 to 100)](docs/getting-started/newcomer-guide.md)
 - **Have existing MeiliSearch?** → [Integration Guide](docs/integration/existing-meilisearch-integration.md)
 - **Want to see it in action?** → Run `python3 deployment/scripts/demo_thai_tokenizer.py`
 
 ### 🚀 Getting Started
+
 - **[Complete Newcomer Guide (0 to 100)](docs/getting-started/newcomer-guide.md)** - Start here if you're new to Thai tokenization
 - **[Existing MeiliSearch Integration](docs/integration/existing-meilisearch-integration.md)** - Add Thai tokenization to your current setup
 - **[Development Guide](docs/development/README.md)** - Complete development setup, API usage, and contribution guidelines
@@ -124,36 +126,43 @@ Our documentation is organized by audience and use case. Start with the section 
 - **[API Documentation](docs/api/index.md)** - Comprehensive REST API reference with interactive examples
 
 ### 🏗️ Architecture & Design
+
 - **[System Architecture](docs/architecture/index.md)** - High-level system design, components, and data flow
 - **[Project Structure Guide](docs/architecture/project-structure.md)** - Detailed explanation of directory organization
 
 ### 🚀 Deployment & Operations
+
 - **[Production Deployment](docs/deployment/PRODUCTION_DEPLOYMENT.md)** - Complete production deployment guide
 - **[Performance Optimizations](docs/deployment/PERFORMANCE_OPTIMIZATIONS.md)** - Performance tuning and scaling strategies
 - **[Deployment Index](docs/deployment/index.md)** - All deployment-related documentation
 
 ### 🔧 Development Resources
+
 - **[Development Setup](docs/development/index.md)** - Local development environment setup
 - **[Testing Guide](docs/development/testing.md)** - Testing strategies and best practices
 - **[Contributing Guidelines](docs/development/contributing.md)** - How to contribute to the project
 
 ### 📊 Data & Configuration
+
 - **[Sample Data Guide](data/samples/README.md)** - Thai text samples, test cases, and usage examples
 - **[Configuration Reference](config/index.md)** - Environment settings and configuration options
 - **[Monitoring Setup](monitoring/index.md)** - Observability, logging, and alerting configuration
 
 ### 🆘 Support & Troubleshooting
+
 - **[Troubleshooting Guide](docs/troubleshooting.md)** - Common issues, solutions, and debugging tips
 - **[Performance Reports](reports/index.md)** - System performance analysis and benchmarks
 
 ## 🚀 Deployment Options
 
 ### Development
+
 ```bash
 docker compose up -d
 ```
 
 ### Production
+
 ```bash
 # Quick production deployment
 ./deployment/scripts/deploy_production.sh
@@ -163,6 +172,7 @@ COMPOSE_PROFILES=monitoring docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### Kubernetes
+
 ```bash
 kubectl apply -f deployment/k8s/
 ```

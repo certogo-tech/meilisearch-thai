@@ -41,7 +41,7 @@ const navigationItems = [
   },
   {
     title: "Test Interface",
-    href: "/test",
+    href: "/admin/test",
     icon: TestTube,
     permissions: [Permission.VIEW_COMPOUNDS]
   },

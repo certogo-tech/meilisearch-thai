@@ -208,3 +208,57 @@ export interface AuditLogFilters {
   endDate?: Date;
   search?: string;
 }
+
+// Tokenization Testing Types
+export interface TokenInfo {
+  text: string;
+  startIndex: number;
+  endIndex: number;
+  isCompound: boolean;
+  confidence: number;
+  category?: string;
+}
+
+export interface CompoundMatch {
+  word: string;
+  startIndex: number;
+  endIndex: number;
+  confidence: number;
+  components?: string[];
+}
+
+export interface TokenizationResult {
+  originalText: string;
+  tokens: TokenInfo[];
+  wordBoundaries: number[];
+  compoundsFound: CompoundMatch[];
+  processingTime: number;
+  engine: string;
+  confidence: number;
+  alternatives?: TokenizationResult[];
+}
+
+export interface TokenizationOptions {
+  includeAlternatives?: boolean;
+  engine?: string;
+  preserveWhitespace?: boolean;
+}
+
+export interface TestResult {
+  id: string;
+  text: string;
+  result: TokenizationResult;
+  timestamp: Date;
+  saved: boolean;
+}
+
+export interface TokenizationMetrics {
+  totalTokens: number;
+  compoundTokens: number;
+  processingTime: number;
+  confidence: number;
+  accuracy?: number;
+  textLength?: number;
+  tokensPerSecond?: number;
+  charactersPerSecond?: number;
+}

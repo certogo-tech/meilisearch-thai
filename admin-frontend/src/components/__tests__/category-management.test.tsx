@@ -2,10 +2,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CategoryManagement } from '../category-management';
 import { CompoundWord } from '@/types';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
 
 // Mock recharts components
 jest.mock('recharts', () => ({
@@ -23,7 +19,7 @@ jest.mock('recharts', () => ({
   Line: jest.fn(() => null),
 }));
 
-const mockCompounds = [
+const mockCompounds: CompoundWord[] = [
   {
     id: '1',
     word: 'วากาเมะ',
@@ -35,7 +31,7 @@ const mockCompounds = [
     createdBy: 'admin',
     tags: ['food', 'japanese'],
   },
-] as CompoundWord[];
+];
 
 describe('CategoryManagement', () => {
   it('should render category management interface', () => {
