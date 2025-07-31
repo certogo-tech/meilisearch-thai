@@ -40,7 +40,7 @@ clean: ## Stop all services and clean up
 
 install: ## Install Python dependencies
 	@echo "📦 Installing dependencies..."
-	@pip install -r requirements.txt
+	@python3 -m pip install -r requirements.txt
 
 build: ## Build Docker images
 	@echo "🐳 Building Docker images..."
