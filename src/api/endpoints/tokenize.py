@@ -32,14 +32,20 @@ def get_thai_segmenter() -> ThaiSegmenter:
     """Dependency to get Thai segmenter instance with compound dictionary support."""
     global _thai_segmenter
     if _thai_segmenter is None:
-        # Load compound dictionary for improved tokenization
-        compound_words = _load_compound_dictionary()
+        # Use configuration manager to get custom dictionary
+        from src.tokenizer.config_manager import ConfigManager
+        config_manager = ConfigManager()
+        
+        # Get tokenizer configuration
+        tokenizer_config = config_manager.get_tokenizer_config()
+        custom_dict = tokenizer_config.custom_dictionary
+        
         _thai_segmenter = ThaiSegmenter(
-            engine="newmm",
-            custom_dict=compound_words,
-            keep_whitespace=True
+            engine=tokenizer_config.engine.value,
+            custom_dict=custom_dict,
+            keep_whitespace=tokenizer_config.keep_whitespace
         )
-        logger.info(f"Thai segmenter initialized with {len(compound_words)} compound words")
+        logger.info(f"Thai segmenter initialized with {len(custom_dict)} compound words from config manager")
     return _thai_segmenter
 
 

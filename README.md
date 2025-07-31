@@ -15,11 +15,11 @@ curl -X POST http://localhost:8001/api/v1/tokenize \
   -H "Content-Type: application/json" \
   -d '{"text": "ปัญญาประดิษฐ์และการเรียนรู้ของเครื่อง"}'
 
-# Run interactive demos
-python3 deployment/scripts/demo_thai_tokenizer.py
+# Run compound word API
+python3 start_api_with_compounds.py
 
 # Run comprehensive tests
-python3 tests/integration/test_comprehensive_system.py
+python3 tests/integration/test_api_integration.py
 ```
 
 ## 🎯 Problem & Solution
