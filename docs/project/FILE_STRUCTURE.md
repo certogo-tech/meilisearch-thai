@@ -1,6 +1,6 @@
-# 📁 Improved File Structure
+# 📁 Ultra-Clean File Structure
 
-## 🎯 **Root Directory (Clean & Organized)**
+## 🎯 **Root Directory (Minimal & Essential)**
 
 ```
 meilisearch-thai/
@@ -8,14 +8,16 @@ meilisearch-thai/
 ├── 📄 QUICK_START.md                     # Quick setup guide
 ├── 📄 pyproject.toml                     # Python project configuration
 ├── 📄 requirements.txt                   # Python dependencies
-├── 🔧 start_api_with_compounds.py        # Wrapper script for API startup
-├── 🔧 setup_existing_meilisearch.sh      # Wrapper script for existing MeiliSearch
+├── 🔧 start_api_with_compounds.py        # Wrapper → scripts/wrappers/
+├── 🔧 setup_existing_meilisearch.sh      # Wrapper → scripts/wrappers/
 ├── 📁 src/                               # Source code
 ├── 📁 tests/                             # All test files
 ├── 📁 docs/                              # All documentation
 ├── 📁 deployment/                        # All deployment files
+├── 📁 scripts/                           # Utility scripts and wrappers
 ├── 📁 data/                              # Data and dictionaries
 ├── 📁 config/                            # Configuration files
+├── 📁 reports/                           # Test reports and coverage
 └── 📁 monitoring/                        # Monitoring and observability
 ```
 
@@ -37,6 +39,27 @@ deployment/
 │   └── .env.existing.example            # Template for existing MeiliSearch
 └── 📁 k8s/                               # Kubernetes manifests
     └── k8s-deployment.yaml               # K8s deployment configuration
+
+## 🔧 **Scripts Directory**
+
+```
+scripts/
+├── README.md                             # Scripts documentation
+└── 📁 wrappers/                          # Wrapper scripts (called from root)
+    ├── setup_existing_meilisearch.sh     # Actual setup implementation
+    └── start_api_with_compounds.py       # Actual API startup implementation
+```
+
+## 📊 **Reports Directory**
+
+```
+reports/
+├── 📁 coverage/                          # Test coverage reports
+│   ├── .coverage                        # Coverage data file
+│   └── coverage.xml                     # Coverage XML report
+├── 📁 performance/                       # Performance benchmarks
+└── 📁 integration/                       # Integration test results
+```
 ```
 
 ## 📚 **Documentation Directory**
@@ -46,6 +69,10 @@ docs/
 ├── 📁 deployment/                        # Deployment guides
 │   ├── PRODUCTION_DEPLOYMENT_GUIDE.md   # Complete production guide
 │   └── COMPOUND_DICTIONARY_DEPLOYMENT.md # Compound word setup
+├── 📁 project/                           # Project documentation
+│   ├── FILE_STRUCTURE.md                # This file structure guide
+│   ├── DELIVERY_SUMMARY.md              # Project delivery summary
+│   └── EXISTING_MEILISEARCH_INTEGRATION.md # Integration details
 ├── 📁 api/                               # API documentation
 ├── 📁 architecture/                      # System architecture
 ├── 📁 development/                       # Development guides
@@ -74,10 +101,11 @@ tests/
 
 ## 🎯 **Key Improvements**
 
-### ✅ **Clean Root Directory**
-- Only essential files in root
+### ✅ **Ultra-Clean Root Directory**
+- Only 6 essential files in root (README, QUICK_START, config files, wrappers)
 - Clear entry points for users
-- Wrapper scripts maintain backward compatibility
+- Wrapper scripts maintain 100% backward compatibility
+- All documentation, scripts, and reports properly organized
 
 ### ✅ **Organized Deployment**
 - All deployment files in `deployment/`

@@ -4,23 +4,33 @@ A high-performance Thai tokenization service that integrates with MeiliSearch to
 
 ## 🚀 Quick Start
 
+### For New Users (Full Stack)
 ```bash
-# Clone and start services
-git clone <repository-url>
-cd thai-tokenizer-meilisearch
+# Start both Thai Tokenizer + MeiliSearch
 docker compose -f deployment/docker/docker-compose.yml up -d
 
-# Test the service
-curl -X POST http://localhost:8001/api/v1/tokenize \
+# Test compound word tokenization
+curl -X POST "http://localhost:8001/api/v1/tokenize" \
   -H "Content-Type: application/json" \
-  -d '{"text": "ปัญญาประดิษฐ์และการเรียนรู้ของเครื่อง"}'
+  -d '{"text": "วากาเมะมีประโยชน์ต่อสุขภาพ"}'
+```
 
-# Run compound word API
+### For Existing MeiliSearch Users
+```bash
+# One-command setup for existing MeiliSearch on port 7700
+./setup_existing_meilisearch.sh
+```
+
+### For Development
+```bash
+# Start API with compound support
 python3 start_api_with_compounds.py
 
-# Run comprehensive tests
+# Run integration tests
 python3 tests/integration/test_api_integration.py
 ```
+
+**📖 Complete Guide**: [QUICK_START.md](QUICK_START.md)
 
 ## 🎯 Problem & Solution
 
@@ -30,24 +40,30 @@ python3 tests/integration/test_api_integration.py
 
 ## ✨ Key Features
 
-- **Accurate Thai Tokenization**: Uses PyThaiNLP with attacut/deepcut fallbacks
-- **Mixed Language Support**: Handles Thai-English mixed content intelligently
-- **High Performance**: < 50ms tokenization for 1000 characters, > 500 docs/sec indexing
-- **Production Ready**: Docker containerization with monitoring, health checks, and scaling
-- **REST API**: FastAPI-based with automatic OpenAPI documentation
-- **Configurable**: Multiple tokenization engines and customizable settings
+- **🎯 Compound Word Tokenization**: Properly handles Thai compound words like "วากาเมะ" (wakame)
+- **⚡ High Performance**: < 50ms tokenization for 1000 characters, > 500 docs/sec indexing
+- **🔧 Easy Integration**: One-command setup for existing MeiliSearch instances
+- **🐳 Production Ready**: Docker containerization with monitoring, health checks, and scaling
+- **📚 Well Documented**: Comprehensive guides and examples for all use cases
+- **🧪 Thoroughly Tested**: 13 automated tests ensure reliability
+- **🏗️ Clean Architecture**: Ultra-organized codebase with clear separation of concerns
 
 ## 📁 Project Structure
 
-This project follows modern Python project organization standards with clear separation of concerns:
+Ultra-clean organization with everything in its proper place:
 
 ```
 thai-tokenizer-meilisearch/
-├── src/                           # 🔧 Source code
-│   ├── api/                      # FastAPI application and endpoints
-│   ├── tokenizer/                # Core Thai tokenization logic
-│   ├── meilisearch_integration/  # MeiliSearch client and integration
-│   └── utils/                    # Shared utility modules
+├── 📄 README.md                  # You are here
+├── 📄 QUICK_START.md             # Quick setup guide  
+├── 🔧 setup_existing_meilisearch.sh  # One-command setup
+├── 🔧 start_api_with_compounds.py    # Development API
+├── 📁 src/                       # Source code
+├── 📁 deployment/                # Docker & deployment configs
+├── 📁 docs/                      # All documentation
+├── 📁 tests/                     # Comprehensive test suite
+├── 📁 scripts/                   # Utility scripts
+└── 📁 data/                      # Dictionaries & sample data
 ├── tests/                         # 🧪 Comprehensive test suite
 │   ├── unit/                     # Unit tests for individual components
 │   ├── integration/              # Integration tests for component interaction

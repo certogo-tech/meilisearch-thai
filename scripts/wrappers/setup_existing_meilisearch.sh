@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Wrapper script for setting up Thai Tokenizer with existing MeiliSearch
-# This script calls the actual implementation
+# This script calls the actual implementation in deployment/scripts/
 
 set -e
 
-SCRIPT_PATH="scripts/wrappers/setup_existing_meilisearch.sh"
+SCRIPT_PATH="deployment/scripts/setup_existing_meilisearch.sh"
 
 if [ ! -f "$SCRIPT_PATH" ]; then
     echo "❌ Setup script not found: $SCRIPT_PATH"
@@ -17,5 +17,6 @@ echo "🚀 Running Thai Tokenizer setup for existing MeiliSearch..."
 echo "Calling: $SCRIPT_PATH"
 echo ""
 
-# Execute the actual script
-exec "$SCRIPT_PATH"
+# Change to the script directory and run it
+cd deployment/scripts
+./setup_existing_meilisearch.sh
