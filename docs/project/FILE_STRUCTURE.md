@@ -44,10 +44,7 @@ deployment/
 
 ```
 scripts/
-├── README.md                             # Scripts documentation
-└── 📁 wrappers/                          # Wrapper scripts (called from root)
-    ├── setup_existing_meilisearch.sh     # Actual setup implementation
-    └── start_api_with_compounds.py       # Actual API startup implementation
+└── README.md                             # Scripts documentation (reserved for future utilities)
 ```
 
 ## 📊 **Reports Directory**

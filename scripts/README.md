@@ -1,59 +1,31 @@
 # 📁 Scripts Directory
 
-This directory contains utility scripts and wrappers for the Thai Tokenizer project.
+This directory is reserved for future utility scripts and tools for the Thai Tokenizer project.
 
-## 📂 Directory Structure
+## 📂 Current Structure
 
 ```
 scripts/
-├── README.md                    # This file
-└── wrappers/                    # Wrapper scripts (called from root)
-    ├── setup_existing_meilisearch.sh    # Setup for existing MeiliSearch
-    └── start_api_with_compounds.py      # API startup with compounds
+└── README.md                    # This file
 ```
-
-## 🔧 Wrapper Scripts
-
-### `wrappers/setup_existing_meilisearch.sh`
-Sets up Thai Tokenizer integration with existing MeiliSearch instances.
-
-**Called from root via**: `./setup_existing_meilisearch.sh`
-
-**What it does**:
-- Verifies compound dictionary (32 entries)
-- Creates environment configuration
-- Tests MeiliSearch connectivity
-- Starts Thai Tokenizer service
-- Validates compound word tokenization
-
-### `wrappers/start_api_with_compounds.py`
-Starts the Thai Tokenizer API with compound word support for development.
-
-**Called from root via**: `python3 start_api_with_compounds.py`
-
-**What it does**:
-- Loads compound dictionary
-- Starts FastAPI server
-- Enables compound word tokenization
-- Provides development-friendly logging
 
 ## 🎯 Design Philosophy
 
-The wrapper scripts in this directory are called by simple wrapper scripts in the project root. This design:
+This directory follows the principle of organized project structure:
 
-- ✅ **Keeps root clean**: Only essential files in root directory
-- ✅ **Maintains compatibility**: Existing commands still work
-- ✅ **Organizes logically**: Scripts grouped by function
-- ✅ **Enables maintenance**: Easy to find and update scripts
+- ✅ **Reserved for utilities**: Future scripts and tools will go here
+- ✅ **Keeps root clean**: Main functionality accessed via simple root wrappers
+- ✅ **Logical organization**: Scripts grouped by function when added
+- ✅ **Easy maintenance**: Clear location for project utilities
 
-## 🚀 Usage
+## 🚀 Current Usage
 
-All scripts are designed to be called from the project root directory:
+The main functionality is accessed via simple wrapper scripts in the project root:
 
 ```bash
 # From project root
-./setup_existing_meilisearch.sh        # Calls scripts/wrappers/setup_existing_meilisearch.sh
-python3 start_api_with_compounds.py    # Calls scripts/wrappers/start_api_with_compounds.py
+./setup_existing_meilisearch.sh        # Calls deployment/scripts/setup_existing_meilisearch.sh
+python3 start_api_with_compounds.py    # Calls deployment/scripts/start_api_with_compounds.py
 ```
 
 ## 📚 Related Documentation
@@ -61,3 +33,11 @@ python3 start_api_with_compounds.py    # Calls scripts/wrappers/start_api_with_c
 - **Quick Start**: `../QUICK_START.md`
 - **Existing MeiliSearch Guide**: `../deployment/scripts/README_EXISTING_MEILISEARCH.md`
 - **Project Structure**: `../docs/project/FILE_STRUCTURE.md`
+
+## 🔮 Future Plans
+
+This directory may contain:
+- Development utilities
+- Testing helpers
+- Maintenance scripts
+- Build tools

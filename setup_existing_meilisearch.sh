@@ -5,7 +5,7 @@
 
 set -e
 
-SCRIPT_PATH="scripts/wrappers/setup_existing_meilisearch.sh"
+SCRIPT_PATH="deployment/scripts/setup_existing_meilisearch.sh"
 
 if [ ! -f "$SCRIPT_PATH" ]; then
     echo "❌ Setup script not found: $SCRIPT_PATH"
@@ -14,8 +14,8 @@ if [ ! -f "$SCRIPT_PATH" ]; then
 fi
 
 echo "🚀 Running Thai Tokenizer setup for existing MeiliSearch..."
-echo "Calling: $SCRIPT_PATH"
 echo ""
 
-# Execute the actual script
-exec "$SCRIPT_PATH"
+# Change to the script directory and execute
+cd deployment/scripts
+exec ./setup_existing_meilisearch.sh

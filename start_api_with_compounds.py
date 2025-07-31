@@ -11,7 +11,7 @@ from pathlib import Path
 
 def main():
     """Execute the actual start script."""
-    script_path = Path("scripts/wrappers/start_api_with_compounds.py")
+    script_path = Path("deployment/scripts/start_api_with_compounds.py")
     
     if not script_path.exists():
         print(f"❌ Start script not found: {script_path}")
@@ -19,7 +19,6 @@ def main():
         sys.exit(1)
     
     print("🚀 Starting Thai Tokenizer API with compound word support...")
-    print(f"Calling: {script_path}")
     print("")
     
     # Execute the actual script
