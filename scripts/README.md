@@ -1,31 +1,38 @@
 # 📁 Scripts Directory
 
-This directory is reserved for future utility scripts and tools for the Thai Tokenizer project.
+This directory contains utility scripts and wrappers for the Thai Tokenizer project.
 
 ## 📂 Current Structure
 
 ```
 scripts/
-└── README.md                    # This file
+├── README.md                           # This file
+├── setup_existing_meilisearch.sh       # Setup wrapper for existing MeiliSearch
+└── start_api_with_compounds.py         # Development API wrapper
 ```
 
 ## 🎯 Design Philosophy
 
 This directory follows the principle of organized project structure:
 
-- ✅ **Reserved for utilities**: Future scripts and tools will go here
-- ✅ **Keeps root clean**: Main functionality accessed via simple root wrappers
-- ✅ **Logical organization**: Scripts grouped by function when added
-- ✅ **Easy maintenance**: Clear location for project utilities
+- ✅ **Centralized scripts**: All user-facing scripts in one location
+- ✅ **Clean root**: Keeps root directory minimal
+- ✅ **Easy access**: Available via Make commands or direct calls
+- ✅ **Logical organization**: Scripts grouped by function
 
-## 🚀 Current Usage
+## 🚀 Usage
 
-The main functionality is accessed via simple wrapper scripts in the project root:
-
+### Via Make Commands (Recommended)
 ```bash
-# From project root
-./setup_existing_meilisearch.sh        # Calls deployment/scripts/setup_existing_meilisearch.sh
-python3 start_api_with_compounds.py    # Calls deployment/scripts/start_api_with_compounds.py
+make setup-existing    # Setup with existing MeiliSearch
+make start-dev         # Start development API
+make help             # Show all available commands
+```
+
+### Direct Script Calls
+```bash
+bash scripts/setup_existing_meilisearch.sh     # Setup existing MeiliSearch
+python3 scripts/start_api_with_compounds.py    # Start development API
 ```
 
 ## 📚 Related Documentation

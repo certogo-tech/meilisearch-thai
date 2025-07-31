@@ -1,20 +1,19 @@
 # 📁 Ultra-Clean File Structure
 
-## 🎯 **Root Directory (Minimal & Essential)**
+## 🎯 **Root Directory (Optimal & Minimal)**
 
 ```
 meilisearch-thai/
 ├── 📄 README.md                          # Main project documentation
 ├── 📄 QUICK_START.md                     # Quick setup guide
+├── 📄 Makefile                           # Easy command access
 ├── 📄 pyproject.toml                     # Python project configuration
 ├── 📄 requirements.txt                   # Python dependencies
-├── 🔧 start_api_with_compounds.py        # Wrapper → scripts/wrappers/
-├── 🔧 setup_existing_meilisearch.sh      # Wrapper → scripts/wrappers/
 ├── 📁 src/                               # Source code
+├── 📁 scripts/                           # User scripts and wrappers
 ├── 📁 tests/                             # All test files
 ├── 📁 docs/                              # All documentation
 ├── 📁 deployment/                        # All deployment files
-├── 📁 scripts/                           # Utility scripts and wrappers
 ├── 📁 data/                              # Data and dictionaries
 ├── 📁 config/                            # Configuration files
 ├── 📁 reports/                           # Test reports and coverage
@@ -44,7 +43,9 @@ deployment/
 
 ```
 scripts/
-└── README.md                             # Scripts documentation (reserved for future utilities)
+├── README.md                             # Scripts documentation
+├── setup_existing_meilisearch.sh         # Setup wrapper for existing MeiliSearch
+└── start_api_with_compounds.py           # Development API wrapper
 ```
 
 ## 📊 **Reports Directory**
@@ -98,11 +99,12 @@ tests/
 
 ## 🎯 **Key Improvements**
 
-### ✅ **Ultra-Clean Root Directory**
-- Only 6 essential files in root (README, QUICK_START, config files, wrappers)
-- Clear entry points for users
-- Wrapper scripts maintain 100% backward compatibility
-- All documentation, scripts, and reports properly organized
+### ✅ **Optimal Root Directory**
+- Only 5 essential files in root (README, QUICK_START, Makefile, config files)
+- Makefile provides easy command access
+- Scripts organized in dedicated directory
+- All functionality accessible via `make` commands
+- Professional project structure
 
 ### ✅ **Organized Deployment**
 - All deployment files in `deployment/`

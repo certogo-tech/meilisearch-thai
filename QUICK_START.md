@@ -17,8 +17,11 @@ curl -X POST "http://localhost:8001/api/v1/tokenize" \
 If you already have MeiliSearch running on port 7700:
 
 ```bash
-# Automated setup (recommended)
-./setup_existing_meilisearch.sh
+# Using Make (recommended)
+make setup-existing
+
+# Or direct script call
+bash scripts/setup_existing_meilisearch.sh
 
 # Or manual setup
 cp deployment/configs/.env.existing.example .env.existing
@@ -31,8 +34,11 @@ docker compose -f deployment/docker/docker-compose.tokenizer-only.yml --env-file
 ## For Development
 
 ```bash
-# Start API with compound support
-python3 start_api_with_compounds.py
+# Using Make (recommended)
+make start-dev
+
+# Or direct script call
+python3 scripts/start_api_with_compounds.py
 
 # Run integration tests
 python3 tests/integration/test_api_integration.py

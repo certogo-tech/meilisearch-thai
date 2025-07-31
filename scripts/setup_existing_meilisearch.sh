@@ -16,6 +16,7 @@ fi
 echo "🚀 Running Thai Tokenizer setup for existing MeiliSearch..."
 echo ""
 
-# Change to the script directory and execute
+# Change to the project root, then to the script directory and execute
+cd "$(dirname "$0")/.."
 cd deployment/scripts
 exec ./setup_existing_meilisearch.sh

@@ -5,6 +5,7 @@ A high-performance Thai tokenization service that integrates with MeiliSearch to
 ## 🚀 Quick Start
 
 ### For New Users (Full Stack)
+
 ```bash
 # Start both Thai Tokenizer + MeiliSearch
 docker compose -f deployment/docker/docker-compose.yml up -d
@@ -16,12 +17,14 @@ curl -X POST "http://localhost:8001/api/v1/tokenize" \
 ```
 
 ### For Existing MeiliSearch Users
+
 ```bash
 # One-command setup for existing MeiliSearch on port 7700
 ./setup_existing_meilisearch.sh
 ```
 
 ### For Development
+
 ```bash
 # Start API with compound support
 python3 start_api_with_compounds.py
