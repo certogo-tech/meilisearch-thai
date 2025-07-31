@@ -186,8 +186,36 @@
     - Verify all project metadata is accurate
     - _Requirements: 1.1_
 
-  - [x] 12.3 Create migration documentation
+  - [ ] 12.3 Create migration documentation
     - Document the migration process and new structure
     - Create migration guide for team members
     - Update development setup instructions for new structure
     - _Requirements: 3.3, 3.4_
+- 
+[x] 13. Optimize root directory for minimal essential files
+  - [x] 13.1 Move wrapper scripts to scripts directory
+    - Move setup_existing_meilisearch.sh and start_api_with_compounds.py to scripts/
+    - Create Makefile for easy command access
+    - Update scripts to work from new locations with proper path resolution
+    - _Requirements: 1.1, 7.1_
+
+  - [x] 13.2 Implement Make-based workflow
+    - Create comprehensive Makefile with all common commands
+    - Add make setup-existing, make start-dev, make help commands
+    - Test all Makefile commands for proper functionality
+    - Update documentation to show Make-based workflow
+    - _Requirements: 7.1, 7.2_
+
+  - [x] 13.3 Achieve optimal root directory structure
+    - Reduce root directory to only 5 essential files
+    - Maintain 100% backward compatibility through Make commands
+    - Verify compound word tokenization still works perfectly
+    - Test all functionality with new structure
+    - _Requirements: 1.1, 2.1_
+
+  - [x] 13.4 Final validation and testing
+    - Run comprehensive test suite on optimized structure
+    - Verify วากาเมะ and ซาชิมิ tokenize as single tokens
+    - Test all Make commands and direct script access
+    - Validate professional project structure standards
+    - _Requirements: 1.1, 2.1, 7.1, 7.2_
