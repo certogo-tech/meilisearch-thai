@@ -1,6 +1,6 @@
 [project]
 name = "thai-tokenizer-meilisearch"
-version = "0.1.0"
+version = "1.0.0"
 description = "Custom Thai tokenizer for MeiliSearch to handle compound words"
 authors = [
     {name = "Thai Tokenizer Team"}
@@ -10,7 +10,7 @@ license = {text = "MIT"}
 requires-python = ">=3.12"
 keywords = ["thai", "tokenizer", "meilisearch", "nlp", "search"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -18,12 +18,6 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-
-[project.urls]
-Homepage = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch"
-Documentation = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch/tree/main/docs"
-Repository = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch"
-Issues = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch/issues"
 
 dependencies = [
     "fastapi>=0.116.0",
@@ -35,6 +29,12 @@ dependencies = [
     "httpx>=0.27.0",
     "python-multipart>=0.0.12",
 ]
+
+[project.urls]
+Homepage = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch"
+Documentation = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch/tree/main/docs"
+Repository = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch"
+Issues = "https://github.com/thai-tokenizer/thai-tokenizer-meilisearch/issues"
 
 [project.optional-dependencies]
 dev = [
