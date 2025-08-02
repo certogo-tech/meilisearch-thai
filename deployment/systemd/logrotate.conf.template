@@ -1,0 +1,58 @@
+# Logrotate configuration for Thai Tokenizer Service
+# Place this file in /etc/logrotate.d/thai-tokenizer
+
+{{LOG_PATH}}/*.log {
+    # Rotate logs daily
+    daily
+    
+    # Keep 30 days of logs
+    rotate 30
+    
+    # Compress old logs
+    compress
+    delaycompress
+    
+    # Don't rotate if log is empty
+    notifempty
+    
+    # Create new log files with specific permissions
+    create 0644 {{SERVICE_USER}} {{SERVICE_GROUP}}
+    
+    # Use shared scripts for all log files
+    sharedscripts
+    
+    # Reload the service after rotation
+    postrotate
+        /bin/systemctl reload {{SERVICE_NAME}} > /dev/null 2>&1 || true
+    endscript
+    
+    # Handle missing log files gracefully
+    missingok
+    
+    # Copy and truncate instead of moving (safer for active logs)
+    copytruncate
+}
+
+# Separate configuration for error logs if they exist
+{{LOG_PATH}}/error.log {
+    daily
+    rotate 60
+    compress
+    delaycompress
+    notifempty
+    create 0644 {{SERVICE_USER}} {{SERVICE_GROUP}}
+    missingok
+    copytruncate
+}
+
+# Configuration for access logs
+{{LOG_PATH}}/access.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0644 {{SERVICE_USER}} {{SERVICE_GROUP}}
+    missingok
+    copytruncate
+}

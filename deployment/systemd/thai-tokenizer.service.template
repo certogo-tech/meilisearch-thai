@@ -1,0 +1,79 @@
+[Unit]
+Description=Thai Tokenizer Service for Meilisearch Integration
+Documentation=https://github.com/your-org/thai-tokenizer
+After=network.target network-online.target
+Wants=network-online.target
+RequiresMountsFor={{INSTALLATION_PATH}} {{DATA_PATH}} {{LOG_PATH}} {{CONFIG_PATH}}
+
+[Service]
+Type=exec
+User={{SERVICE_USER}}
+Group={{SERVICE_GROUP}}
+WorkingDirectory={{INSTALLATION_PATH}}
+
+# Environment configuration
+Environment=PYTHONPATH={{INSTALLATION_PATH}}
+Environment=PYTHONUNBUFFERED=1
+Environment=SYSTEMD_DEPLOYMENT=true
+EnvironmentFile={{CONFIG_PATH}}/environment
+
+# Service execution
+ExecStartPre=/bin/mkdir -p {{DATA_PATH}} {{LOG_PATH}}
+ExecStartPre=/bin/chown {{SERVICE_USER}}:{{SERVICE_GROUP}} {{DATA_PATH}} {{LOG_PATH}}
+ExecStart={{INSTALLATION_PATH}}/venv/bin/uvicorn src.api.main:app \
+    --host {{SERVICE_HOST}} \
+    --port {{SERVICE_PORT}} \
+    --workers {{WORKER_PROCESSES}} \
+    --access-log \
+    --log-level {{LOG_LEVEL}}
+
+# Health check and reload
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+TimeoutStopSec=30
+
+# Restart policy
+Restart=always
+RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{SERVICE_NAME}}
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+# File system access
+ReadWritePaths={{DATA_PATH}} {{LOG_PATH}} {{CONFIG_PATH}}
+ReadOnlyPaths={{INSTALLATION_PATH}}
+
+# Network security
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+IPAddressDeny=any
+IPAddressAllow=localhost
+IPAddressAllow={{ALLOWED_NETWORKS}}
+
+# Resource limits
+MemoryLimit={{MEMORY_LIMIT_MB}}M
+CPUQuota={{CPU_QUOTA}}%
+TasksMax={{MAX_TASKS}}
+
+# Process limits
+LimitNOFILE={{MAX_OPEN_FILES}}
+LimitNPROC={{MAX_PROCESSES}}
+
+[Install]
+WantedBy=multi-user.target

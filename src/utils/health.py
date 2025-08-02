@@ -325,6 +325,26 @@ class HealthChecker:
         if len(self.request_stats["response_times"]) > 1000:
             self.request_stats["response_times"] = self.request_stats["response_times"][-1000:]
     
+    def record_tokenization_operation(self, token_count: int, processing_time_ms: float, 
+                                    text_length: int, engine: str):
+        """Record tokenization operation for throughput calculation."""
+        if not hasattr(self, '_tokenization_operations'):
+            self._tokenization_operations = []
+        
+        operation = {
+            'timestamp': time.time(),
+            'token_count': token_count,
+            'processing_time_ms': processing_time_ms,
+            'text_length': text_length,
+            'engine': engine
+        }
+        
+        self._tokenization_operations.append(operation)
+        
+        # Keep only last 1000 operations to prevent memory growth
+        if len(self._tokenization_operations) > 1000:
+            self._tokenization_operations = self._tokenization_operations[-1000:]
+    
     def get_diagnostic_info(self) -> Dict[str, Any]:
         """Get comprehensive diagnostic information."""
         return {
@@ -359,8 +379,20 @@ class HealthChecker:
     
     def get_token_throughput(self) -> float:
         """Get tokens processed per second."""
-        # This would need to be tracked separately in actual implementation
-        return 0.0  # Placeholder
+        # Calculate based on recent tokenization operations
+        current_time = time.time()
+        recent_operations = [
+            op for op in getattr(self, '_tokenization_operations', [])
+            if current_time - op['timestamp'] < 60  # Last minute
+        ]
+        
+        if not recent_operations:
+            return 0.0
+        
+        total_tokens = sum(op.get('token_count', 0) for op in recent_operations)
+        time_span = 60  # seconds
+        
+        return total_tokens / time_span if time_span > 0 else 0.0
     
     def get_uptime_percentage(self) -> float:
         """Get service uptime percentage."""
@@ -624,6 +656,341 @@ class HealthChecker:
         }
 
 
+async def check_network_connectivity() -> Dict[str, Any]:
+    """Check network connectivity for on-premise deployment."""
+    try:
+        import socket
+        import urllib.request
+        
+        connectivity_tests = []
+        
+        # Test DNS resolution
+        try:
+            socket.gethostbyname("google.com")
+            connectivity_tests.append({"test": "dns_resolution", "status": "passed"})
+        except Exception as e:
+            connectivity_tests.append({"test": "dns_resolution", "status": "failed", "error": str(e)})
+        
+        # Test internet connectivity (optional for on-premise)
+        try:
+            urllib.request.urlopen("http://google.com", timeout=3)
+            connectivity_tests.append({"test": "internet_connectivity", "status": "passed"})
+        except Exception as e:
+            connectivity_tests.append({"test": "internet_connectivity", "status": "failed", "error": str(e)})
+        
+        # Test local network interfaces
+        try:
+            hostname = socket.gethostname()
+            local_ip = socket.gethostbyname(hostname)
+            connectivity_tests.append({
+                "test": "local_network", 
+                "status": "passed",
+                "details": {"hostname": hostname, "local_ip": local_ip}
+            })
+        except Exception as e:
+            connectivity_tests.append({"test": "local_network", "status": "failed", "error": str(e)})
+        
+        # Determine overall status
+        failed_tests = [t for t in connectivity_tests if t["status"] == "failed"]
+        critical_failures = [t for t in failed_tests if t["test"] in ["dns_resolution", "local_network"]]
+        
+        if critical_failures:
+            return {
+                "status": "unhealthy",
+                "message": f"Critical network connectivity issues: {len(critical_failures)} failures",
+                "details": {"tests": connectivity_tests, "critical_failures": len(critical_failures)}
+            }
+        elif failed_tests:
+            return {
+                "status": "degraded",
+                "message": f"Some network connectivity issues: {len(failed_tests)} failures",
+                "details": {"tests": connectivity_tests, "non_critical_failures": len(failed_tests)}
+            }
+        else:
+            return {
+                "status": "healthy",
+                "message": "Network connectivity is normal",
+                "details": {"tests": connectivity_tests}
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Failed to check network connectivity: {str(e)}",
+            "error": type(e).__name__
+        }
+
+
+async def check_disk_space() -> Dict[str, Any]:
+    """Check disk space availability for on-premise deployment."""
+    try:
+        if not PSUTIL_AVAILABLE:
+            return {
+                "status": "error",
+                "message": "psutil not available for disk space checking",
+                "error": "psutil_not_available"
+            }
+        
+        import psutil
+        
+        # Check disk usage for critical paths
+        critical_paths = ["/", "/tmp", "/var/log"]
+        disk_info = {}
+        issues = []
+        
+        for path in critical_paths:
+            try:
+                if os.path.exists(path):
+                    usage = psutil.disk_usage(path)
+                    usage_percent = (usage.used / usage.total) * 100
+                    free_gb = usage.free / (1024**3)
+                    
+                    disk_info[path] = {
+                        "usage_percent": usage_percent,
+                        "free_gb": free_gb,
+                        "total_gb": usage.total / (1024**3)
+                    }
+                    
+                    # Check thresholds
+                    if usage_percent > 95:
+                        issues.append(f"Critical disk usage on {path}: {usage_percent:.1f}%")
+                    elif usage_percent > 85:
+                        issues.append(f"High disk usage on {path}: {usage_percent:.1f}%")
+                    
+                    if free_gb < 1:
+                        issues.append(f"Low free space on {path}: {free_gb:.1f}GB")
+                        
+            except Exception as e:
+                disk_info[path] = {"error": str(e)}
+                issues.append(f"Failed to check {path}: {str(e)}")
+        
+        # Determine status
+        critical_issues = [i for i in issues if "Critical" in i or "Low free space" in i]
+        
+        if critical_issues:
+            return {
+                "status": "unhealthy",
+                "message": f"Critical disk space issues: {len(critical_issues)} problems",
+                "details": {"disk_info": disk_info, "issues": issues}
+            }
+        elif issues:
+            return {
+                "status": "degraded",
+                "message": f"Disk space warnings: {len(issues)} issues",
+                "details": {"disk_info": disk_info, "issues": issues}
+            }
+        else:
+            return {
+                "status": "healthy",
+                "message": "Disk space is adequate",
+                "details": {"disk_info": disk_info}
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Failed to check disk space: {str(e)}",
+            "error": type(e).__name__
+        }
+
+
+async def check_configuration_validity(config_manager) -> Dict[str, Any]:
+    """Check configuration validity for on-premise deployment."""
+    try:
+        if config_manager is None:
+            return {
+                "status": "error",
+                "message": "Configuration manager not available",
+                "error": "config_manager_not_available"
+            }
+        
+        validation_results = []
+        
+        # Test configuration loading
+        try:
+            current_config = config_manager.get_config()
+            validation_results.append({
+                "test": "config_loading",
+                "status": "passed",
+                "details": {"config_keys": list(current_config.keys()) if isinstance(current_config, dict) else "non_dict_config"}
+            })
+        except Exception as e:
+            validation_results.append({
+                "test": "config_loading",
+                "status": "failed",
+                "error": str(e)
+            })
+        
+        # Test MeiliSearch configuration
+        try:
+            meilisearch_config = config_manager.get_meilisearch_config()
+            
+            # Validate required fields
+            required_fields = ["host", "api_key"]
+            missing_fields = [field for field in required_fields if not getattr(meilisearch_config, field, None)]
+            
+            if missing_fields:
+                validation_results.append({
+                    "test": "meilisearch_config",
+                    "status": "failed",
+                    "error": f"Missing required fields: {missing_fields}"
+                })
+            else:
+                validation_results.append({
+                    "test": "meilisearch_config",
+                    "status": "passed",
+                    "details": {
+                        "host": meilisearch_config.host,
+                        "timeout_ms": meilisearch_config.timeout_ms,
+                        "max_retries": meilisearch_config.max_retries
+                    }
+                })
+                
+        except Exception as e:
+            validation_results.append({
+                "test": "meilisearch_config",
+                "status": "failed",
+                "error": str(e)
+            })
+        
+        # Test tokenizer configuration
+        try:
+            tokenizer_config = config_manager.get_tokenizer_config()
+            validation_results.append({
+                "test": "tokenizer_config",
+                "status": "passed",
+                "details": {
+                    "engine": tokenizer_config.engine,
+                    "model_version": tokenizer_config.model_version,
+                    "enable_fallback": tokenizer_config.enable_fallback
+                }
+            })
+        except Exception as e:
+            validation_results.append({
+                "test": "tokenizer_config",
+                "status": "failed",
+                "error": str(e)
+            })
+        
+        # Check environment variables
+        env_vars = health_checker.check_environment_variables()
+        if env_vars["required_vars_present"]:
+            validation_results.append({
+                "test": "environment_variables",
+                "status": "passed",
+                "details": env_vars
+            })
+        else:
+            validation_results.append({
+                "test": "environment_variables",
+                "status": "failed",
+                "error": f"Missing required environment variables: {env_vars['missing_vars']}"
+            })
+        
+        # Determine overall status
+        failed_tests = [r for r in validation_results if r["status"] == "failed"]
+        
+        if failed_tests:
+            return {
+                "status": "unhealthy",
+                "message": f"Configuration validation failed: {len(failed_tests)} issues",
+                "details": {"validation_results": validation_results, "failed_tests": len(failed_tests)}
+            }
+        else:
+            return {
+                "status": "healthy",
+                "message": "Configuration is valid",
+                "details": {"validation_results": validation_results}
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Failed to validate configuration: {str(e)}",
+            "error": type(e).__name__
+        }
+
+
+async def check_thai_models() -> Dict[str, Any]:
+    """Check Thai language models availability and functionality."""
+    try:
+        model_tests = []
+        
+        # Test PyThaiNLP models
+        try:
+            import pythainlp
+            from pythainlp import word_tokenize
+            
+            # Test different engines
+            engines = ["newmm", "attacut", "deepcut"]
+            working_engines = []
+            
+            for engine in engines:
+                try:
+                    # Test tokenization with each engine
+                    test_text = "ทดสอบการแบ่งคำภาษาไทย"
+                    tokens = word_tokenize(test_text, engine=engine)
+                    
+                    if tokens and len(tokens) > 0:
+                        working_engines.append(engine)
+                        model_tests.append({
+                            "engine": engine,
+                            "status": "available",
+                            "test_tokens": len(tokens),
+                            "sample_tokens": tokens[:3]  # First 3 tokens as sample
+                        })
+                    else:
+                        model_tests.append({
+                            "engine": engine,
+                            "status": "failed",
+                            "error": "No tokens produced"
+                        })
+                        
+                except Exception as e:
+                    model_tests.append({
+                        "engine": engine,
+                        "status": "failed",
+                        "error": str(e)
+                    })
+            
+            # Check if at least one engine is working
+            if working_engines:
+                return {
+                    "status": "healthy",
+                    "message": f"Thai models are functional: {len(working_engines)} engines available",
+                    "details": {
+                        "working_engines": working_engines,
+                        "total_engines_tested": len(engines),
+                        "model_tests": model_tests,
+                        "pythainlp_version": pythainlp.__version__
+                    }
+                }
+            else:
+                return {
+                    "status": "unhealthy",
+                    "message": "No Thai tokenization engines are working",
+                    "details": {
+                        "working_engines": working_engines,
+                        "model_tests": model_tests,
+                        "pythainlp_version": pythainlp.__version__
+                    }
+                }
+                
+        except ImportError:
+            return {
+                "status": "error",
+                "message": "PyThaiNLP not available",
+                "error": "pythainlp_not_installed"
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Failed to check Thai models: {str(e)}",
+            "error": type(e).__name__
+        }
+
+
 # Global health checker instance
 health_checker = HealthChecker()
 
@@ -813,6 +1180,35 @@ def register_default_checks(meilisearch_client, config_manager):
         "dependencies",
         check_dependencies,
         timeout=1.0,
+        critical=True
+    )
+    
+    # On-premise specific health checks
+    health_checker.register_check(
+        "network_connectivity",
+        check_network_connectivity,
+        timeout=3.0,
+        critical=False
+    )
+    
+    health_checker.register_check(
+        "disk_space",
+        check_disk_space,
+        timeout=1.0,
+        critical=True
+    )
+    
+    health_checker.register_check(
+        "configuration_validity",
+        lambda: check_configuration_validity(config_manager),
+        timeout=2.0,
+        critical=True
+    )
+    
+    health_checker.register_check(
+        "thai_models",
+        check_thai_models,
+        timeout=5.0,
         critical=True
     )
     

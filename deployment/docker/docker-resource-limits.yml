@@ -1,0 +1,403 @@
+# Docker Resource Limits Configuration for Thai Tokenizer Service
+# This file defines resource constraints and limits for different deployment scenarios
+# Requirements: 2.2, 5.1, 5.2
+
+# Default resource limits for production deployment
+production:
+  thai-tokenizer:
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+          pids: 100
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: rollback
+        monitor: 60s
+        max_failure_ratio: 0.3
+    healthcheck:
+      test: |
+        curl -f http://localhost:8000/health && \
+        curl -f http://localhost:8000/health/detailed | grep -q '"meilisearch_status":"healthy"'
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      nproc: 4096
+
+  nginx:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+# Development resource limits (more relaxed)
+development:
+  thai-tokenizer:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 2
+        window: 60s
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+  nginx:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+
+# High-performance resource limits for heavy workloads
+high-performance:
+  thai-tokenizer:
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 2G
+          pids: 200
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 5
+        window: 180s
+      update_config:
+        parallelism: 1
+        delay: 60s
+        failure_action: rollback
+        monitor: 120s
+        max_failure_ratio: 0.2
+    healthcheck:
+      test: |
+        curl -f http://localhost:8000/health && \
+        curl -f http://localhost:8000/health/detailed | grep -q '"meilisearch_status":"healthy"' && \
+        curl -f http://localhost:8000/metrics | grep -q 'thai_tokenizer_health_status'
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+        compress: "true"
+    ulimits:
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc: 8192
+    environment:
+      - WORKER_PROCESSES=8
+      - TOKENIZER_CACHE_SIZE=2000
+      - MAX_WORKERS=8
+      - BATCH_SIZE=100
+
+  nginx:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 128M
+
+# Low-resource limits for constrained environments
+low-resource:
+  thai-tokenizer:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+          pids: 50
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        delay: 20s
+        max_attempts: 2
+        window: 120s
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 120s
+      timeout: 20s
+      retries: 2
+      start_period: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "25m"
+        max-file: "2"
+    environment:
+      - WORKER_PROCESSES=1
+      - TOKENIZER_CACHE_SIZE=100
+      - MAX_WORKERS=2
+      - BATCH_SIZE=10
+
+  nginx:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+        reservations:
+          cpus: '0.05'
+          memory: 16M
+
+# Security-focused configuration
+security-hardened:
+  thai-tokenizer:
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+          pids: 50
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 2
+        window: 300s
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /var/tmp:noexec,nosuid,size=50m
+    healthcheck:
+      test: |
+        curl -f http://localhost:8000/health && \
+        curl -f http://localhost:8000/health/detailed | grep -q '"meilisearch_status":"healthy"'
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 90s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
+    ulimits:
+      nofile:
+        soft: 1024
+        hard: 2048
+      nproc: 100
+
+# Monitoring and observability configuration
+monitoring:
+  thai-tokenizer:
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=8000"
+      - "prometheus.io/path=/metrics"
+      - "traefik.enable=true"
+      - "traefik.http.routers.thai-tokenizer.rule=Host(`${THAI_TOKENIZER_DOMAIN:-localhost}`)"
+      - "traefik.http.services.thai-tokenizer.loadbalancer.server.port=8000"
+      - "traefik.http.routers.thai-tokenizer.middlewares=auth"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+        compress: "true"
+        labels: "service,version,environment"
+    environment:
+      - ENABLE_METRICS=true
+      - METRICS_PORT=8000
+      - LOG_LEVEL=INFO
+      - STRUCTURED_LOGGING=true
+
+# Network configuration templates
+networks:
+  production:
+    thai-tokenizer-network:
+      driver: bridge
+      name: ${COMPOSE_PROJECT_NAME:-thai_tokenizer}_internal
+      ipam:
+        config:
+          - subnet: 172.21.0.0/16
+            gateway: 172.21.0.1
+      driver_opts:
+        com.docker.network.bridge.name: thai-tokenizer-br
+        com.docker.network.bridge.enable_icc: "true"
+        com.docker.network.bridge.enable_ip_masquerade: "true"
+    
+    external-meilisearch-network:
+      external: true
+      name: ${EXTERNAL_MEILISEARCH_NETWORK:-bridge}
+
+  development:
+    thai-tokenizer-network:
+      driver: bridge
+      name: ${COMPOSE_PROJECT_NAME:-thai_tokenizer}_dev
+    
+    external-meilisearch-network:
+      external: true
+      name: ${EXTERNAL_MEILISEARCH_NETWORK:-bridge}
+
+# Volume configuration templates
+volumes:
+  production:
+    thai_tokenizer_logs:
+      driver: local
+      driver_opts:
+        type: none
+        o: bind
+        device: ${LOG_DIR:-../../logs/thai-tokenizer}
+    
+    pythainlp_data:
+      driver: local
+      name: pythainlp_data_${COMPOSE_PROJECT_NAME:-thai_tokenizer}
+      driver_opts:
+        type: none
+        o: bind
+        device: ${PYTHAINLP_DATA_DIR:-/var/lib/pythainlp}
+
+  development:
+    thai_tokenizer_logs:
+      driver: local
+      driver_opts:
+        type: none
+        o: bind
+        device: ${LOG_DIR:-../../logs/thai-tokenizer}
+    
+    pythainlp_data:
+      driver: local
+      name: pythainlp_data_dev
+
+# Environment-specific overrides
+environment_overrides:
+  production:
+    PYTHONOPTIMIZE: "2"
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONPATH: "/app"
+    WORKER_PROCESSES: "4"
+    LOG_LEVEL: "INFO"
+    DEBUG: "false"
+    ENABLE_METRICS: "true"
+    HEALTH_CHECK_INTERVAL: "30s"
+    REQUEST_TIMEOUT: "30"
+    MAX_WORKERS: "4"
+    TOKENIZER_CACHE_SIZE: "1000"
+
+  development:
+    PYTHONOPTIMIZE: "0"
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONPATH: "/app"
+    WORKER_PROCESSES: "2"
+    LOG_LEVEL: "DEBUG"
+    DEBUG: "true"
+    ENABLE_METRICS: "true"
+    HEALTH_CHECK_INTERVAL: "60s"
+    REQUEST_TIMEOUT: "60"
+    MAX_WORKERS: "2"
+    TOKENIZER_CACHE_SIZE: "500"
+
+  high-performance:
+    PYTHONOPTIMIZE: "2"
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONPATH: "/app"
+    WORKER_PROCESSES: "8"
+    LOG_LEVEL: "INFO"
+    DEBUG: "false"
+    ENABLE_METRICS: "true"
+    HEALTH_CHECK_INTERVAL: "20s"
+    REQUEST_TIMEOUT: "15"
+    MAX_WORKERS: "8"
+    TOKENIZER_CACHE_SIZE: "2000"
+    BATCH_SIZE: "100"
+
+  low-resource:
+    PYTHONOPTIMIZE: "1"
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONPATH: "/app"
+    WORKER_PROCESSES: "1"
+    LOG_LEVEL: "WARNING"
+    DEBUG: "false"
+    ENABLE_METRICS: "false"
+    HEALTH_CHECK_INTERVAL: "120s"
+    REQUEST_TIMEOUT: "60"
+    MAX_WORKERS: "1"
+    TOKENIZER_CACHE_SIZE: "100"
+    BATCH_SIZE: "10"

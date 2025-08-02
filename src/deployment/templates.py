@@ -547,23 +547,57 @@ networks:
         if config.deployment_method != DeploymentMethod.SYSTEMD:
             raise ValueError("Systemd unit export only available for systemd deployment method")
         
+        # Calculate resource limits
+        cpu_quota = int(config.resource_config.cpu_limit_cores * 100)
+        max_tasks = max(50, config.service_config.worker_processes * 10)
+        max_open_files = max(1024, config.resource_config.max_concurrent_requests * 2)
+        
+        # Determine allowed networks
+        allowed_networks = ["127.0.0.1/32", "::1/128"]  # localhost by default
+        if config.service_config.service_host != "127.0.0.1":
+            allowed_networks.append("0.0.0.0/0")  # Allow all if binding to all interfaces
+        
         unit_content = f"""[Unit]
 Description=Thai Tokenizer Service for Meilisearch Integration
 Documentation=https://github.com/your-org/thai-tokenizer
-After=network.target
-Wants=network.target
+After=network.target network-online.target
+Wants=network-online.target
+RequiresMountsFor={config.installation_path} {config.data_path} {config.log_path} {config.config_path}
 
 [Service]
 Type=exec
 User={config.service_config.service_user}
 Group={config.service_config.service_group}
 WorkingDirectory={config.installation_path}
+
+# Environment configuration
 Environment=PYTHONPATH={config.installation_path}
+Environment=PYTHONUNBUFFERED=1
+Environment=SYSTEMD_DEPLOYMENT=true
 EnvironmentFile={config.config_path}/environment
-ExecStart={config.installation_path}/venv/bin/uvicorn src.api.main:app --host {config.service_config.service_host} --port {config.service_config.service_port} --workers {config.service_config.worker_processes}
+
+# Service execution
+ExecStartPre=/bin/mkdir -p {config.data_path} {config.log_path}
+ExecStartPre=/bin/chown {config.service_config.service_user}:{config.service_config.service_group} {config.data_path} {config.log_path}
+ExecStart={config.installation_path}/venv/bin/uvicorn src.api.main:app \\
+    --host {config.service_config.service_host} \\
+    --port {config.service_config.service_port} \\
+    --workers {config.service_config.worker_processes} \\
+    --access-log \\
+    --log-level {config.monitoring_config.log_level.lower()}
+
+# Health check and reload
 ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+TimeoutStopSec=30
+
+# Restart policy
 Restart=always
 RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Logging
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier={config.service_config.service_name}
@@ -573,11 +607,32 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+# File system access
 ReadWritePaths={config.data_path} {config.log_path} {config.config_path}
+ReadOnlyPaths={config.installation_path}
+
+# Network security
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+IPAddressDeny=any
+IPAddressAllow=localhost
+IPAddressAllow={" ".join(allowed_networks)}
 
 # Resource limits
 MemoryLimit={config.resource_config.memory_limit_mb}M
-CPUQuota={int(config.resource_config.cpu_limit_cores * 100)}%
+CPUQuota={cpu_quota}%
+TasksMax={max_tasks}
+
+# Process limits
+LimitNOFILE={max_open_files}
+LimitNPROC={max(10, config.service_config.worker_processes * 2)}
 
 [Install]
 WantedBy=multi-user.target
@@ -587,3 +642,83 @@ WantedBy=multi-user.target
             Path(file_path).write_text(unit_content, encoding="utf-8")
         
         return unit_content
+    
+    @staticmethod
+    def to_logrotate_config(config: OnPremiseConfig, file_path: Optional[str] = None) -> str:
+        """
+        Export configuration as logrotate configuration file.
+        
+        Args:
+            config: Configuration to export
+            file_path: Optional file path to write to
+            
+        Returns:
+            Logrotate configuration content as string
+        """
+        if config.deployment_method != DeploymentMethod.SYSTEMD:
+            raise ValueError("Logrotate config export only available for systemd deployment method")
+        
+        logrotate_content = f"""# Logrotate configuration for Thai Tokenizer Service
+# Place this file in /etc/logrotate.d/{config.service_config.service_name}
+
+{config.log_path}/*.log {{
+    # Rotate logs daily
+    daily
+    
+    # Keep 30 days of logs
+    rotate 30
+    
+    # Compress old logs
+    compress
+    delaycompress
+    
+    # Don't rotate if log is empty
+    notifempty
+    
+    # Create new log files with specific permissions
+    create 0644 {config.service_config.service_user} {config.service_config.service_group}
+    
+    # Use shared scripts for all log files
+    sharedscripts
+    
+    # Reload the service after rotation
+    postrotate
+        /bin/systemctl reload {config.service_config.service_name} > /dev/null 2>&1 || true
+    endscript
+    
+    # Handle missing log files gracefully
+    missingok
+    
+    # Copy and truncate instead of moving (safer for active logs)
+    copytruncate
+}}
+
+# Separate configuration for error logs if they exist
+{config.log_path}/error.log {{
+    daily
+    rotate 60
+    compress
+    delaycompress
+    notifempty
+    create 0644 {config.service_config.service_user} {config.service_config.service_group}
+    missingok
+    copytruncate
+}}
+
+# Configuration for access logs
+{config.log_path}/access.log {{
+    daily
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0644 {config.service_config.service_user} {config.service_config.service_group}
+    missingok
+    copytruncate
+}}
+"""
+        
+        if file_path:
+            Path(file_path).write_text(logrotate_content, encoding="utf-8")
+        
+        return logrotate_content
