@@ -28,6 +28,20 @@ try:
     from src.utils.logging import get_structured_logger
 except ImportError:
     # Fallback for when running outside the main application
+    try:
+        from deployment.config import (
+            OnPremiseConfig, DeploymentMethod, ValidationResult, 
+            ConfigurationValidator, MeilisearchConnectionTester
+        )
+        from deployment.systemd_manager import SystemdServiceManager, SystemdUserManager, SystemdServiceGenerator
+        from utils.logging import get_structured_logger
+    except ImportError:
+        # Define minimal fallbacks
+        from enum import Enum
+        class DeploymentMethod(Enum):
+            DOCKER = "docker"
+            SYSTEMD = "systemd"
+            STANDALONE = "standalone"
     import logging
     def get_structured_logger(name):
         return logging.getLogger(name)

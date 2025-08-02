@@ -1,0 +1,62 @@
+{
+  "deployment_method": "standalone",
+  "meilisearch_config": {
+    "host": "http://localhost:7700",
+    "port": 7700,
+    "api_key": "test-key",
+    "ssl_enabled": false,
+    "ssl_verify": true,
+    "timeout_seconds": 30,
+    "max_retries": 3,
+    "retry_delay_seconds": 1.0
+  },
+  "service_config": {
+    "service_name": "thai-tokenizer-docker",
+    "service_port": 8000,
+    "service_host": "0.0.0.0",
+    "worker_processes": 2,
+    "service_user": "thai-tokenizer",
+    "service_group": "thai-tokenizer"
+  },
+  "security_config": {
+    "security_level": "standard",
+    "allowed_hosts": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "cors_origins": [
+      "http://localhost:3000"
+    ],
+    "api_key_required": false,
+    "api_key": null,
+    "enable_https": false,
+    "ssl_cert_path": null,
+    "ssl_key_path": null,
+    "firewall_rules": []
+  },
+  "resource_config": {
+    "memory_limit_mb": 256,
+    "cpu_limit_cores": 0.5,
+    "max_concurrent_requests": 50,
+    "request_timeout_seconds": 30,
+    "enable_metrics": true,
+    "metrics_port": 9000
+  },
+  "monitoring_config": {
+    "enable_health_checks": true,
+    "health_check_interval_seconds": 30,
+    "enable_logging": true,
+    "log_level": "INFO",
+    "log_file_path": null,
+    "enable_prometheus": false,
+    "prometheus_port": 9000
+  },
+  "installation_path": "./thai-tokenizer-docker",
+  "data_path": "./thai-tokenizer-docker/data",
+  "log_path": "./thai-tokenizer-docker/logs",
+  "config_path": "./thai-tokenizer-docker/config",
+  "environment_variables": {
+    "PYTHONPATH": "src",
+    "LOG_LEVEL": "INFO"
+  }
+}

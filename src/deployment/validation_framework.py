@@ -34,9 +34,34 @@ try:
     from src.utils.logging import get_structured_logger
 except ImportError:
     # Fallback for when running outside the main application
-    import logging
-    def get_structured_logger(name):
-        return logging.getLogger(name)
+    try:
+        from deployment.config import (
+            OnPremiseConfig, ValidationResult, MeilisearchConnectionTester,
+            ConnectionResult, ConnectionStatus
+        )
+        from utils.logging import get_structured_logger
+    except ImportError:
+        # Define minimal fallbacks
+        import logging
+        def get_structured_logger(name):
+            return logging.getLogger(name)
+        
+        from enum import Enum
+        class ValidationResult(BaseModel):
+            valid: bool = True
+            errors: List[str] = []
+            warnings: List[str] = []
+        
+        class ConnectionStatus(Enum):
+            SUCCESS = "success"
+            FAILED = "failed"
+        
+        class ConnectionResult(BaseModel):
+            status: ConnectionStatus
+            message: str = ""
+        
+        class OnPremiseConfig(BaseModel):
+            pass
 
 logger = get_structured_logger(__name__)
 

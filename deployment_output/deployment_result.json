@@ -1,0 +1,10 @@
+{
+  "deployment_id": "deploy_1754120742",
+  "success": false,
+  "deployment_method": "standalone",
+  "summary": "Deployment FAILED: standalone in 0.0s",
+  "endpoints": {},
+  "configuration_path": null,
+  "log_file_path": null,
+  "timestamp": "2025-08-02T14:45:42.296606"
+}

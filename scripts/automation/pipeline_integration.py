@@ -304,18 +304,18 @@ class PipelineIntegration:
         
         environments = environments or ["development", "staging", "production"]
         
-        jenkinsfile_content = f'''pipeline {{
+        jenkinsfile_content = '''pipeline {
     agent any
     
-    environment {{
+    environment {
         PYTHON_VERSION = '3.12'
-        DEPLOYMENT_METHOD = '{deployment_method}'
-    }}
+        DEPLOYMENT_METHOD = '''' + deployment_method + ''''
+    }
     
-    parameters {{
+    parameters {
         choice(
             name: 'ENVIRONMENT',
-            choices: {environments},
+            choices: ''' + str(environments) + ''',
             description: 'Target environment for deployment'
         )
         booleanParam(
@@ -323,25 +323,25 @@ class PipelineIntegration:
             defaultValue: false,
             description: 'Skip test execution'
         )
-    }}
+    }
     
-    stages {{
-        stage('Checkout') {{
-            steps {{
+    stages {
+        stage('Checkout') {
+            steps {
                 checkout scm
-            }}
-        }}
+            }
+        }
         
-        stage('Setup') {{
-            steps {{
-                sh '''
+        stage('Setup') {
+            steps {
+                sh \'\'\'
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install uv
                     uv pip install -r requirements.txt
-                '''
-            }}
-        }}
+                \'\'\'
+            }
+        }
 '''
         
         if include_tests:
@@ -351,10 +351,10 @@ class PipelineIntegration:
                 not { params.SKIP_TESTS }
             }
             steps {
-                sh '''
+                sh \'\'\'
                     . venv/bin/activate
                     python scripts/run_deployment_tests.py --test-type all --output-dir test_results
-                '''
+                \'\'\'
             }
             post {
                 always {

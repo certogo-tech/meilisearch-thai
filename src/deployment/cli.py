@@ -506,8 +506,23 @@ Examples:
             output_file = Path(output_path)
             output_file.parent.mkdir(parents=True, exist_ok=True)
             
-            # Convert config to dict
-            config_dict = config.dict()
+            # Convert config to dict with proper serialization
+            try:
+                # Try Pydantic v2 method first
+                config_dict = config.model_dump(mode='json')
+            except AttributeError:
+                # Fallback to Pydantic v1 method
+                config_dict = config.dict()
+                # Handle SecretStr manually
+                def convert_secrets(obj):
+                    if hasattr(obj, 'get_secret_value'):
+                        return obj.get_secret_value()
+                    elif isinstance(obj, dict):
+                        return {k: convert_secrets(v) for k, v in obj.items()}
+                    elif isinstance(obj, list):
+                        return [convert_secrets(item) for item in obj]
+                    return obj
+                config_dict = convert_secrets(config_dict)
             
             # Save based on file extension
             if output_file.suffix.lower() == '.json':
