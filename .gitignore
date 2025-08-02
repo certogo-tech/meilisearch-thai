@@ -381,3 +381,165 @@ logs/**/
 # uv specific files (modern Python package manager)
 uv.lock
 .uv/
+
+# Deployment and Testing Specific
+
+# Test configuration files
+test-*.json
+test-*.yaml
+test-*.yml
+*-test-config.*
+
+# Mock server logs and data
+mock_*.log
+mock_*.json
+mock_*.db
+
+# Deployment output directories
+deployment_output/
+deployment_results/
+deployment_logs/
+
+# Test output directories
+test_output/
+test_results/
+test_package/
+test_dist/
+
+# Temporary deployment files
+*.deployment.tmp
+deployment.log
+deployment-*.log
+
+# Package creation artifacts
+dist/
+*.tar.gz
+*.zip
+thai-tokenizer-deployment-*.zip
+thai-tokenizer-deployment-*.tar.gz
+
+# Pipeline templates (generated)
+deployment/pipeline_templates/*.yml
+deployment/pipeline_templates/*.yaml
+!deployment/pipeline_templates/README.md
+
+# Automation output
+automation_output/
+pipeline_output/
+
+# Configuration management
+config_backup/
+config_temp/
+
+# Security and secrets
+*.secret
+*.private
+*.key.json
+api_keys.txt
+secrets.env
+
+# Performance and benchmarking
+benchmark_*.json
+performance_*.log
+load_test_*.json
+
+# Development and debugging
+debug.log
+debug_*.log
+trace_*.log
+*.debug
+
+# Temporary files
+*.tmp
+*.temp
+temp_*
+tmp_*
+
+# Editor backup files
+*~
+*.swp
+*.swo
+.#*
+\#*\#
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux specific
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environment files
+.env.*
+!.env.example
+.envrc
+
+# Local development
+local_*
+dev_*
+development_*
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# Database dumps
+*.sql
+*.dump
+
+# Compressed files (except required ones)
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+!requirements.txt
+!setup.py
+
+# System files
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Network files
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
