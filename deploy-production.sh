@@ -131,14 +131,19 @@ create_directories() {
 deploy() {
     log_info "Building and deploying Thai Tokenizer..."
     
-    # Use docker-compose or docker compose based on availability
-    if command -v docker-compose &> /dev/null; then
+    # Use docker compose (newer) or docker-compose (legacy) based on availability
+    # Prefer docker compose over docker-compose to avoid permission issues
+    if docker compose version &> /dev/null; then
+        COMPOSE_CMD="docker compose"
+    elif command -v docker-compose &> /dev/null && [ -x "$(command -v docker-compose)" ]; then
         COMPOSE_CMD="docker-compose"
     else
-        COMPOSE_CMD="docker compose"
+        log_error "Neither 'docker compose' nor 'docker-compose' is available or executable"
+        exit 1
     fi
     
     # Build the image
+    log_info "Using Docker Compose command: $COMPOSE_CMD"
     log_info "Building Thai Tokenizer image..."
     $COMPOSE_CMD -f "$COMPOSE_FILE" --env-file "$ENV_FILE" build thai-tokenizer
     

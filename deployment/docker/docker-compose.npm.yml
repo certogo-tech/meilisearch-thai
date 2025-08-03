@@ -105,10 +105,6 @@ services:
 volumes:
   thai_tokenizer_logs:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${LOG_DIR:-../../logs/thai-tokenizer}
   
   pythainlp_data:
     driver: local
