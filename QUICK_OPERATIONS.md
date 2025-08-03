@@ -3,6 +3,7 @@
 ## 🚀 Most Common Operations
 
 ### 1. Add New Compound Word
+
 ```bash
 # 1. Edit dictionary
 nano data/dictionaries/thai_compounds.json
@@ -21,6 +22,7 @@ curl -X POST "https://search.cads.arda.or.th/api/v1/tokenize/compound" \
 ```
 
 ### 2. Restart Service
+
 ```bash
 # Quick restart
 ./deploy.sh rebuild
@@ -33,6 +35,7 @@ curl -X POST "https://search.cads.arda.or.th/api/v1/tokenize/compound" \
 ```
 
 ### 3. Test วากาเมะ Compound Search
+
 ```bash
 # Test tokenization
 ./scripts/testing/test-wakame-tokenization.sh
@@ -55,6 +58,7 @@ curl -X POST "https://search.cads.arda.or.th/api/v1/search" \
 ```
 
 ### 4. Health Check
+
 ```bash
 # Quick health
 curl -s "https://search.cads.arda.or.th/health"
@@ -68,6 +72,7 @@ curl -s "https://search.cads.arda.or.th/api/v1/health/check/meilisearch"
 ```
 
 ### 5. Debug Issues
+
 ```bash
 # Debug dictionary loading
 ./scripts/maintenance/debug-dictionary.sh
@@ -80,6 +85,7 @@ docker logs $(docker ps --filter "name=thai-tokenizer" --format "{{.ID}}" | head
 ```
 
 ### 6. Performance Testing
+
 ```bash
 # Test external API
 ./scripts/testing/test-external-api.sh
@@ -96,6 +102,7 @@ time curl -X POST "https://search.cads.arda.or.th/api/v1/tokenize/compound" \
 ## 🆘 Emergency Commands
 
 ### Service Down
+
 ```bash
 # Emergency restart
 docker restart $(docker ps --filter "name=thai-tokenizer" --format "{{.ID}}" | head -1)
@@ -108,6 +115,7 @@ docker logs $(docker ps -a --filter "name=thai-tokenizer" --format "{{.ID}}" | h
 ```
 
 ### Configuration Issues
+
 ```bash
 # Restore from backup
 cp backups/env/.env.production.backup.* .env.production
@@ -121,10 +129,10 @@ cp .env.production.example .env.production
 
 ## 📊 Key URLs
 
-- **API**: https://search.cads.arda.or.th
-- **Health**: https://search.cads.arda.or.th/api/v1/health/detailed
-- **Docs**: https://search.cads.arda.or.th/docs
-- **Meilisearch**: http://10.0.2.105:7700
+- **API**: <https://search.cads.arda.or.th>
+- **Health**: <https://search.cads.arda.or.th/api/v1/health/detailed>
+- **Docs**: <https://search.cads.arda.or.th/docs>
+- **Meilisearch**: <http://10.0.2.105:7700>
 
 ## 📁 Key Files
 
