@@ -158,6 +158,9 @@ class ThaiSegmenter:
         """
         Specialized segmentation for compound words with enhanced processing.
         
+        This method preserves known compound words from the custom dictionary
+        while splitting unknown long tokens that might be compound words.
+        
         Args:
             text: Input text potentially containing compound words
             
@@ -180,13 +183,18 @@ class ThaiSegmenter:
         enhanced_tokens = []
         for token in primary_result.tokens:
             if token in compound_candidates:
-                # Try alternative segmentation for potential compounds
-                sub_result = self._segment_with_fallback(token)
-                if len(sub_result.tokens) > 1:
-                    enhanced_tokens.extend(sub_result.tokens)
-                    logger.debug(f"Split compound word '{token}' into: {sub_result.tokens}")
-                else:
+                # Check if this token is in our custom dictionary - if so, preserve it
+                if self.custom_dict and token in self.custom_dict:
                     enhanced_tokens.append(token)
+                    logger.debug(f"Preserved compound word from dictionary: '{token}'")
+                else:
+                    # Try alternative segmentation for potential compounds
+                    sub_result = self._segment_with_fallback(token)
+                    if len(sub_result.tokens) > 1:
+                        enhanced_tokens.extend(sub_result.tokens)
+                        logger.debug(f"Split compound word '{token}' into: {sub_result.tokens}")
+                    else:
+                        enhanced_tokens.append(token)
             else:
                 enhanced_tokens.append(token)
         
