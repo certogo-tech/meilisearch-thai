@@ -34,7 +34,19 @@ curl -X POST "https://search.cads.arda.or.th/api/v1/tokenize/compound" \
 ./scripts/deployment/rebuild-with-dictionary.sh
 ```
 
-### 3. Test วากาเมะ Compound Search
+### 3. Assess Existing Index Reindexing Need
+
+```bash
+# Check if you need to reindex existing documents
+./scripts/maintenance/assess-reindexing-need.sh
+
+# This will tell you:
+# - Whether reindexing is needed (full/selective/none)
+# - Current search quality assessment
+# - Specific recommendations based on your index size and quality
+```
+
+### 4. Test วากาเมะ Compound Search
 
 ```bash
 # Test tokenization
