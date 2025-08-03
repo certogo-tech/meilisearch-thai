@@ -60,6 +60,9 @@ services:
       
       # PyThaiNLP configuration
       - PYTHAINLP_DATA_PATH=/home/appuser/.pythainlp
+      
+      # Custom dictionary configuration
+      - CUSTOM_DICTIONARY_PATH=${CUSTOM_DICTIONARY_PATH:-}
     
     # Health check
     healthcheck:
@@ -95,6 +98,7 @@ services:
     volumes:
       - thai_tokenizer_logs:/var/log/thai-tokenizer
       - pythainlp_data:/home/appuser/.pythainlp
+      - ./data/dictionaries:/app/data/dictionaries:ro
     
     # Labels for monitoring
     labels:
