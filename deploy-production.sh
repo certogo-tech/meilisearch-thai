@@ -10,7 +10,7 @@ echo "========================================"
 
 # Configuration
 ENV_FILE=".env.production"
-COMPOSE_FILE="deployment/docker/docker-compose.production.yml"
+COMPOSE_FILE="deployment/docker/docker-compose.npm.yml"
 DOCKERFILE="deployment/docker/Dockerfile.prod"
 
 # Colors for output
