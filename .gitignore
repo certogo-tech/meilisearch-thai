@@ -544,3 +544,5 @@ development_*
 Network Trash Folder
 Temporary Items
 .apdisk
+# Environment backups
+backups/env/.env.production.backup.*

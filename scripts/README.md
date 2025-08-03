@@ -1,50 +1,69 @@
-# 📁 Scripts Directory
+# Scripts Directory
 
-This directory contains utility scripts and wrappers for the Thai Tokenizer project.
+This directory contains all the operational scripts for the Thai Tokenizer service.
 
-## 📂 Current Structure
+## Directory Structure
 
-```
-scripts/
-├── README.md                           # This file
-├── setup_existing_meilisearch.sh       # Setup wrapper for existing MeiliSearch
-└── start_api_with_compounds.py         # Development API wrapper
-```
+### `deployment/`
+Scripts for deploying and managing the production service:
+- `deploy-production.sh` - Full production deployment with health checks
+- `setup-production-tokenizer.sh` - Setup service with custom dictionary
+- `final-wakame-fix.sh` - Apply the wakame tokenization fix
+- `simple-rebuild.sh` - Simple rebuild and restart
+- `rebuild-*.sh` - Various rebuild scripts for specific fixes
+- `setup-ssl.sh` - SSL certificate setup
+- `restart-service.sh` - Restart the service
 
-## 🎯 Design Philosophy
+### `testing/`
+Scripts for testing the service functionality:
+- `test-external-api.sh` - Comprehensive external API testing
+- `test-wakame-tokenization.sh` - Test wakame tokenization specifically
+- `test-service-health.sh` - Test service health and status
+- `test-from-container.sh` - Test from inside Docker container
 
-This directory follows the principle of organized project structure:
+### `maintenance/`
+Scripts for maintenance and debugging:
+- `debug-dictionary.sh` - Debug custom dictionary loading
+- `validate-env-config.sh` - Validate environment configuration
+- `check-meilisearch.sh` - Check Meilisearch connectivity
 
-- ✅ **Centralized scripts**: All user-facing scripts in one location
-- ✅ **Clean root**: Keeps root directory minimal
-- ✅ **Easy access**: Available via Make commands or direct calls
-- ✅ **Logical organization**: Scripts grouped by function
+## Usage
 
-## 🚀 Usage
-
-### Via Make Commands (Recommended)
+### Quick Deployment
 ```bash
-make setup-existing    # Setup with existing MeiliSearch
-make start-dev         # Start development API
-make help             # Show all available commands
+# From project root
+./deploy.sh production
 ```
 
-### Direct Script Calls
+### Quick Testing
 ```bash
-bash scripts/setup_existing_meilisearch.sh     # Setup existing MeiliSearch
-python3 scripts/start_api_with_compounds.py    # Start development API
+# From project root
+./deploy.sh test
 ```
 
-## 📚 Related Documentation
+### Direct Script Usage
+```bash
+# Run specific deployment script
+./scripts/deployment/deploy-production.sh
 
-- **Quick Start**: `../QUICK_START.md`
-- **Existing MeiliSearch Guide**: `../deployment/scripts/README_EXISTING_MEILISEARCH.md`
-- **Project Structure**: `../docs/project/FILE_STRUCTURE.md`
+# Run specific test
+./scripts/testing/test-external-api.sh
 
-## 🔮 Future Plans
+# Run maintenance task
+./scripts/maintenance/debug-dictionary.sh
+```
 
-This directory may contain:
-- Development utilities
-- Testing helpers
-- Maintenance scripts
-- Build tools
+## Script Dependencies
+
+Most scripts require:
+- Docker and Docker Compose
+- curl for API testing
+- Access to `.env.production` file
+- Proper network connectivity to the service
+
+## Environment
+
+Scripts are designed to work with:
+- Production environment at `https://search.cads.arda.or.th`
+- Meilisearch at `http://10.0.2.105:7700`
+- Docker containers for the Thai Tokenizer service
