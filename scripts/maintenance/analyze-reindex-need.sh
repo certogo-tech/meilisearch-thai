@@ -7,11 +7,11 @@ echo "🔍 Analyzing MeiliSearch Indexes for Reindexing Need"
 echo "===================================================="
 
 # Colors for output
-RED='\\033[0;31m'
-GREEN='\\033[0;32m'
-YELLOW='\\033[1;33m'
-BLUE='\\033[0;34m'
-NC='\\033[0m' # No Color
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
 print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -27,8 +27,8 @@ echo ""
 
 # Get all indexes
 print_info "=== DISCOVERING INDEXES ==="
-ALL_INDEXES=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \\
-    -H "Authorization: Bearer $MEILISEARCH_API_KEY" | \\
+ALL_INDEXES=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \
+    -H "Authorization: Bearer $MEILISEARCH_API_KEY" | \
     python3 -c "
 import sys, json
 try:
@@ -72,8 +72,8 @@ echo "$ALL_INDEXES" | while IFS=':' read -r INDEX_NAME DOC_COUNT; do
         print_info "Analyzing index: $INDEX_NAME ($DOC_COUNT documents)"
         
         # Sample a few documents to check for tokenized_content field
-        SAMPLE_DOCS=$(curl -s -X GET "$MEILISEARCH_HOST/indexes/$INDEX_NAME/documents" \\
-            -H "Authorization: Bearer $MEILISEARCH_API_KEY" \\
+        SAMPLE_DOCS=$(curl -s -X GET "$MEILISEARCH_HOST/indexes/$INDEX_NAME/documents" \
+            -H "Authorization: Bearer $MEILISEARCH_API_KEY" \
             -d '{"limit": 5}')
         
         # Check if documents have tokenized_content field
@@ -122,8 +122,8 @@ except Exception as e:
         fi
         
         # Test a compound word search to see current quality
-        COMPOUND_TEST=$(curl -s -X POST "$MEILISEARCH_HOST/indexes/$INDEX_NAME/search" \\
-            -H "Authorization: Bearer $MEILISEARCH_API_KEY" \\
+        COMPOUND_TEST=$(curl -s -X POST "$MEILISEARCH_HOST/indexes/$INDEX_NAME/search" \
+            -H "Authorization: Bearer $MEILISEARCH_API_KEY" \
             -d '{"q": "วากาเมะ", "limit": 3}')
         
         COMPOUND_HITS=$(echo "$COMPOUND_TEST" | python3 -c "

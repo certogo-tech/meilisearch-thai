@@ -7,11 +7,11 @@ echo "🔄 MeiliSearch Thai Tokenization Reindexing Tool"
 echo "================================================="
 
 # Colors for output
-RED='\\033[0;31m'
-GREEN='\\033[0;32m'
-YELLOW='\\033[1;33m'
-BLUE='\\033[0;34m'
-NC='\\033[0m' # No Color
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
 print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -70,7 +70,7 @@ check_prerequisites() {
     fi
     
     # Check API key
-    INDEX_TEST=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \\
+    INDEX_TEST=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \
         -H "Authorization: Bearer $MEILISEARCH_API_KEY")
     
     if echo "$INDEX_TEST" | grep -q "error"; then
@@ -86,8 +86,8 @@ check_prerequisites() {
 # Function to show available indexes
 show_available_indexes() {
     print_info "Available indexes:"
-    curl -s -X GET "$MEILISEARCH_HOST/indexes" \\
-        -H "Authorization: Bearer $MEILISEARCH_API_KEY" | \\
+    curl -s -X GET "$MEILISEARCH_HOST/indexes" \
+        -H "Authorization: Bearer $MEILISEARCH_API_KEY" | \
         python3 -c "
 import sys, json
 try:
@@ -106,7 +106,7 @@ estimate_time() {
     print_info "Estimating reindexing time..."
     
     # Get document counts
-    INDEXES_INFO=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \\
+    INDEXES_INFO=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \
         -H "Authorization: Bearer $MEILISEARCH_API_KEY")
     
     total_docs=$(echo "$INDEXES_INFO" | python3 -c "
