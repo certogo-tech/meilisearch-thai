@@ -337,9 +337,9 @@ data/benchmarks/temp_*
 docker_data/
 deployment/docker/volumes/
 
-# Docker Compose overrides and environment-specific files
-deployment/docker/docker-compose.override.yml
-deployment/docker/docker-compose.local.yml
+# Docker Compose local overrides only
+# deployment/docker/docker-compose.override.yml
+# deployment/docker/docker-compose.local.yml
 
 # Kubernetes secrets
 deployment/k8s/secrets/
