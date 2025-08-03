@@ -3,8 +3,8 @@
 # Test Researcher Index for วากาเมะ Tokenization
 # This script tests the existing "researcher" index to verify compound word tokenization
 
-echo "🔬 Testing Researcher Index for วากาเมะ Compound Word Tokenization"
-echo "=================================================================="
+echo "🔬 Testing Meilisearch Index '$INDEX_NAME' for วากาเมะ Compound Word Tokenization"
+echo "=============================================================================="
 
 # Colors for output
 RED='\033[0;31m'
@@ -21,8 +21,10 @@ print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 # Configuration
 MEILISEARCH_HOST="http://10.0.2.105:7700"
 MEILISEARCH_API_KEY="FKjPKTmFnCl7EPg6YLula1DC6n5mHqId"
-INDEX_NAME="researcher"
 THAI_TOKENIZER_API="https://search.cads.arda.or.th"
+
+# Default index name (can be overridden by command line argument)
+INDEX_NAME="${1:-research}"
 
 print_info "Testing configuration:"
 echo "• Meilisearch: $MEILISEARCH_HOST"
@@ -30,8 +32,8 @@ echo "• Index: $INDEX_NAME"
 echo "• Thai Tokenizer: $THAI_TOKENIZER_API"
 echo ""
 
-# Test 1: Check if researcher index exists
-print_info "=== TEST 1: Verify Researcher Index ==="
+# Test 1: Check if the specified index exists
+print_info "=== TEST 1: Verify Index '$INDEX_NAME' ==="
 INDEX_INFO=$(curl -s -X GET "$MEILISEARCH_HOST/indexes/$INDEX_NAME" \
     -H "Authorization: Bearer $MEILISEARCH_API_KEY")
 
