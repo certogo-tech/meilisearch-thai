@@ -62,7 +62,7 @@ services:
       - PYTHAINLP_DATA_PATH=/home/appuser/.pythainlp
       
       # Custom dictionary configuration
-      - CUSTOM_DICTIONARY_PATH=${CUSTOM_DICTIONARY_PATH:-}
+      - THAI_TOKENIZER_CUSTOM_DICTIONARY_PATH=${CUSTOM_DICTIONARY_PATH:-}
     
     # Health check
     healthcheck:
