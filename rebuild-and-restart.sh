@@ -48,16 +48,16 @@ $DOCKER_COMPOSE_CMD -f deployment/docker/docker-compose.npm.yml --env-file .env.
 print_info "Waiting for service to start..."
 sleep 15
 
-# Test the fixes
+# Test the fixes using localhost (internal network)
 print_info "Testing configuration validity..."
-HEALTH_RESPONSE=$(curl -s 'https://search.cads.arda.or.th/api/v1/health/check/configuration_validity')
+HEALTH_RESPONSE=$(curl -s 'http://localhost:8000/api/v1/health/check/configuration_validity')
 
 if echo "$HEALTH_RESPONSE" | grep -q '"status":"healthy"'; then
     print_success "✅ Configuration validation is now healthy!"
-    echo "$HEALTH_RESPONSE" | jq .
+    echo "$HEALTH_RESPONSE" | jq . 2>/dev/null || echo "$HEALTH_RESPONSE"
 elif echo "$HEALTH_RESPONSE" | grep -q '"status":"unhealthy"'; then
     print_warning "⚠️ Configuration validation still has issues:"
-    echo "$HEALTH_RESPONSE" | jq .
+    echo "$HEALTH_RESPONSE" | jq . 2>/dev/null || echo "$HEALTH_RESPONSE"
 else
     print_error "❌ Could not get health status"
     echo "$HEALTH_RESPONSE"
@@ -65,7 +65,7 @@ fi
 
 # Test overall health
 print_info "Checking overall health status..."
-OVERALL_HEALTH=$(curl -s 'https://search.cads.arda.or.th/api/v1/health/summary')
+OVERALL_HEALTH=$(curl -s 'http://localhost:8000/api/v1/health/summary')
 
 if echo "$OVERALL_HEALTH" | grep -q '"overall_status":"healthy"'; then
     print_success "🎉 Service is now fully healthy!"
@@ -76,8 +76,16 @@ else
 fi
 
 # Show health score
-HEALTH_SCORE=$(echo "$OVERALL_HEALTH" | jq -r '.health_score // "unknown"')
+HEALTH_SCORE=$(echo "$OVERALL_HEALTH" | jq -r '.health_score // "unknown"' 2>/dev/null || echo "unknown")
 print_info "Current health score: $HEALTH_SCORE%"
+
+# Also test external access
+print_info "Testing external access..."
+if curl -s --connect-timeout 5 'https://search.cads.arda.or.th/health' > /dev/null; then
+    print_success "✅ External domain is accessible"
+else
+    print_warning "⚠️ External domain not accessible from this server (may be normal)"
+fi
 
 print_success "✅ Rebuild and restart completed!"
 print_info "Service URL: https://search.cads.arda.or.th"
