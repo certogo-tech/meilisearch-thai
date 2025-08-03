@@ -74,21 +74,27 @@ The mock Meilisearch server successfully simulated a production Meilisearch inst
 Following the production deployment guide procedures:
 
 1. **Step 1: Generate Configuration Template**
+
    ```bash
    ./scripts/thai-tokenizer-deploy generate-config --method docker --output test-config.json --example
    ```
+
    Result: ✅ Configuration template generated successfully
 
 2. **Step 2: Validate Configuration**
+
    ```bash
    ./scripts/thai-tokenizer-deploy --config test-config.json validate-config
    ```
+
    Result: ✅ Configuration is valid
 
 3. **Step 3: Test Meilisearch Connectivity**
+
    ```bash
    ./scripts/thai-tokenizer-deploy --config test-config.json validate-meilisearch
    ```
+
    Result: ✅ All connectivity tests passed
 
 ### System Validation Results
