@@ -13,6 +13,12 @@ services:
       - "${THAI_TOKENIZER_PORT:-8000}:8000"
     environment:
       # External Meilisearch connection configuration
+      - MEILISEARCH_HOST=${MEILISEARCH_HOST:-http://localhost:7700}
+      - MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY}
+      - MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
+      - MEILISEARCH_SSL_VERIFY=${MEILISEARCH_SSL_VERIFY:-false}
+      - MEILISEARCH_TIMEOUT_MS=${MEILISEARCH_TIMEOUT_MS:-10000}
+      - MEILISEARCH_MAX_RETRIES=${MEILISEARCH_MAX_RETRIES:-3}
       - THAI_TOKENIZER_MEILISEARCH_HOST=${MEILISEARCH_HOST:-http://localhost:7700}
       - THAI_TOKENIZER_MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY}
       - THAI_TOKENIZER_MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
@@ -67,9 +73,8 @@ services:
     
     restart: unless-stopped
     
-    # Network configuration - connect to your existing Meilisearch network
-    networks:
-      - external-meilisearch-network
+    # Network configuration - using direct IP connection to Meilisearch
+    # No external network needed since we're connecting via IP address
     
     # Resource limits
     deploy:
@@ -111,8 +116,4 @@ volumes:
     name: pythainlp_data_${COMPOSE_PROJECT_NAME:-thai_tokenizer_prod}
 
 # Network definitions
-networks:
-  # External network for connecting to existing Meilisearch
-  external-meilisearch-network:
-    external: true
-    name: ${EXTERNAL_MEILISEARCH_NETWORK:-arda-network-stack}
+# No external networks needed - using direct IP connection to Meilisearch
