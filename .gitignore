@@ -193,10 +193,8 @@ Thumbs.db
 # Docker
 .dockerignore
 
-# Docker Compose override files
+# Docker Compose override files (only local overrides)
 docker-compose.override.yml
-docker-compose.*.yml
-!docker-compose.yml
 
 # Logs
 *.log
@@ -338,8 +336,8 @@ docker_data/
 deployment/docker/volumes/
 
 # Docker Compose local overrides only
-# deployment/docker/docker-compose.override.yml
-# deployment/docker/docker-compose.local.yml
+deployment/docker/docker-compose.override.yml
+deployment/docker/docker-compose.local.yml
 
 # Kubernetes secrets
 deployment/k8s/secrets/
@@ -352,7 +350,6 @@ deployment/k8s/*.secret.yaml
 .terraform.lock.hcl
 
 # Local development overrides
-deployment/docker/docker-compose.local.yml
 deployment/environments/.env.local
 
 # IDE specific files

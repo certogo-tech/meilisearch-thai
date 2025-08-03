@@ -1,0 +1,202 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ../../ssl:/etc/nginx/ssl:ro
+      - ../../logs/nginx:/var/log/nginx
+    depends_on:
+      thai-tokenizer:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 128M
+
+  thai-tokenizer:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile.prod
+    expose:
+      - "8000"
+    environment:
+      # MeiliSearch connection
+      - THAI_TOKENIZER_MEILISEARCH_HOST=http://meilisearch:7700
+      - THAI_TOKENIZER_MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY}
+      - THAI_TOKENIZER_MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
+      
+      # Tokenizer configuration
+      - THAI_TOKENIZER_TOKENIZER_ENGINE=${TOKENIZER_ENGINE:-pythainlp}
+      - THAI_TOKENIZER_TOKENIZER_MODEL=${TOKENIZER_MODEL:-}
+      
+      # Production processing configuration
+      - THAI_TOKENIZER_PROCESSING_BATCH_SIZE=${BATCH_SIZE:-50}
+      - THAI_TOKENIZER_MEILISEARCH_MAX_RETRIES=${MAX_RETRIES:-5}
+      - THAI_TOKENIZER_MEILISEARCH_TIMEOUT_MS=${TIMEOUT_MS:-10000}
+      
+      # Production optimizations
+      - PYTHONOPTIMIZE=2  # Maximum Python optimizations
+      - PYTHONUNBUFFERED=1
+      - TOKENIZER_CACHE_SIZE=2000  # Larger cache for production
+      - WORKER_PROCESSES=8  # More workers for production
+      
+      # Production service configuration
+      - THAI_TOKENIZER_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - THAI_TOKENIZER_SERVICE_NAME=thai-tokenizer-prod
+      - THAI_TOKENIZER_VERSION=${VERSION:-1.0.0}
+      
+      # Security
+      - THAI_TOKENIZER_DEBUG=false
+      - THAI_TOKENIZER_CORS_ORIGINS=${CORS_ORIGINS:-https://yourdomain.com}
+    depends_on:
+      meilisearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    volumes:
+      - ../../logs/thai-tokenizer:/var/log/thai-tokenizer
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: rollback
+        monitor: 60s
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.15.2
+    expose:
+      - "7700"
+    environment:
+      # Production MeiliSearch configuration
+      - MEILI_MASTER_KEY=${MEILISEARCH_API_KEY}
+      - MEILI_ENV=production
+      - MEILI_LOG_LEVEL=${MEILI_LOG_LEVEL:-WARN}
+      
+      # Production performance settings
+      - MEILI_MAX_INDEXING_MEMORY=${MEILI_MAX_INDEXING_MEMORY:-2Gb}
+      - MEILI_MAX_INDEXING_THREADS=${MEILI_MAX_INDEXING_THREADS:-4}
+      
+      # Data persistence
+      - MEILI_SNAPSHOT_DIR=/meili_data/snapshots
+      - MEILI_DUMP_DIR=/meili_data/dumps
+      
+      # Security
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_DISABLE_AUTO_BATCHING=false
+    volumes:
+      - meilisearch_data:/meili_data
+      - meilisearch_snapshots:/meili_data/snapshots
+      - meilisearch_dumps:/meili_data/dumps
+      - ../../logs/meilisearch:/var/log/meilisearch
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 3G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # Monitoring and logging
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ../../monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    restart: unless-stopped
+    networks:
+      - thai-tokenizer-network
+    profiles:
+      - monitoring
+
+volumes:
+  meilisearch_data:
+    driver: local
+  meilisearch_snapshots:
+    driver: local
+  meilisearch_dumps:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  thai-tokenizer-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
