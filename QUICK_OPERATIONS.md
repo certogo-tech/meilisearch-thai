@@ -46,7 +46,25 @@ curl -X POST "https://search.cads.arda.or.th/api/v1/tokenize/compound" \
 # - Specific recommendations based on your index size and quality
 ```
 
-### 4. Test วากาเมะ Compound Search
+### 4. Reindex Existing Data (CRITICAL!)
+
+Your existing indexes need reindexing to add `tokenized_content` field:
+
+```bash
+# 1. Analyze what needs reindexing
+./scripts/maintenance/analyze-reindex-need.sh
+
+# 2. Preview changes (dry run)
+./scripts/maintenance/reindex-all-data.sh --dry-run --all
+
+# 3. Reindex all indexes
+./scripts/maintenance/reindex-all-data.sh --all
+
+# 4. Or reindex specific index
+./scripts/maintenance/reindex-all-data.sh --index research
+```
+
+### 5. Test วากาเมะ Compound Search
 
 ```bash
 # Test tokenization
@@ -69,7 +87,7 @@ curl -X POST "https://search.cads.arda.or.th/api/v1/search" \
   -d '{"query": "วากาเมะ"}'
 ```
 
-### 4. Health Check
+### 6. Health Check
 
 ```bash
 # Quick health
