@@ -48,9 +48,28 @@ $DOCKER_COMPOSE_CMD -f deployment/docker/docker-compose.npm.yml --env-file .env.
 print_info "Waiting for service to start..."
 sleep 15
 
-# Test the fixes using localhost (internal network)
+# Test the fixes using Docker container internal network
 print_info "Testing configuration validity..."
-HEALTH_RESPONSE=$(curl -s 'http://localhost:8000/api/v1/health/check/configuration_validity')
+
+# Try multiple endpoints to find the working one
+HEALTH_RESPONSE=""
+for endpoint in "http://localhost:8000" "http://127.0.0.1:8000" "http://0.0.0.0:8000"; do
+    if curl -s --connect-timeout 3 "$endpoint/health" > /dev/null 2>&1; then
+        print_info "Using endpoint: $endpoint"
+        HEALTH_RESPONSE=$(curl -s "$endpoint/api/v1/health/check/configuration_validity")
+        break
+    fi
+done
+
+# If local endpoints don't work, try Docker container inspection
+if [ -z "$HEALTH_RESPONSE" ]; then
+    print_info "Local endpoints not accessible, trying Docker container..."
+    CONTAINER_ID=$(docker ps --filter "name=thai-tokenizer" --format "{{.ID}}" | head -1)
+    if [ -n "$CONTAINER_ID" ]; then
+        print_info "Found container: $CONTAINER_ID"
+        HEALTH_RESPONSE=$(docker exec "$CONTAINER_ID" curl -s "http://localhost:8000/api/v1/health/check/configuration_validity" 2>/dev/null || echo "")
+    fi
+fi
 
 if echo "$HEALTH_RESPONSE" | grep -q '"status":"healthy"'; then
     print_success "✅ Configuration validation is now healthy!"
@@ -63,9 +82,23 @@ else
     echo "$HEALTH_RESPONSE"
 fi
 
-# Test overall health
+# Test overall health using the same endpoint that worked
 print_info "Checking overall health status..."
-OVERALL_HEALTH=$(curl -s 'http://localhost:8000/api/v1/health/summary')
+OVERALL_HEALTH=""
+for endpoint in "http://localhost:8000" "http://127.0.0.1:8000" "http://0.0.0.0:8000"; do
+    if curl -s --connect-timeout 3 "$endpoint/health" > /dev/null 2>&1; then
+        OVERALL_HEALTH=$(curl -s "$endpoint/api/v1/health/summary")
+        break
+    fi
+done
+
+# If local endpoints don't work, try Docker container
+if [ -z "$OVERALL_HEALTH" ]; then
+    CONTAINER_ID=$(docker ps --filter "name=thai-tokenizer" --format "{{.ID}}" | head -1)
+    if [ -n "$CONTAINER_ID" ]; then
+        OVERALL_HEALTH=$(docker exec "$CONTAINER_ID" curl -s "http://localhost:8000/api/v1/health/summary" 2>/dev/null || echo "")
+    fi
+fi
 
 if echo "$OVERALL_HEALTH" | grep -q '"overall_status":"healthy"'; then
     print_success "🎉 Service is now fully healthy!"
