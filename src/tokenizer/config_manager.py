@@ -63,6 +63,10 @@ class TokenizerConfig(BaseModel):
         TokenizerEngine.NEWMM,
         description="Fallback engine if primary fails"
     )
+    enable_fallback: bool = Field(
+        True,
+        description="Whether to enable fallback to alternative engines"
+    )
     
     @field_validator('custom_dictionary')
     @classmethod
@@ -207,6 +211,7 @@ class ThaiTokenizerSettings(BaseSettings):
     tokenizer_keep_whitespace: bool = Field(True, description="Keep whitespace in tokens")
     tokenizer_handle_compounds: bool = Field(True, description="Handle compound words")
     tokenizer_fallback_engine: Optional[TokenizerEngine] = Field(TokenizerEngine.NEWMM, description="Fallback engine")
+    tokenizer_enable_fallback: bool = Field(True, description="Enable fallback engines")
     
     # Processing configuration
     processing_batch_size: int = Field(100, description="Batch processing size")
@@ -377,7 +382,8 @@ class ConfigManager:
                 custom_dictionary=self._custom_dictionary,
                 keep_whitespace=self.settings.tokenizer_keep_whitespace,
                 handle_compounds=self.settings.tokenizer_handle_compounds,
-                fallback_engine=self.settings.tokenizer_fallback_engine
+                fallback_engine=self.settings.tokenizer_fallback_engine,
+                enable_fallback=self.settings.tokenizer_enable_fallback
             )
         except ValidationError as e:
             raise ConfigurationError(f"Invalid tokenizer configuration: {e}")
@@ -429,6 +435,7 @@ class ConfigManager:
             self.settings.tokenizer_keep_whitespace = validated_config.keep_whitespace
             self.settings.tokenizer_handle_compounds = validated_config.handle_compounds
             self.settings.tokenizer_fallback_engine = validated_config.fallback_engine
+            self.settings.tokenizer_enable_fallback = validated_config.enable_fallback
             
             # Update custom dictionary
             self._custom_dictionary = validated_config.custom_dictionary
@@ -538,6 +545,10 @@ class ConfigManager:
         config_dict["custom_dictionary"] = self._custom_dictionary
         config_dict["validation_report"] = self.validate_configuration()
         return config_dict
+    
+    def get_config(self) -> Dict[str, Any]:
+        """Get complete configuration dictionary for health checks."""
+        return self.to_dict()
     
     def get_stats(self) -> Dict[str, Any]:
         """Get configuration statistics."""
