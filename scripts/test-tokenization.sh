@@ -125,7 +125,7 @@ echo ""
 echo -e "${YELLOW}Test 4: Compound Word Recognition${NC}"
 echo "Testing various compound words..."
 
-COMPOUNDS=("คอมพิวเตอร์" "อินเทอร์เน็ต" "สมาร์ทโฟน")
+COMPOUNDS=("คอมพิวเตอร์" "อินเทอร์เน็ต" "สมาร์ทโฟน" "สาหร่ายวากาเมะ" "พิซซ่าไทย" "เส้นใหญ่ผัดซีอิ๊ว" "ข้าวผัดอเมริกัน" "แอปพลิเคชัน" "โปรแกรมมิ่ง" "คลาวด์เซิร์ฟเวอร์" "ไซเบอร์เซ็กคิวริตี้")
 
 for word in "${COMPOUNDS[@]}"; do
     echo -n "  $word: "
