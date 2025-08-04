@@ -1,0 +1,69 @@
+# Prometheus configuration for Thai Search Proxy monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'thai-search-proxy'
+    environment: 'production'
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Thai Search Proxy metrics
+  - job_name: 'thai-search-proxy'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'search-proxy'
+  
+  # Search proxy specific metrics
+  - job_name: 'search-proxy-metrics'
+    metrics_path: '/metrics/search-proxy'
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'search-proxy-specific'
+  
+  # Health metrics
+  - job_name: 'search-proxy-health'
+    metrics_path: '/metrics/health'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+  
+  # Performance metrics
+  - job_name: 'search-proxy-performance'
+    metrics_path: '/metrics/performance'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+  
+  # MeiliSearch metrics
+  - job_name: 'meilisearch'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['meilisearch:7700']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'meilisearch'
+  
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

@@ -1,0 +1,78 @@
+# Prometheus configuration for Thai Search Proxy with NPM
+# Configured to work with Nginx Proxy Manager deployment
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'thai-search-proxy-npm'
+    environment: 'production'
+    deployment: 'npm'
+
+# Scrape configurations
+scrape_configs:
+  # Thai Search Proxy main metrics
+  - job_name: 'thai-search-proxy'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'search-proxy-npm'
+  
+  # Search proxy specific metrics
+  - job_name: 'search-proxy-metrics'
+    metrics_path: '/metrics/search-proxy'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'search-proxy-specific'
+  
+  # Health metrics
+  - job_name: 'search-proxy-health'
+    metrics_path: '/metrics/health'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+  
+  # Performance metrics
+  - job_name: 'search-proxy-performance'
+    metrics_path: '/metrics/performance'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+  
+  # System metrics
+  - job_name: 'search-proxy-system'
+    metrics_path: '/metrics/system'
+    scrape_interval: 60s
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+  
+  # Custom Thai tokenizer metrics
+  - job_name: 'search-proxy-custom'
+    metrics_path: '/metrics/custom'
+    scrape_interval: 60s
+    static_configs:
+      - targets: ['thai-tokenizer-search-proxy:8000']
+  
+  # External MeiliSearch metrics (if accessible)
+  - job_name: 'meilisearch-external'
+    metrics_path: '/metrics'
+    static_configs:
+      # Update this target to your actual MeiliSearch host
+      - targets: ['${MEILISEARCH_HOST:-localhost:7700}']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'meilisearch-external'
+    # Skip if MeiliSearch is not accessible
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'up'
+        target_label: __tmp_meilisearch_up
+        replacement: '1'

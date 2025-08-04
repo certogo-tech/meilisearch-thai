@@ -1,0 +1,160 @@
+version: '3.8'
+
+# Docker Compose configuration for Thai Search Proxy Service
+# This configuration extends the base service with search proxy specific settings
+
+services:
+  thai-tokenizer-search-proxy:
+    extends:
+      file: docker-compose.yml
+      service: thai-tokenizer
+    environment:
+      # Override service name for search proxy
+      - THAI_TOKENIZER_SERVICE_NAME=thai-search-proxy
+      
+      # Search proxy specific configuration
+      - SEARCH_PROXY_ENABLED=true
+      - SEARCH_PROXY_SERVICE_VERSION=1.0.0
+      - SEARCH_PROXY_ENVIRONMENT=${ENVIRONMENT:-production}
+      
+      # Tokenization settings optimized for search
+      - SEARCH_PROXY_TOKENIZATION__PRIMARY_ENGINE=newmm
+      - SEARCH_PROXY_TOKENIZATION__FALLBACK_ENGINES=attacut,deepcut
+      - SEARCH_PROXY_TOKENIZATION__TIMEOUT_MS=3000
+      - SEARCH_PROXY_TOKENIZATION__CONFIDENCE_THRESHOLD=0.7
+      - SEARCH_PROXY_TOKENIZATION__ENABLE_COMPOUND_SPLITTING=true
+      - SEARCH_PROXY_TOKENIZATION__PRESERVE_ORIGINAL=true
+      - SEARCH_PROXY_TOKENIZATION__MIXED_LANGUAGE_DETECTION=true
+      
+      # Search execution settings
+      - SEARCH_PROXY_SEARCH__PARALLEL_SEARCHES=true
+      - SEARCH_PROXY_SEARCH__MAX_CONCURRENT_SEARCHES=10
+      - SEARCH_PROXY_SEARCH__TIMEOUT_MS=5000
+      - SEARCH_PROXY_SEARCH__RETRY_ATTEMPTS=2
+      - SEARCH_PROXY_SEARCH__RETRY_DELAY_MS=100
+      - SEARCH_PROXY_SEARCH__ENABLE_FALLBACK_SEARCH=true
+      - SEARCH_PROXY_SEARCH__MAX_QUERY_VARIANTS=5
+      - SEARCH_PROXY_SEARCH__DEDUPLICATION_ENABLED=true
+      
+      # Result ranking settings
+      - SEARCH_PROXY_RANKING__ALGORITHM=optimized_score
+      - SEARCH_PROXY_RANKING__BOOST_EXACT_MATCHES=1.8
+      - SEARCH_PROXY_RANKING__BOOST_THAI_MATCHES=1.3
+      - SEARCH_PROXY_RANKING__BOOST_COMPOUND_MATCHES=1.2
+      - SEARCH_PROXY_RANKING__DECAY_FACTOR=0.05
+      - SEARCH_PROXY_RANKING__MIN_SCORE_THRESHOLD=0.2
+      - SEARCH_PROXY_RANKING__MAX_RESULTS_PER_VARIANT=100
+      - SEARCH_PROXY_RANKING__ENABLE_SCORE_NORMALIZATION=true
+      
+      # Performance and monitoring
+      - SEARCH_PROXY_PERFORMANCE__ENABLE_METRICS=true
+      - SEARCH_PROXY_PERFORMANCE__ENABLE_DETAILED_LOGGING=${DETAILED_LOGGING:-false}
+      - SEARCH_PROXY_PERFORMANCE__MAX_QUERY_LENGTH=500
+      - SEARCH_PROXY_PERFORMANCE__MAX_BATCH_SIZE=50
+      - SEARCH_PROXY_PERFORMANCE__MEMORY_LIMIT_MB=256
+      - SEARCH_PROXY_PERFORMANCE__CACHE_ENABLED=true
+      - SEARCH_PROXY_PERFORMANCE__CACHE_TTL_SECONDS=300
+      
+      # Analytics configuration
+      - SEARCH_PROXY_ANALYTICS_ENABLED=true
+      - SEARCH_PROXY_ANALYTICS_SESSION_TIMEOUT_MINUTES=30
+      - SEARCH_PROXY_ANALYTICS_PATTERN_WINDOW_HOURS=24
+      
+      # Enable health checks and monitoring
+      - SEARCH_PROXY_ENABLE_HEALTH_CHECKS=true
+      - SEARCH_PROXY_HEALTH_CHECK_INTERVAL_SECONDS=30
+      
+      # Feature flags
+      - SEARCH_PROXY_ENABLE_EXPERIMENTAL_FEATURES=${ENABLE_EXPERIMENTAL:-false}
+      - SEARCH_PROXY_ENABLE_A_B_TESTING=${ENABLE_AB_TESTING:-false}
+      
+    volumes:
+      # Additional volumes for search proxy
+      - search_analytics:/home/appuser/search-proxy/analytics
+      - search_logs:/home/appuser/search-proxy/logs
+      - search_cache:/home/appuser/search-proxy/cache
+    
+    # Enhanced health check for search proxy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health | grep -q 'healthy' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Resource limits optimized for search proxy
+    deploy:
+      resources:
+        limits:
+          cpus: '2.5'
+          memory: 1.5G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+    
+    labels:
+      - "com.thai-search-proxy.description=Thai Search Proxy Service"
+      - "com.thai-search-proxy.version=1.0.0"
+      - "com.thai-search-proxy.maintainer=Thai Search Team"
+
+  # Prometheus for metrics collection (optional)
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+    depends_on:
+      - thai-tokenizer-search-proxy
+    networks:
+      - thai-tokenizer-network
+    profiles:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Grafana for visualization (optional)
+  grafana:
+    image: grafana/grafana:10.1.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - thai-tokenizer-network
+    profiles:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+volumes:
+  search_analytics:
+    driver: local
+  search_logs:
+    driver: local
+  search_cache:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

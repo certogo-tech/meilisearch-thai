@@ -1,0 +1,66 @@
+# Production configuration for Thai Search Proxy Service
+
+search_proxy:
+  service_name: "thai-search-proxy"
+  service_version: "1.0.0"
+  environment: "production"
+  
+  # Tokenization configuration (optimized for performance)
+  tokenization:
+    primary_engine: "newmm"
+    fallback_engines: ["attacut"]  # Fewer fallbacks for performance
+    timeout_ms: 3000
+    confidence_threshold: 0.8
+    enable_compound_splitting: true
+    preserve_original: true
+    mixed_language_detection: true
+  
+  # Search execution configuration
+  search:
+    parallel_searches: true
+    max_concurrent_searches: 10
+    timeout_ms: 5000
+    retry_attempts: 2
+    retry_delay_ms: 100
+    enable_fallback_search: true
+    max_query_variants: 5
+    deduplication_enabled: true
+  
+  # Result ranking configuration
+  ranking:
+    algorithm: "optimized_score"
+    boost_exact_matches: 1.8
+    boost_thai_matches: 1.3
+    boost_compound_matches: 1.2
+    decay_factor: 0.05
+    min_score_threshold: 0.2
+    max_results_per_variant: 100
+    enable_score_normalization: true
+  
+  # Performance configuration
+  performance:
+    enable_metrics: true
+    enable_detailed_logging: false
+    max_query_length: 1000
+    max_batch_size: 50
+    memory_limit_mb: 256
+    cache_enabled: true
+    cache_ttl_seconds: 300
+  
+  # External services
+  meilisearch:
+    url: "http://meilisearch:7700"
+    timeout_ms: 30000
+    # api_key: set via environment variable
+  
+  # Logging and monitoring
+  logging:
+    level: "INFO"
+    structured_logging: true
+    enable_health_checks: true
+    health_check_interval_seconds: 30
+  
+  # Feature flags
+  features:
+    enable_experimental_features: false
+    enable_a_b_testing: true

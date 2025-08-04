@@ -1,0 +1,226 @@
+# Docker Compose for Thai Search Proxy with Nginx Proxy Manager
+# Enhanced version with search proxy features for NPM deployment
+# NPM should proxy search.cads.arda.or.th to localhost:8000
+
+services:
+  # Thai Tokenizer with Search Proxy enabled
+  thai-tokenizer-search-proxy:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile.prod
+    ports:
+      # Expose on port 8000 for Nginx Proxy Manager
+      - "${THAI_TOKENIZER_PORT:-8000}:8000"
+    environment:
+      # External Meilisearch connection configuration
+      - MEILISEARCH_HOST=${MEILISEARCH_HOST:-http://localhost:7700}
+      - MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY}
+      - MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
+      - MEILISEARCH_SSL_VERIFY=${MEILISEARCH_SSL_VERIFY:-false}
+      - MEILISEARCH_TIMEOUT_MS=${MEILISEARCH_TIMEOUT_MS:-10000}
+      - MEILISEARCH_MAX_RETRIES=${MEILISEARCH_MAX_RETRIES:-3}
+      - THAI_TOKENIZER_MEILISEARCH_HOST=${MEILISEARCH_HOST:-http://localhost:7700}
+      - THAI_TOKENIZER_MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY}
+      - THAI_TOKENIZER_MEILISEARCH_INDEX=${MEILISEARCH_INDEX:-documents}
+      
+      # Thai tokenizer configuration
+      - THAI_TOKENIZER_TOKENIZER_ENGINE=${TOKENIZER_ENGINE:-pythainlp}
+      - THAI_TOKENIZER_TOKENIZER_MODEL=${TOKENIZER_MODEL:-}
+      - THAI_TOKENIZER_ENABLE_MIXED_LANGUAGE=${ENABLE_MIXED_LANGUAGE:-true}
+      
+      # Service configuration
+      - THAI_TOKENIZER_SERVICE_HOST=${SERVICE_HOST:-0.0.0.0}
+      - THAI_TOKENIZER_SERVICE_PORT=8000
+      - THAI_TOKENIZER_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - THAI_TOKENIZER_DEBUG=${DEBUG:-false}
+      - THAI_TOKENIZER_SERVICE_NAME=thai-search-proxy-prod
+      - THAI_TOKENIZER_VERSION=${VERSION:-1.0.0}
+      
+      # === SEARCH PROXY CONFIGURATION ===
+      # Enable search proxy features
+      - SEARCH_PROXY_ENABLED=true
+      - SEARCH_PROXY_SERVICE_VERSION=1.0.0
+      - SEARCH_PROXY_ENVIRONMENT=${ENVIRONMENT:-production}
+      
+      # Search proxy MeiliSearch connection
+      - SEARCH_PROXY_MEILISEARCH_URL=${MEILISEARCH_HOST:-http://localhost:7700}
+      - SEARCH_PROXY_MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY}
+      
+      # Tokenization settings for search
+      - SEARCH_PROXY_TOKENIZATION__PRIMARY_ENGINE=${SEARCH_PROXY_PRIMARY_ENGINE:-newmm}
+      - SEARCH_PROXY_TOKENIZATION__FALLBACK_ENGINES=${SEARCH_PROXY_FALLBACK_ENGINES:-attacut,deepcut}
+      - SEARCH_PROXY_TOKENIZATION__TIMEOUT_MS=3000
+      - SEARCH_PROXY_TOKENIZATION__CONFIDENCE_THRESHOLD=0.7
+      - SEARCH_PROXY_TOKENIZATION__ENABLE_COMPOUND_SPLITTING=true
+      - SEARCH_PROXY_TOKENIZATION__PRESERVE_ORIGINAL=true
+      - SEARCH_PROXY_TOKENIZATION__MIXED_LANGUAGE_DETECTION=true
+      
+      # Search execution settings
+      - SEARCH_PROXY_SEARCH__PARALLEL_SEARCHES=true
+      - SEARCH_PROXY_SEARCH__MAX_CONCURRENT_SEARCHES=${SEARCH_PROXY_MAX_CONCURRENT:-10}
+      - SEARCH_PROXY_SEARCH__TIMEOUT_MS=${SEARCH_PROXY_TIMEOUT_MS:-5000}
+      - SEARCH_PROXY_SEARCH__RETRY_ATTEMPTS=2
+      - SEARCH_PROXY_SEARCH__RETRY_DELAY_MS=100
+      - SEARCH_PROXY_SEARCH__ENABLE_FALLBACK_SEARCH=true
+      - SEARCH_PROXY_SEARCH__MAX_QUERY_VARIANTS=5
+      - SEARCH_PROXY_SEARCH__DEDUPLICATION_ENABLED=true
+      
+      # Result ranking settings
+      - SEARCH_PROXY_RANKING__ALGORITHM=${SEARCH_PROXY_RANKING_ALGORITHM:-optimized_score}
+      - SEARCH_PROXY_RANKING__BOOST_EXACT_MATCHES=1.8
+      - SEARCH_PROXY_RANKING__BOOST_THAI_MATCHES=1.3
+      - SEARCH_PROXY_RANKING__BOOST_COMPOUND_MATCHES=1.2
+      - SEARCH_PROXY_RANKING__DECAY_FACTOR=0.05
+      - SEARCH_PROXY_RANKING__MIN_SCORE_THRESHOLD=${SEARCH_PROXY_MIN_SCORE_THRESHOLD:-0.1}
+      - SEARCH_PROXY_RANKING__MAX_RESULTS_PER_VARIANT=100
+      - SEARCH_PROXY_RANKING__ENABLE_SCORE_NORMALIZATION=true
+      
+      # Performance and monitoring
+      - SEARCH_PROXY_PERFORMANCE__ENABLE_METRICS=true
+      - SEARCH_PROXY_PERFORMANCE__ENABLE_DETAILED_LOGGING=${DETAILED_LOGGING:-false}
+      - SEARCH_PROXY_PERFORMANCE__MAX_QUERY_LENGTH=500
+      - SEARCH_PROXY_PERFORMANCE__MAX_BATCH_SIZE=50
+      - SEARCH_PROXY_PERFORMANCE__MEMORY_LIMIT_MB=256
+      - SEARCH_PROXY_PERFORMANCE__CACHE_ENABLED=${SEARCH_PROXY_CACHE:-true}
+      - SEARCH_PROXY_PERFORMANCE__CACHE_TTL_SECONDS=300
+      
+      # Analytics configuration
+      - SEARCH_PROXY_ANALYTICS_ENABLED=true
+      - SEARCH_PROXY_ANALYTICS_SESSION_TIMEOUT_MINUTES=30
+      - SEARCH_PROXY_ANALYTICS_PATTERN_WINDOW_HOURS=24
+      
+      # Health checks and monitoring
+      - SEARCH_PROXY_ENABLE_HEALTH_CHECKS=true
+      - SEARCH_PROXY_HEALTH_CHECK_INTERVAL_SECONDS=30
+      
+      # Feature flags
+      - SEARCH_PROXY_ENABLE_EXPERIMENTAL_FEATURES=${ENABLE_EXPERIMENTAL:-false}
+      - SEARCH_PROXY_ENABLE_A_B_TESTING=${ENABLE_AB_TESTING:-false}
+      
+      # Performance configuration (enhanced for search proxy)
+      - THAI_TOKENIZER_PROCESSING_BATCH_SIZE=${BATCH_SIZE:-25}
+      - THAI_TOKENIZER_MAX_WORKERS=${MAX_WORKERS:-4}
+      - THAI_TOKENIZER_REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-30}
+      - WORKER_PROCESSES=${WORKER_PROCESSES:-4}
+      - TOKENIZER_CACHE_SIZE=${TOKENIZER_CACHE_SIZE:-2000}
+      
+      # Security configuration (NPM handles HTTPS)
+      - THAI_TOKENIZER_CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - THAI_TOKENIZER_ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - THAI_TOKENIZER_API_KEY_REQUIRED=${API_KEY_REQUIRED:-false}
+      - THAI_TOKENIZER_API_KEY=${THAI_TOKENIZER_API_KEY:-}
+      
+      # Python optimizations
+      - PYTHONOPTIMIZE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONPATH=/app
+      
+      # PyThaiNLP configuration
+      - PYTHAINLP_DATA_PATH=/home/appuser/.pythainlp
+      
+      # Custom dictionary configuration
+      - THAI_TOKENIZER_CUSTOM_DICTIONARY_PATH=${CUSTOM_DICTIONARY_PATH:-}
+    
+    # Enhanced health check for search proxy
+    healthcheck:
+      test: |
+        curl -f http://localhost:8000/health && \
+        curl -f http://localhost:8000/api/v1/health | grep -q '"status":"healthy"' && \
+        curl -f http://localhost:8000/health/detailed | grep -q '"meilisearch_status":"healthy"'
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+    
+    restart: unless-stopped
+    
+    # Enhanced resource limits for search proxy
+    deploy:
+      resources:
+        limits:
+          cpus: '${CPU_LIMIT:-3.0}'  # Increased for search proxy
+          memory: ${MEMORY_LIMIT:-1.5G}  # Increased for caching
+        reservations:
+          cpus: '${CPU_RESERVATION:-1.0}'
+          memory: ${MEMORY_RESERVATION:-512M}
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    
+    # Volume mounts with search proxy additions
+    volumes:
+      - thai_tokenizer_logs:/var/log/thai-tokenizer
+      - pythainlp_data:/home/appuser/.pythainlp
+      - search_analytics:/home/appuser/search-proxy/analytics
+      - search_logs:/home/appuser/search-proxy/logs
+      - search_cache:/home/appuser/search-proxy/cache
+      - ../../data/dictionaries:/app/data/dictionaries:ro
+    
+    # Labels for monitoring and Prometheus
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=8000"
+      - "prometheus.io/path=/metrics"
+      - "prometheus.io/job=thai-search-proxy"
+      - "service.name=thai-search-proxy"
+      - "service.version=1.0.0"
+      - "environment=production"
+      - "proxy.managed-by=nginx-proxy-manager"
+      - "feature.search-proxy=enabled"
+      - "feature.analytics=enabled"
+
+  # Optional: Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus-npm.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    depends_on:
+      - thai-tokenizer-search-proxy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    profiles:
+      - monitoring
+    labels:
+      - "prometheus.io/scrape=false"  # Don't scrape Prometheus itself
+
+# Volume definitions
+volumes:
+  thai_tokenizer_logs:
+    driver: local
+  
+  pythainlp_data:
+    driver: local
+    name: pythainlp_data_${COMPOSE_PROJECT_NAME:-thai_search_proxy_prod}
+  
+  # Search proxy specific volumes
+  search_analytics:
+    driver: local
+    name: search_analytics_${COMPOSE_PROJECT_NAME:-thai_search_proxy_prod}
+  
+  search_logs:
+    driver: local
+    name: search_logs_${COMPOSE_PROJECT_NAME:-thai_search_proxy_prod}
+  
+  search_cache:
+    driver: local
+    name: search_cache_${COMPOSE_PROJECT_NAME:-thai_search_proxy_prod}
+  
+  # Prometheus data (only if monitoring profile is used)
+  prometheus_data:
+    driver: local
+    name: prometheus_data_${COMPOSE_PROJECT_NAME:-thai_search_proxy_prod}

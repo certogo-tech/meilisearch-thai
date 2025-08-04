@@ -44,7 +44,10 @@ COPY src/ ./src/
 COPY pyproject.toml ./
 
 # Create home directory and data directory for PyThaiNLP
+# Also create directories for search proxy analytics and logs
 RUN mkdir -p /home/appuser/.pythainlp && \
+    mkdir -p /home/appuser/search-proxy/analytics && \
+    mkdir -p /home/appuser/search-proxy/logs && \
     chown -R appuser:appuser /home/appuser && \
     chown -R appuser:appuser /app
 
@@ -53,6 +56,10 @@ USER appuser
 
 # Set PyThaiNLP data path
 ENV PYTHAINLP_DATA_PATH=/home/appuser/.pythainlp
+
+# Set search proxy paths
+ENV SEARCH_PROXY_ANALYTICS_DIR=/home/appuser/search-proxy/analytics
+ENV SEARCH_PROXY_LOG_DIR=/home/appuser/search-proxy/logs
 
 # Health check configuration
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

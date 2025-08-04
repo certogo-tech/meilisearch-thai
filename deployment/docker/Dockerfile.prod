@@ -45,8 +45,11 @@ COPY pyproject.toml ./
 
 # Create necessary directories and set permissions
 RUN mkdir -p /var/log/thai-tokenizer && \
+    mkdir -p /var/log/search-proxy/analytics && \
     mkdir -p /home/appuser/.pythainlp && \
-    chown -R appuser:appuser /app /var/log/thai-tokenizer /home/appuser
+    mkdir -p /home/appuser/search-proxy/cache && \
+    mkdir -p /home/appuser/search-proxy/logs && \
+    chown -R appuser:appuser /app /var/log/thai-tokenizer /var/log/search-proxy /home/appuser
 
 # Switch to non-root user
 USER appuser

@@ -398,6 +398,23 @@ class PrometheusMetrics:
         
         return metrics
     
+    def format_search_proxy_metrics(self) -> List[str]:
+        """Format search proxy specific metrics."""
+        metrics = []
+        
+        try:
+            from src.search_proxy.metrics import metrics_collector
+            
+            # Get search proxy metrics in Prometheus format
+            search_proxy_metrics = metrics_collector.get_prometheus_metrics()
+            metrics.extend(search_proxy_metrics)
+            
+        except Exception as e:
+            logger.warning("Failed to format search proxy metrics", error=e)
+            metrics.append(f"# Error: Failed to get search proxy metrics - {str(e)}")
+        
+        return metrics
+    
     async def get_all_metrics(self) -> str:
         """Get all metrics in Prometheus format."""
         current_time = time.time()
@@ -436,6 +453,9 @@ class PrometheusMetrics:
             all_metrics.append("")
             
             all_metrics.extend(self.format_custom_metrics())
+            all_metrics.append("")
+            
+            all_metrics.extend(self.format_search_proxy_metrics())
             all_metrics.append("")
             
             # Add service info
@@ -612,6 +632,37 @@ async def custom_metrics():
         logger.error("Custom metrics endpoint failed", error=e)
         return PlainTextResponse(
             content=f"# Error: Failed to generate custom metrics - {str(e)}\n",
+            status_code=500,
+            media_type="text/plain"
+        )
+
+
+@router.get("/metrics/search-proxy", response_class=PlainTextResponse)
+async def search_proxy_metrics():
+    """
+    Search proxy specific metrics in Prometheus format.
+    
+    Returns metrics for search proxy operations including query processing,
+    search execution, result ranking, and performance metrics.
+    """
+    try:
+        search_proxy_metrics_list = prometheus_metrics.format_search_proxy_metrics()
+        
+        metrics_text = "\n".join([
+            "# Thai Search Proxy Metrics",
+            f"# Generated at: {datetime.now().isoformat()}",
+            ""
+        ] + search_proxy_metrics_list)
+        
+        return PlainTextResponse(
+            content=metrics_text,
+            media_type="text/plain; version=0.0.4; charset=utf-8"
+        )
+        
+    except Exception as e:
+        logger.error("Search proxy metrics endpoint failed", error=e)
+        return PlainTextResponse(
+            content=f"# Error: Failed to generate search proxy metrics - {str(e)}\n",
             status_code=500,
             media_type="text/plain"
         )
