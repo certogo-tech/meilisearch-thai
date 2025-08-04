@@ -18,9 +18,9 @@ print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Configuration
-MEILISEARCH_HOST="http://10.0.2.105:7700"
-MEILISEARCH_API_KEY="FKjPKTmFnCl7EPg6YLula1DC6n5mHqId"
+# Configuration - can be overridden by environment variables
+MEILISEARCH_HOST="${MEILISEARCH_HOST:-http://10.0.2.105:7700}"
+MEILISEARCH_API_KEY="${MEILISEARCH_API_KEY:-FKjPKTmFnCl7EPg6YLula1DC6n5mHqId}"
 
 print_info "Connecting to MeiliSearch: $MEILISEARCH_HOST"
 
@@ -37,20 +37,31 @@ echo ""
 
 # Get all indexes
 print_info "=== DISCOVERING INDEXES ==="
-ALL_INDEXES=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \
-    -H "Authorization: Bearer $MEILISEARCH_API_KEY" | \
-    python3 -c "
+INDEXES_RESPONSE=$(curl -s -X GET "$MEILISEARCH_HOST/indexes" \
+    -H "Authorization: Bearer $MEILISEARCH_API_KEY" 2>/dev/null)
+
+if [ $? -ne 0 ] || [ -z "$INDEXES_RESPONSE" ]; then
+    print_error "Failed to fetch indexes from MeiliSearch"
+    exit 1
+fi
+
+ALL_INDEXES=$(echo "$INDEXES_RESPONSE" | python3 -c "
 import sys, json
 try:
     data = json.load(sys.stdin)
+    if 'error' in data:
+        print(f'API_ERROR:{data.get(\"message\", \"Unknown error\")}', file=sys.stderr)
+        sys.exit(1)
     for idx in data.get('results', []):
         print(f'{idx[\"uid\"]}:{idx.get(\"numberOfDocuments\", 0)}')
 except Exception as e:
-    print(f'ERROR:{e}', file=sys.stderr)
+    print(f'PARSE_ERROR:{e}', file=sys.stderr)
+    sys.exit(1)
 ")
 
 if echo "$ALL_INDEXES" | grep -q "ERROR:"; then
-    print_error "Failed to connect to MeiliSearch or parse response"
+    ERROR_MSG=$(echo "$ALL_INDEXES" | grep "ERROR:" | cut -d':' -f2-)
+    print_error "Failed to fetch indexes: $ERROR_MSG"
     exit 1
 fi
 
@@ -68,23 +79,27 @@ echo ""
 
 # Analyze each index
 print_info "=== ANALYZING TOKENIZATION STATUS ==="
-TOTAL_INDEXES=0
-NEEDS_REINDEXING=0
-ALREADY_TOKENIZED=0
-TOTAL_DOCS=0
-DOCS_NEED_REINDEXING=0
 
-echo "$ALL_INDEXES" | while IFS=':' read -r INDEX_NAME DOC_COUNT; do
+# Create temporary file for analysis results
+ANALYSIS_TEMP=$(mktemp "/tmp/analysis_results_XXXXXX.txt")
+trap 'rm -f "$ANALYSIS_TEMP"' EXIT
+> "$ANALYSIS_TEMP"
+
+# Process each index (avoid subshell by using process substitution)
+while IFS=':' read -r INDEX_NAME DOC_COUNT; do
     if [ -n "$INDEX_NAME" ] && [ "$DOC_COUNT" -gt 0 ]; then
-        TOTAL_INDEXES=$((TOTAL_INDEXES + 1))
-        TOTAL_DOCS=$((TOTAL_DOCS + DOC_COUNT))
-        
         print_info "Analyzing index: $INDEX_NAME ($DOC_COUNT documents)"
         
         # Sample a few documents to check for tokenized_content field
         SAMPLE_DOCS=$(curl -s -X GET "$MEILISEARCH_HOST/indexes/$INDEX_NAME/documents" \
             -H "Authorization: Bearer $MEILISEARCH_API_KEY" \
-            -d '{"limit": 5}')
+            -d '{"limit": 5}' 2>/dev/null)
+        
+        if [ $? -ne 0 ] || [ -z "$SAMPLE_DOCS" ]; then
+            print_error "  ❌ Failed to fetch documents from index $INDEX_NAME"
+            echo "ERROR:$INDEX_NAME" >> "$ANALYSIS_TEMP"
+            continue
+        fi
         
         # Check if documents have tokenized_content field
         HAS_TOKENIZED=$(echo "$SAMPLE_DOCS" | python3 -c "
@@ -107,34 +122,36 @@ except Exception as e:
         
         if echo "$HAS_TOKENIZED" | grep -q "ERROR:"; then
             print_error "  ❌ Failed to analyze documents"
+            echo "ERROR:$INDEX_NAME" >> "$ANALYSIS_TEMP"
             continue
         fi
         
         if echo "$HAS_TOKENIZED" | grep -q "NO_DOCS"; then
             print_info "  ℹ️ No documents to analyze"
+            echo "NO_DOCS:$INDEX_NAME" >> "$ANALYSIS_TEMP"
             continue
         fi
         
         # Parse results
-        HAS_TOKENIZED_FIELD=$(echo "$HAS_TOKENIZED" | cut -d':' -f2)
-        HAS_THAI_CONTENT=$(echo "$HAS_TOKENIZED" | cut -d':' -f4)
+        HAS_TOKENIZED_FIELD=$(echo "$HAS_TOKENIZED" | cut -d':' -f2 2>/dev/null || echo "False")
+        HAS_THAI_CONTENT=$(echo "$HAS_TOKENIZED" | cut -d':' -f4 2>/dev/null || echo "False")
         
         if [ "$HAS_TOKENIZED_FIELD" = "True" ]; then
             print_success "  ✅ Already has tokenized_content field"
-            ALREADY_TOKENIZED=$((ALREADY_TOKENIZED + 1))
+            echo "ALREADY_TOKENIZED:$INDEX_NAME" >> "$ANALYSIS_TEMP"
         elif [ "$HAS_THAI_CONTENT" = "True" ]; then
             print_warning "  ⚠️ Has Thai content but missing tokenized_content"
             print_info "     → NEEDS REINDEXING for compound word search"
-            NEEDS_REINDEXING=$((NEEDS_REINDEXING + 1))
-            DOCS_NEED_REINDEXING=$((DOCS_NEED_REINDEXING + DOC_COUNT))
+            echo "NEEDS_REINDEXING:$INDEX_NAME" >> "$ANALYSIS_TEMP"
         else
             print_info "  ℹ️ No Thai content detected, tokenization not needed"
+            echo "NO_THAI:$INDEX_NAME" >> "$ANALYSIS_TEMP"
         fi
         
         # Test a compound word search to see current quality
         COMPOUND_TEST=$(curl -s -X POST "$MEILISEARCH_HOST/indexes/$INDEX_NAME/search" \
             -H "Authorization: Bearer $MEILISEARCH_API_KEY" \
-            -d '{"q": "วากาเมะ", "limit": 3}')
+            -d '{"q": "วากาเมะ", "limit": 3}' 2>/dev/null)
         
         COMPOUND_HITS=$(echo "$COMPOUND_TEST" | python3 -c "
 import sys, json
@@ -153,7 +170,7 @@ except:
         
         echo ""
     fi
-done > /tmp/analysis_summary.txt
+done < <(echo "$ALL_INDEXES")
 
 # Read the summary (since variables don't persist from subshell)
 SUMMARY_STATS=$(echo "$ALL_INDEXES" | python3 -c "
@@ -181,10 +198,19 @@ echo "  • Total documents: $TOTAL_DOCS"
 echo ""
 
 # Count indexes that need reindexing by checking the analysis output
-NEEDS_REINDEXING=$(grep -c "NEEDS REINDEXING" /tmp/analysis_summary.txt 2>/dev/null || echo "0")
-ALREADY_TOKENIZED=$(grep -c "Already has tokenized_content" /tmp/analysis_summary.txt 2>/dev/null || echo "0")
+if [ -f "$ANALYSIS_TEMP" ]; then
+    NEEDS_REINDEXING=$(grep -c "NEEDS_REINDEXING:" "$ANALYSIS_TEMP" 2>/dev/null)
+    ALREADY_TOKENIZED=$(grep -c "ALREADY_TOKENIZED:" "$ANALYSIS_TEMP" 2>/dev/null)
+else
+    NEEDS_REINDEXING=0
+    ALREADY_TOKENIZED=0
+fi
 
-# Ensure variables are integers
+# Clean up any newlines and ensure variables are integers
+NEEDS_REINDEXING=$(echo "$NEEDS_REINDEXING" | tr -d '\n\r' | sed 's/[^0-9]//g')
+ALREADY_TOKENIZED=$(echo "$ALREADY_TOKENIZED" | tr -d '\n\r' | sed 's/[^0-9]//g')
+
+# Set defaults if empty
 NEEDS_REINDEXING=${NEEDS_REINDEXING:-0}
 ALREADY_TOKENIZED=${ALREADY_TOKENIZED:-0}
 
@@ -221,7 +247,7 @@ else
     echo "  2. Reindex specific indexes that need it"
     echo ""
     print_info "Indexes that likely need reindexing:"
-    grep -B1 "NEEDS REINDEXING" /tmp/analysis_summary.txt 2>/dev/null | grep "Analyzing index:" | sed 's/.*Analyzing index: /  • /' || echo "  (Check analysis output above)"
+    grep "NEEDS_REINDEXING:" "$ANALYSIS_TEMP" 2>/dev/null | cut -d':' -f2 | sed 's/^/  • /' || echo "  (Check analysis output above)"
 fi
 
 echo ""
@@ -246,8 +272,7 @@ if [ "${NEEDS_REINDEXING:-0}" -gt 0 ]; then
     echo "  • Monitor system resources during processing"
 fi
 
-# Cleanup
-rm -f /tmp/analysis_summary.txt
+# Cleanup handled by trap
 
 print_success "🎉 Analysis completed!"
 echo ""
