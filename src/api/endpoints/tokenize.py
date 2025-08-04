@@ -16,6 +16,7 @@ from src.tokenizer.token_processor import TokenProcessor
 from src.tokenizer.query_processor import QueryProcessor
 from src.tokenizer.result_enhancer import SearchResultEnhancer
 from src.utils.logging import get_structured_logger, set_correlation_id, generate_correlation_id
+from src.api.middleware.auth import api_key_auth
 
 logger = get_structured_logger(__name__)
 
@@ -125,7 +126,8 @@ async def tokenize_text(
     request: TokenizeRequest,
     http_request: Request,
     thai_segmenter: ThaiSegmenter = Depends(get_thai_segmenter),
-    token_processor: TokenProcessor = Depends(get_token_processor)
+    token_processor: TokenProcessor = Depends(get_token_processor),
+    api_key: str = Depends(api_key_auth)
 ):
     """
     Tokenize Thai text into word segments.

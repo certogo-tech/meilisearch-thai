@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError as PydanticValidationError
 
 from src.utils.logging import get_structured_logger
+from src.api.middleware.auth import api_key_auth
 from src.search_proxy.models.requests import SearchRequest, BatchSearchRequest
 from src.search_proxy.models.responses import SearchResponse, SearchErrorResponse
 from src.search_proxy.services.search_proxy_service import SearchProxyService
@@ -84,7 +85,8 @@ async def get_search_proxy_service() -> SearchProxyService:
 async def search(
     request: SearchRequest,
     http_request: Request,
-    service: SearchProxyService = Depends(get_search_proxy_service)
+    service: SearchProxyService = Depends(get_search_proxy_service),
+    api_key: str = Depends(api_key_auth)
 ) -> SearchResponse:
     """
     Execute a single search request with Thai tokenization.
@@ -218,7 +220,8 @@ async def search(
 async def batch_search(
     request: BatchSearchRequest,
     http_request: Request,
-    service: SearchProxyService = Depends(get_search_proxy_service)
+    service: SearchProxyService = Depends(get_search_proxy_service),
+    api_key: str = Depends(api_key_auth)
 ) -> List[SearchResponse]:
     """
     Execute multiple search requests concurrently.
