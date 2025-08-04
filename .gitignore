@@ -546,3 +546,4 @@ Temporary Items
 .apdisk
 # Environment backups
 backups/env/.env.production.backup.*
+deployment/docker/.env
