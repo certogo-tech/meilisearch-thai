@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Load testing for Thai tokenizer system.
+Load testing for Thai Search Proxy system.
 """
 
 import asyncio
@@ -9,31 +9,54 @@ import time
 import statistics
 from typing import List, Dict, Any
 import json
+import argparse
 
-BASE_URL = "http://localhost:8001"
+BASE_URL = "http://localhost:8000"
 
-# Test data
-THAI_TEXTS = [
-    "รถยนต์ไฟฟ้าเป็นเทคโนโลยีใหม่",
-    "โรงเรียนมัธยมศึกษาเป็นสถาบันการศึกษา",
-    "ปัญญาประดิษฐ์เป็นเทคโนโลยีที่สำคัญ",
-    "ความรับผิดชอบเป็นคุณธรรมที่สำคัญ",
-    "การศึกษาเป็นรากฐานของการพัฒนา",
-    "เทคโนโลยีสารสนเทศเป็นเครื่องมือสำคัญ",
-    "การแพทย์แผนไทยเป็นภูมิปัญญาท้องถิน",
-    "อุตสaหกรรมการท่องเที่ยวเป็นรายได้สำคัญ",
-    "การเกษตรอินทรีย์เป็นเทรนด์ใหม่",
-    "พลังงานทดแทนเป็นทางเลือกที่ยั่งยืน"
+# Test queries for search
+THAI_QUERIES = [
+    # Simple words
+    "ข้าว",
+    "มะพร้าว",
+    "สาหร่าย",
+    
+    # Compound words
+    "สาหร่ายวากาเมะ",
+    "คอมพิวเตอร์",
+    "อินเทอร์เน็ต",
+    
+    # Phrases
+    "การเกษตรแบบยั่งยืน",
+    "เทคโนโลยีการเพาะปลูก",
+    "น้ำมันมะพร้าวบริสุทธิ์",
+    "พลังงานทดแทน",
+    
+    # Mixed language
+    "Smart Farm",
+    "IoT เกษตร",
+    "Precision Agriculture"
 ]
 
-async def tokenize_request(session: aiohttp.ClientSession, text: str, request_id: int) -> Dict[str, Any]:
-    """Make a single tokenization request."""
+async def search_request(session: aiohttp.ClientSession, query: str, request_id: int, api_key: str = None) -> Dict[str, Any]:
+    """Make a single search request."""
     start_time = time.time()
+    
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["X-API-Key"] = api_key
+    
     try:
         async with session.post(
-            f"{BASE_URL}/api/v1/tokenize",
-            json={"text": text, "engine": "pythainlp"},
-            headers={"Content-Type": "application/json"}
+            f"{BASE_URL}/api/v1/search",
+            json={
+                "query": query,
+                "index_name": "research",
+                "options": {
+                    "limit": 10,
+                    "offset": 0
+                }
+            },
+            headers=headers
         ) as response:
             result = await response.json()
             end_time = time.time()
@@ -43,8 +66,9 @@ async def tokenize_request(session: aiohttp.ClientSession, text: str, request_id
                 "status": "success",
                 "response_time": (end_time - start_time) * 1000,
                 "status_code": response.status,
-                "tokens": len(result.get("tokens", [])),
-                "text_length": len(text)
+                "total_hits": result.get("total_hits", 0),
+                "processing_time_ms": result.get("processing_time_ms", 0),
+                "query_length": len(query)
             }
     except Exception as e:
         end_time = time.time()
@@ -53,11 +77,11 @@ async def tokenize_request(session: aiohttp.ClientSession, text: str, request_id
             "status": "error",
             "response_time": (end_time - start_time) * 1000,
             "error": str(e),
-            "text_length": len(text)
+            "query_length": len(query)
         }
 
-async def run_concurrent_requests(num_requests: int, concurrency: int) -> List[Dict[str, Any]]:
-    """Run concurrent tokenization requests."""
+async def run_concurrent_requests(num_requests: int, concurrency: int, api_key: str = None) -> List[Dict[str, Any]]:
+    """Run concurrent search requests."""
     print(f"🚀 Running {num_requests} requests with {concurrency} concurrent connections...")
     
     connector = aiohttp.TCPConnector(limit=concurrency)
@@ -67,8 +91,8 @@ async def run_concurrent_requests(num_requests: int, concurrency: int) -> List[D
         tasks = []
         
         for i in range(num_requests):
-            text = THAI_TEXTS[i % len(THAI_TEXTS)]
-            task = tokenize_request(session, text, i)
+            query = THAI_QUERIES[i % len(THAI_QUERIES)]
+            task = search_request(session, query, i, api_key)
             tasks.append(task)
         
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -119,14 +143,14 @@ def analyze_results(results: List[Dict[str, Any]]) -> Dict[str, Any]:
         },
         "throughput": {
             "requests_per_second": len(successful_requests) / (max(response_times) / 1000) if response_times else 0,
-            "total_tokens": sum(r.get("tokens", 0) for r in successful_requests),
-            "tokens_per_second": sum(r.get("tokens", 0) for r in successful_requests) / (max(response_times) / 1000) if response_times else 0
+            "total_hits": sum(r.get("total_hits", 0) for r in successful_requests),
+            "avg_processing_time": statistics.mean([r.get("processing_time_ms", 0) for r in successful_requests]) if successful_requests else 0
         }
     }
 
-async def run_load_tests():
+async def run_load_tests(api_key: str = None):
     """Run comprehensive load tests."""
-    print("⚡ Starting Thai Tokenizer Load Tests")
+    print("⚡ Starting Thai Search Proxy Load Tests")
     print("=" * 60)
     
     test_scenarios = [
@@ -143,7 +167,7 @@ async def run_load_tests():
         print("-" * 40)
         
         start_time = time.time()
-        results = await run_concurrent_requests(scenario["requests"], scenario["concurrency"])
+        results = await run_concurrent_requests(scenario["requests"], scenario["concurrency"], api_key)
         end_time = time.time()
         
         analysis = analyze_results(results)
@@ -167,7 +191,7 @@ async def run_load_tests():
             tp = analysis['throughput']
             print(f"  Throughput:")
             print(f"    Requests/sec: {tp['requests_per_second']:.2f}")
-            print(f"    Tokens/sec: {tp['tokens_per_second']:.2f}")
+            print(f"    Avg Processing Time: {tp['avg_processing_time']:.2f}ms")
     
     # Overall Assessment
     print("\n" + "=" * 60)
@@ -203,4 +227,11 @@ async def run_load_tests():
     return requirements_met
 
 if __name__ == "__main__":
-    asyncio.run(run_load_tests())
+    parser = argparse.ArgumentParser(description="Load test Thai Search Proxy")
+    parser.add_argument("--api-key", help="API key if required")
+    parser.add_argument("--url", default="http://localhost:8000", help="Base URL of the service")
+    
+    args = parser.parse_args()
+    BASE_URL = args.url
+    
+    asyncio.run(run_load_tests(args.api_key))
