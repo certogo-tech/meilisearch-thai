@@ -1,0 +1,17 @@
+[Unit]
+Description=Thai Search Proxy Service
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/itadmin/meilisearch-thai/deployment/docker
+ExecStart=/usr/bin/docker-compose -f docker-compose.npm-search-proxy.yml up -d
+ExecStop=/usr/bin/docker-compose -f docker-compose.npm-search-proxy.yml down
+ExecReload=/usr/bin/docker-compose -f docker-compose.npm-search-proxy.yml restart
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target
