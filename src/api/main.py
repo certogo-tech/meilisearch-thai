@@ -232,7 +232,7 @@ async def health_check():
 
 
 # Include routers
-from src.api.endpoints import tokenize, documents, config, monitoring, health, metrics, monitoring_integration, search_proxy, analytics
+from src.api.endpoints import tokenize, documents, config, monitoring, health, metrics, monitoring_integration, search_proxy, analytics, config_management
 app.include_router(tokenize.router, prefix="/api/v1", tags=["tokenization"])
 app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
 app.include_router(config.router, prefix="/api/v1", tags=["configuration"])
@@ -242,6 +242,7 @@ app.include_router(metrics.router, tags=["metrics"])
 app.include_router(monitoring_integration.router, prefix="/api/v1", tags=["monitoring-integration"])
 app.include_router(search_proxy.router, prefix="/api/v1", tags=["search-proxy"])
 app.include_router(analytics.router, prefix="/api/v1", tags=["analytics"])
+app.include_router(config_management.router, prefix="/api/v1/admin", tags=["config-management"])
 
 # Root endpoint
 @app.get("/")

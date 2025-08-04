@@ -88,6 +88,7 @@ class PerformanceConfig(BaseModel):
     memory_limit_mb: int = Field(default=256, ge=64, le=2048, description="Memory limit in MB")
     cache_enabled: bool = Field(default=True, description="Enable result caching")
     cache_ttl_seconds: int = Field(default=300, ge=60, le=3600, description="Cache TTL in seconds")
+    enable_hot_reload: bool = Field(default=False, description="Enable hot configuration reload")
     
     class Config:
         json_schema_extra = {

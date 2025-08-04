@@ -20,6 +20,7 @@ from ..analytics import analytics_collector
 from .query_processor import QueryProcessor
 from .search_executor import SearchExecutor, SearchExecutorConfig
 from .result_ranker import ResultRanker
+from ..config.hot_reload import HotReloadConfigManager
 
 
 logger = get_structured_logger(__name__)
@@ -59,6 +60,10 @@ class SearchProxyService:
         self._search_executor: Optional[SearchExecutor] = None
         self._result_ranker: Optional[ResultRanker] = None
         
+        # Hot reload configuration manager
+        self._hot_reload_manager: Optional[HotReloadConfigManager] = None
+        self._enable_hot_reload = getattr(settings.performance, 'enable_hot_reload', False)
+        
     async def initialize(self) -> None:
         """
         Initialize the search proxy service and its components.
@@ -77,6 +82,10 @@ class SearchProxyService:
             
             # Verify external dependencies
             await self._verify_dependencies()
+            
+            # Initialize hot reload if enabled
+            if self._enable_hot_reload:
+                await self._initialize_hot_reload()
             
             self._initialized = True
             
@@ -397,6 +406,65 @@ class SearchProxyService:
             }
         
         return health_status
+    
+    async def _initialize_hot_reload(self) -> None:
+        """Initialize hot reload configuration manager."""
+        logger.info("Initializing hot reload configuration manager")
+        
+        try:
+            self._hot_reload_manager = HotReloadConfigManager(self.settings)
+            
+            # Register reload callbacks
+            self._hot_reload_manager.register_reload_callback(self._on_config_reload)
+            
+            # Start watching config files
+            self._hot_reload_manager.start()
+            
+            logger.info("Hot reload configuration manager initialized")
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize hot reload: {e}")
+            # Don't fail service initialization if hot reload fails
+    
+    async def _on_config_reload(self, config_type: str) -> None:
+        """Handle configuration reload events."""
+        logger.info(f"Reloading configuration: {config_type}")
+        
+        try:
+            if config_type == "dictionary":
+                # Reload dictionary in query processor
+                if self._query_processor:
+                    await self._query_processor.reload_dictionary(
+                        self._hot_reload_manager.get_cached_config("dictionary")
+                    )
+                    
+            elif config_type == "tokenization":
+                # Update tokenization settings
+                if self._query_processor:
+                    self._query_processor.settings = self.settings
+                    
+            elif config_type == "ranking":
+                # Update ranking settings
+                if self._result_ranker:
+                    self._result_ranker.config = self.settings.ranking
+                    
+            logger.info(f"Successfully reloaded {config_type} configuration")
+            
+        except Exception as e:
+            logger.error(f"Failed to reload {config_type} configuration: {e}")
+    
+    async def shutdown(self) -> None:
+        """Shutdown the search proxy service and cleanup resources."""
+        logger.info("Shutting down search proxy service")
+        
+        # Stop hot reload if enabled
+        if self._hot_reload_manager:
+            self._hot_reload_manager.stop()
+        
+        # Cleanup other resources
+        self._initialized = False
+        
+        logger.info("Search proxy service shutdown complete")
     
     # Private helper methods
     
