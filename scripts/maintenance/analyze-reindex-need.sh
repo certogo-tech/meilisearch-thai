@@ -23,6 +23,16 @@ MEILISEARCH_HOST="http://10.0.2.105:7700"
 MEILISEARCH_API_KEY="FKjPKTmFnCl7EPg6YLula1DC6n5mHqId"
 
 print_info "Connecting to MeiliSearch: $MEILISEARCH_HOST"
+
+# Test basic connectivity and API key
+print_info "Testing API connectivity..."
+HEALTH_CHECK=$(curl -s "$MEILISEARCH_HOST/health" 2>/dev/null)
+if echo "$HEALTH_CHECK" | grep -q "available"; then
+    print_success "MeiliSearch is healthy"
+else
+    print_warning "MeiliSearch health check failed: $HEALTH_CHECK"
+fi
+
 echo ""
 
 # Get all indexes
@@ -174,6 +184,10 @@ echo ""
 NEEDS_REINDEXING=$(grep -c "NEEDS REINDEXING" /tmp/analysis_summary.txt 2>/dev/null || echo "0")
 ALREADY_TOKENIZED=$(grep -c "Already has tokenized_content" /tmp/analysis_summary.txt 2>/dev/null || echo "0")
 
+# Ensure variables are integers
+NEEDS_REINDEXING=${NEEDS_REINDEXING:-0}
+ALREADY_TOKENIZED=${ALREADY_TOKENIZED:-0}
+
 echo "🔄 Reindexing Status:"
 echo "  • Indexes needing reindexing: $NEEDS_REINDEXING"
 echo "  • Indexes already tokenized: $ALREADY_TOKENIZED"
@@ -182,7 +196,7 @@ echo ""
 # Recommendations
 print_info "=== RECOMMENDATIONS ==="
 
-if [ "$NEEDS_REINDEXING" -eq 0 ]; then
+if [ "${NEEDS_REINDEXING:-0}" -eq 0 ]; then
     print_success "✅ No reindexing needed!"
     echo "  All indexes either have tokenized_content or don't contain Thai text."
     echo ""
@@ -190,7 +204,7 @@ if [ "$NEEDS_REINDEXING" -eq 0 ]; then
     echo "  1. Test search quality: ./scripts/testing/test-all-indexes.sh"
     echo "  2. Verify compound words work: search for วากาเมะ, รูเมน, ซูชิ"
     
-elif [ "$NEEDS_REINDEXING" -eq "$TOTAL_INDEXES" ]; then
+elif [ "${NEEDS_REINDEXING:-0}" -eq "${TOTAL_INDEXES:-0}" ]; then
     print_warning "🔄 Full reindexing recommended!"
     echo "  All indexes need reindexing for proper Thai compound word search."
     echo ""
@@ -213,7 +227,7 @@ fi
 echo ""
 
 # Performance estimates
-if [ "$NEEDS_REINDEXING" -gt 0 ]; then
+if [ "${NEEDS_REINDEXING:-0}" -gt 0 ]; then
     print_info "=== PERFORMANCE ESTIMATES ==="
     
     # Estimate processing time (conservative: 100ms per document)
